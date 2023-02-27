@@ -1,0 +1,7 @@
+{
+  "name": "stay-connected",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
