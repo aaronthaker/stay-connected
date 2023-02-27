@@ -3,13 +3,13 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   // When user visits root, they will be redirected to Inbox
+  // {
+  //   path: '',
+  //   redirectTo: 'folder/meet',
+  //   pathMatch: 'full'
+  // },
   {
     path: '',
-    redirectTo: 'folder/meet',
-    pathMatch: 'full'
-  },
-  {
-    path: ':id',
     loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
   }
 ];
