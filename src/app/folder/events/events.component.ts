@@ -7,6 +7,28 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EventsComponent implements OnInit {
 
+  enteredValue = '';
+  newEvent = 'NO CONTENT';
+
+  onAddEvent() {
+    this.newEvent = this.enteredValue;
+  }
+
+
+  existingEvents = [
+    {
+      event: "Cunty",
+      location: "CuntyCity",
+      date: "Tomorrow"
+    },
+    {
+      event: "Test",
+      location: "Test",
+      date: "Test"
+    }
+  ];
+
+
   constructor() { }
 
   ngOnInit() {}

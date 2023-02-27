@@ -7,14 +7,12 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { CreateEventComponent } from './folder/events/create-event/create-event.component';
 import { EventsComponent } from './folder/events/events.component';
 import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CreateEventComponent,
     EventsComponent
   ],
   imports: [

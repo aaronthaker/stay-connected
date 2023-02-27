@@ -1,1 +1,15 @@
-<app-create-event></app-create-event>
+<ion-content>
+    <ion-card *ngFor="let item of existingEvents">
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+        <ion-card-header>
+            <ion-card-title class="ion-text-bold">Events</ion-card-title>
+            <ion-card-subtitle>Card Subtitle</ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+            <ion-textarea rows="2" [(ngModel)]="enteredValue"></ion-textarea>
+            <hr>
+            <ion-button (click)="onAddEvent()" color="tertiary">Save Post</ion-button>
+        </ion-card-content>
+    </ion-card>
+</ion-content>
