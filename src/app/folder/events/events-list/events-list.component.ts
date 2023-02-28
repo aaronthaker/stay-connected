@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-events',
-  templateUrl: './events.component.html',
-  styleUrls: ['./events.component.scss'],
+  selector: 'app-events-list',
+  templateUrl: './events-list.component.html',
+  styleUrls: ['./events-list.component.scss'],
 })
-export class EventsComponent implements OnInit {
+export class EventsListComponent implements OnInit {
 
   enteredValue = '';
   newEvent = 'NO CONTENT';
