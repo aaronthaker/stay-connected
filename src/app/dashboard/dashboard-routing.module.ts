@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { EventsListComponent } from './events/events-list/events-list.component';
 
-import { FolderPage } from './folder.page';
+import { DashboardPage } from './dashboard.page';
 import { MeetComponent } from './meet/meet.component';
 import { MessagesComponent } from './messages/messages.component';
 
@@ -21,7 +21,7 @@ const routes: Routes = [
   },
   {
     path: 'log-out',
-    component: FolderPage
+    component: DashboardPage
   },
 ];
 
@@ -29,4 +29,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class FolderPageRoutingModule {}
+export class DashboardPageRoutingModule {}

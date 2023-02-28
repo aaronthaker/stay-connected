@@ -5,12 +5,12 @@ const routes: Routes = [
   // When user visits root, they will be redirected to Inbox
   // {
   //   path: '',
-  //   redirectTo: 'folder/meet',
+  //   redirectTo: 'dashboard/meet',
   //   pathMatch: 'full'
   // },
   {
     path: '',
-    loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
+    loadChildren: () => import('./dashboard/dashboard.module').then( m => m.DashboardPageModule)
   }
 ];
 

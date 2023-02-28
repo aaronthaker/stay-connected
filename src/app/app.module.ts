@@ -9,7 +9,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule } from '@angular/forms';
-import { EventsListComponent } from './folder/events/events-list/events-list.component';
+import { EventsListComponent } from './dashboard/events/events-list/events-list.component';
 
 @NgModule({
   declarations: [
