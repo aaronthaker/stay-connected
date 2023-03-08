@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-create-event',
@@ -17,18 +18,18 @@ export class CreateEventComponent implements OnInit {
 
   @Output() eventCreated = new EventEmitter();
 
-  constructor() { }
+  constructor(private modalController: ModalController) {}
 
   ngOnInit() {}
 
-  addEvent() {
-    const event = {
-      event: this.enteredEventTitle,
-      location: this.enteredEventLocation,
-      date: this.enteredEventDate,
-      description: this.enteredEventDescription
-    };
-    this.eventCreated.emit(event);
+  createEvent() {
+    const newEvent = {
+        event: this.enteredEventTitle,
+        location: this.enteredEventLocation,
+        date: this.enteredEventDate,
+        description: this.enteredEventDescription
+    }
+    this.modalController.dismiss(newEvent);
   }
 
 }

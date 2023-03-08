@@ -80,19 +80,21 @@ export class EventsListComponent implements OnInit {
         'Learn how to flirt with confidence at this seminar in Miami!',
     },
   ];
-
   async showCreateEventModal() {
     const modal = await this.modalController.create({
       component: CreateEventComponent,
     });
+    modal.onDidDismiss().then((data) => {
+        console.log(data);
+        if (data.data) {
+            this.existingEvents.push(data.data);
+        }
+    })
     await modal.present();
   }
-
   viewEvent() {
     // This should bring up a model showing the event
   }
-
   constructor(private modalController: ModalController) {}
-
   ngOnInit() {}
 }
