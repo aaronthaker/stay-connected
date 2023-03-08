@@ -1,6 +1,10 @@
 ion-content {
-    --padding-bottom: 10%;
-    --padding-end: 10%;
-    --padding-start: 10%;
+    --padding-bottom: 0%;
+    --padding-end: 0%;
+    --padding-start: 0%;
     --padding-top: 0%;
+}
+
+#no-events-text {
+    text-align: center;
 }

@@ -8,13 +8,15 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventsListComponent } from './dashboard/events/events-list/events-list.component';
+import { CreateEventComponent } from './dashboard/events/create-event/create-event.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EventsListComponent
+    EventsListComponent,
+    CreateEventComponent
   ],
   imports: [
     BrowserModule,
@@ -22,6 +24,7 @@ import { EventsListComponent } from './dashboard/events/events-list/events-list.
     AppRoutingModule,
     MatInputModule,
     FormsModule,
+    // ReactiveFormsModule,
     BrowserAnimationsModule
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
