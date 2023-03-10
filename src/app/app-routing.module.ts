@@ -1,17 +1,26 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { EventsListComponent } from './events/events-list/events-list.component';
+import { MeetComponent } from './meet/meet.component';
+import { MessagesComponent } from './messages/messages.component';
 
 const routes: Routes = [
-  // When user visits root, they will be redirected to Inbox
-  // {
-  //   path: '',
-  //   redirectTo: 'dashboard/meet',
-  //   pathMatch: 'full'
-  // },
   {
-    path: '',
-    loadChildren: () => import('./dashboard/dashboard.module').then( m => m.DashboardPageModule)
-  }
+    path: 'meet',
+    component: MeetComponent
+  },
+  {
+    path: 'messages',
+    component: MessagesComponent
+  },
+  {
+    path: 'events',
+    component: EventsListComponent
+  },
+  {
+    path: 'log-out',
+    component: EventsListComponent
+  },
 ];
 
 @NgModule({
