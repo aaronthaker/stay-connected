@@ -11,11 +11,11 @@
                 <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index; last as isLast">
                     <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="!isLast">
                         <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
-                        <ion-label>{{ p.title }}</ion-label>
+                        <ion-label color="white">{{ p.title }}</ion-label>
                     </ion-item>
                     <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="isLast" class="logout-button">
                         <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
-                        <ion-label>Log Out</ion-label>
+                        <ion-label color="white">Log Out</ion-label>
                     </ion-item>
                 </ion-menu-toggle>
             </ion-list>

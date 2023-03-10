@@ -30,5 +30,10 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 body {
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'Proxima Nova', sans-serif;
+}
+
+// Below is to set the sidemenu to transparent, god knows why it works on page element as well
+ion-app {
+    --ion-background-color: transparent;
 }
