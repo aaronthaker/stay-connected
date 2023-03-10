@@ -1,14 +1,11 @@
 <ion-app>
     <ion-split-pane contentId="main-content">
-
         <ion-menu class="sidemenu" contentId="main-content" type="overlay">
-            <ion-list lines="full" id="meet-list">
-                <!-- <ion-list-header>Stay Connected</ion-list-header>
-                <ion-note>hi@ionicframework.com</ion-note> -->
+            <ion-list lines="full" id="meet-list" style="width: 100%; height: 100%;">
 
-                <ion-list padding class="ion-text-center">
+                <ion-list padding class="ion-text-center" id="welcome">
                     <ion-title class="ion-text-center">Welcome, Aaron.</ion-title>
-                    <ion-label class="ion-text-center" style="color: #737373">user.email@gmail.com</ion-label>
+                    <ion-label class="ion-text-center" style="color:  #d3d3d3">user.email@gmail.com</ion-label>
                 </ion-list>
 
                 <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index; last as isLast">
@@ -16,7 +13,7 @@
                         <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
                         <ion-label>{{ p.title }}</ion-label>
                     </ion-item>
-                    <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="isLast" class="custom-class">
+                    <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="isLast" class="logout-button">
                         <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
                         <ion-label>Log Out</ion-label>
                     </ion-item>

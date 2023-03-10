@@ -1,0 +1,16 @@
+<ion-card>
+    <div style="display: flex; flex-direction: column; width: 100%; align-items: center;">
+        <img [src]="user.photo" width="300px" height="300px" />
+        <ion-label size="xlarge" style="font-weight: bold;">
+            {{ user.name }}
+        </ion-label>
+        <div style="display: flex; justify-content: space-around; width: 100%; margin: 20px 0;">
+            <ion-button (click)="onCrossClick()">
+                <ion-icon name="close-circle-outline"></ion-icon>
+            </ion-button>
+            <ion-button (click)="onTickClick()">
+                <ion-icon name="heart-outline"></ion-icon>
+            </ion-button>
+        </div>
+    </div>
+</ion-card>

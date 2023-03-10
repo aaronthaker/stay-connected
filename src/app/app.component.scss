@@ -1,5 +1,16 @@
-// Manually added styles
-.custom-class {
+ion-menu {
+    background: -webkit-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    background: -o-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    background: -ms-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    background: -moz-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+}
+
+#welcome {
+    padding: 5% 0%;
+}
+
+.logout-button {
     position: absolute;
     bottom: 0;
 }
@@ -15,7 +26,8 @@ ion-menu::part(container) {
 
 #meet-list {
     min-height: 100%;
-    // text-align: center;
+    font-family: 'Proxima Nova', sans-serif;
+    color: white;
 }
 
 ion-list-header {
@@ -29,10 +41,6 @@ ion-list-header {
     --side-max-width: 25%;
 }
 
-ion-menu ion-content {
-    --background: var(--ion-item-background, var(--ion-background-color, #fff));
-}
-
 ion-menu.md ion-content {
     --padding-start: 8px;
     --padding-end: 8px;
@@ -40,8 +48,8 @@ ion-menu.md ion-content {
     --padding-bottom: 20px;
 }
 
-ion-menu.md ion-list {
-    padding: 20px 0;
+.list-md {
+    padding-top: unset;
 }
 
 ion-menu.md ion-note {
@@ -70,7 +78,13 @@ ion-menu.md ion-item {
 }
 
 ion-menu.md ion-item.selected {
-    --background: rgba(var(--ion-color-primary-rgb), 0.14);
+    // --background: rgba(var(--ion-color-primary-rgb), 0.14);
+    --background: #f56696;
+    --background: -webkit-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    --background: -o-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    --background: -ms-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    --background: -moz-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
 }
 
 ion-menu.md ion-item.selected ion-icon {
@@ -134,5 +148,5 @@ ion-note {
 }
 
 ion-item.selected {
-    --color: var(--ion-color-primary);
+    // --color: var(--ion-color-primary);
 }

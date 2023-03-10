@@ -11,12 +11,16 @@ import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventsListComponent } from './dashboard/events/events-list/events-list.component';
 import { CreateEventComponent } from './dashboard/events/create-event/create-event.component';
+import { UserDetailsComponent } from './dashboard/meet/user-details/user-details.component';
+import { MeetComponent } from './dashboard/meet/meet.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     EventsListComponent,
-    CreateEventComponent
+    CreateEventComponent,
+    UserDetailsComponent,
+    MeetComponent
   ],
   imports: [
     BrowserModule,
