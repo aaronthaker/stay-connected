@@ -9,7 +9,7 @@
                 </ion-list>
 
                 <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index; last as isLast">
-                    <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="!isLast">
+                    <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="!isLast" class="sidenav-items">
                         <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
                         <ion-label color="white">{{ p.title }}</ion-label>
                     </ion-item>
