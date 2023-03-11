@@ -1,0 +1,36 @@
+ion-card img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 35px;
+}
+
+ion-card ion-card-title {
+    text-align: center;
+}
+
+ion-card p {
+    text-align: center;
+    font-style: italic;
+}
+
+ion-card {
+    --background: -webkit-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    --background: -o-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    --background: -ms-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    --background: -moz-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+    --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+}
+
+.button-row {
+    background-color: white;
+}
+
+ion-card-content,
+ion-card-title {
+    color: white;
+}
+
+ion-card-title {
+    font-weight: 100;
+}

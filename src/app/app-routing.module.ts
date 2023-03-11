@@ -1,13 +1,18 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { EventsListComponent } from './events/events-list/events-list.component';
-import { MeetComponent } from './meet/meet.component';
+import { HomeComponent } from './home/home.component';
+import { MatchesComponent } from './matches/matches.component';
 import { MessagesComponent } from './messages/messages.component';
 
 const routes: Routes = [
   {
-    path: 'meet',
-    component: MeetComponent
+    path: 'home',
+    component: HomeComponent
+  },
+  {
+    path: 'matches',
+    component: MatchesComponent
   },
   {
     path: 'messages',

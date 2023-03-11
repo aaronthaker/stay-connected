@@ -1,23 +1,35 @@
 <ion-app>
     <ion-split-pane contentId="main-content">
         <ion-menu class="sidemenu" contentId="main-content" type="overlay">
-            <ion-list lines="full" id="meet-list" style="width: 100%; height: 100%;">
+            <ion-list lines="full" id="meet-list">
 
                 <ion-list padding class="ion-text-center" id="welcome">
-                    <ion-title class="ion-text-center">Welcome, Aaron.</ion-title>
-                    <ion-label class="ion-text-center" style="color:  #d3d3d3">user.email@gmail.com</ion-label>
+                    <div class="profile-container">
+                        <a routerDirection="root" [routerLink]="['/profile']" lines="none" detail="false" routerLinkActive="selected" class="profile-button">
+                            <ion-icon slot="start" ios="person-outline" md="person-sharp"></ion-icon>
+                        </a>
+                        <div>
+                            <ion-title class="ion-text-center">Welcome, Aaron.</ion-title>
+                            <ion-label class="ion-text-center">user.email@gmail.com</ion-label>
+                        </div>
+
+                        <a routerDirection="root" [routerLink]="['/settings']" lines="none" detail="false" routerLinkActive="selected" class="settings-button">
+                            <ion-icon slot="start" ios="settings-outline" md="settings-sharp"></ion-icon>
+                        </a>
+                    </div>
                 </ion-list>
 
-                <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index; last as isLast">
-                    <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="!isLast" class="sidenav-items">
-                        <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
-                        <ion-label color="white">{{ p.title }}</ion-label>
-                    </ion-item>
-                    <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="isLast" class="logout-button">
-                        <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
-                        <ion-label color="white">Log Out</ion-label>
-                    </ion-item>
-                </ion-menu-toggle>
+                <div class="sidenav-container">
+                    <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index; last as isLast">
+                        <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" *ngIf="!isLast" class="sidenav-items">
+                            <ion-item style="margin-left: 10px;width: 100%;">
+                                <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-outline'"></ion-icon>
+                                <ion-label style="font-size: smaller">{{ p.title }}</ion-label>
+                            </ion-item>
+
+                        </ion-item>
+                    </ion-menu-toggle>
+                </div>
             </ion-list>
 
         </ion-menu>

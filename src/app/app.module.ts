@@ -11,8 +11,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventsListComponent } from './events/events-list/events-list.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
-import { UserDetailsComponent } from './meet/user-details/user-details.component';
-import { MeetComponent } from './meet/meet.component';
+import { UserDetailsComponent } from './home/user-details/user-details.component';
+import { HomeComponent } from './home/home.component';
+import { MatchesComponent } from './matches/matches.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { MeetComponent } from './meet/meet.component';
     EventsListComponent,
     CreateEventComponent,
     UserDetailsComponent,
-    MeetComponent
+    HomeComponent,
+    MatchesComponent
   ],
   imports: [
     BrowserModule,

@@ -9,7 +9,7 @@ export class UserDetailsComponent implements OnInit {
 
   user: any;
   users: any[] = [
-    { name: 'John', photo: '../../../../assets/faces/face1.jpg' },
+    { name: 'Hash Farnsworth', photo: '../../../../assets/faces/face1.jpg' },
     { name: 'Jane', photo: '../../../../assets/faces/face2.jpg' },
     { name: 'Jack', photo: '../../../../assets/faces/face3.jpg' },
     { name: 'Jill', photo: '../../../../assets/faces/face3.jpg' }

@@ -37,3 +37,12 @@ body {
 ion-app {
     --ion-background-color: transparent;
 }
+
+.ion-page {
+    justify-content: center;
+    align-items: center;
+}
+
+app-home {
+    background: radial-gradient(#ff3434, transparent)
+}
