@@ -1,14 +1,11 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { EventsService } from '../events.service';
 
 @Component({
   selector: 'app-create-event',
   templateUrl: './create-event.component.html',
-  styleUrls: ['./create-event.component.scss'],
-  host: {
-    'class': 'modal-content',
-    'style': 'width:100%; height: 100%;'
-}
+  styleUrls: ['./create-event.component.scss']
 })
 export class CreateEventComponent implements OnInit {
   enteredEventTitle = '';
@@ -16,20 +13,12 @@ export class CreateEventComponent implements OnInit {
   enteredEventDate = '';
   enteredEventDescription = '';
 
-  @Output() eventCreated = new EventEmitter();
-
-  constructor(private modalController: ModalController) {}
+  constructor(public eventService: EventsService) {}
 
   ngOnInit() {}
 
-  createEvent() {
-    const newEvent = {
-        event: this.enteredEventTitle,
-        location: this.enteredEventLocation,
-        date: this.enteredEventDate,
-        description: this.enteredEventDescription
-    }
-    this.modalController.dismiss(newEvent);
+  onAddEvent(form: NgForm) {
+    this.eventService.addEvent(form.value.title, form.value.description, form.value.date, form.value.location)
   }
 
 }

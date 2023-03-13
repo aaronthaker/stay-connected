@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { EventsListComponent } from './events/events-list/events-list.component';
+import { EventsPageComponent } from './events/events-page/events-page.component';
 import { HomeComponent } from './home/home.component';
 import { MatchesComponent } from './matches/matches.component';
 import { MessagesComponent } from './messages/messages.component';
@@ -20,12 +21,8 @@ const routes: Routes = [
   },
   {
     path: 'events',
-    component: EventsListComponent
-  },
-  {
-    path: 'log-out',
-    component: EventsListComponent
-  },
+    component: EventsPageComponent
+  }
 ];
 
 @NgModule({
