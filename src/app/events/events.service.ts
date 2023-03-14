@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { map, Subject } from 'rxjs';
 import { Event } from './event.model';
 
 @Injectable({
@@ -11,9 +11,23 @@ export class EventsService {
   private eventsUpdated = new Subject<Event[]>();
 
   getEvents() {
-    this.http.get<{message: string, events: Event[]}>('http://localhost:3000/api/events').subscribe((eventData) => {
-      console.log(eventData)
-      this.events = eventData.events;
+    this.http
+    .get<{ message: string, events: any }>(
+      'http://localhost:3000/api/events'
+    )
+    .pipe(map((eventData) => {
+      return eventData.events.map((event: { title: any; description: any; location: any; date: any; _id: any; }) => {
+        return {
+          title: event.title,
+          description: event.description,
+          location: event.location,
+          date: event.date,
+          id: event._id
+        };
+      });
+    }))
+    .subscribe((transformedEvents) => {
+      this.events = transformedEvents;
       this.eventsUpdated.next([...this.events]);
     })
   }

@@ -1,28 +1,26 @@
-<ion-content>
-    <ion-card>
-        <form (submit)="onAddEvent(eventForm)" #eventForm="ngForm">
+<ion-card>
+    <form (submit)="onAddEvent(eventForm)" #eventForm="ngForm">
 
-            <ion-item>
-                <ion-label>Event Title:</ion-label>
-                <ion-input matInput name="title" ngModel></ion-input>
-            </ion-item>
+        <ion-item>
+            <ion-label>Event Title:</ion-label>
+            <ion-input matInput name="title" ngModel></ion-input>
+        </ion-item>
 
-            <ion-item>
-                <ion-label>Event Location:</ion-label>
-                <ion-input matInput ngModel name="location"></ion-input>
-            </ion-item>
+        <ion-item>
+            <ion-label>Event Location:</ion-label>
+            <ion-input matInput ngModel name="location"></ion-input>
+        </ion-item>
 
-            <ion-item>
-                <ion-label>Event Date:</ion-label>
-                <ion-input matInput ngModel name="date"></ion-input>
-            </ion-item>
+        <ion-item>
+            <ion-label>Event Date:</ion-label>
+            <ion-input matInput ngModel name="date"></ion-input>
+        </ion-item>
 
-            <ion-item>
-                <ion-label>Event Description:</ion-label>
-                <ion-input matInput ngModel name="description"></ion-input>
-            </ion-item>
+        <ion-item>
+            <ion-label>Event Description:</ion-label>
+            <ion-input matInput ngModel name="description"></ion-input>
+        </ion-item>
 
-            <ion-button type="submit">Submit</ion-button>
-        </form>
-    </ion-card>
-</ion-content>
+        <ion-button type="submit">Submit</ion-button>
+    </form>
+</ion-card>

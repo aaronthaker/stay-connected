@@ -1,8 +1,18 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
+const mongoose = require('mongoose');
 // const cors = require('cors');
 // app.use(cors());
+
+mongoose.connect('mongodb+srv://190088169:MX2mOQCX1GUrktZY@cluster0.5lzxrui.mongodb.net/stay-connected?retryWrites=true&w=majority')
+    .then(() => {
+        console.log('Connected to database!')
+    })
+    .catch(() => {
+        console.log('Connection to database failed.')
+    })
+const Event = require('./models/event');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,28 +31,25 @@ app.use((req, res, next) => {
 });
 
 app.post("/api/events", (req, res, next) => {
-    const event = req.body;
-    console.log(event);
+    const event = new Event({
+        title: req.body.title,
+        location: req.body.location,
+        date: req.body.date,
+        description: req.body.description
+    });
+    event.save();
     res.status(201).json({
         message: 'Event added successfully'
     });
 })
 
 app.get('/api/events', (req, res, next) => {
-    events = [{
-            event: 'Visually Impaired Singles Speed Dating',
-            location: 'New York City, NY',
-            date: 'September 5th, 2020',
-            description: 'Come meet other visually impaired singles in a fun and fast...',
-            imagePath: '../assets/faces/face1.jpg',
-            attending: false
-        },
-        // more events
-    ];
-    res.status(200).json({
-        message: 'Events fetched successfully',
-        events: events
-    });
+    Event.find().then(documents => {
+        res.status(200).json({
+            message: 'Events fetched successfully',
+            events: documents
+        });
+    })
 })
 
 
