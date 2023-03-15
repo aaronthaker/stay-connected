@@ -3,12 +3,13 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import {MatInputModule} from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { EventsListComponent } from './events/events-list/events-list.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
 import { UserDetailsComponent } from './home/user-details/user-details.component';
@@ -31,11 +32,12 @@ import { HttpClientModule } from "@angular/common/http"
     IonicModule.forRoot(),
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule,
+    // ReactiveFormsModule,
     BrowserAnimationsModule,
     MatInputModule,
     MatFormFieldModule,
-    HttpClientModule
+    HttpClientModule,
+    MatProgressSpinnerModule
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

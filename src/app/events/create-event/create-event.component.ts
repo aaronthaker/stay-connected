@@ -17,6 +17,7 @@ export class CreateEventComponent implements OnInit {
   private editMode: boolean = false;
   private eventId: string | null;
   event: Event;
+  isLoading = false;
 
   constructor(
     public eventService: EventsService,
@@ -29,7 +30,9 @@ export class CreateEventComponent implements OnInit {
       if (paramMap.has('eventId')) {
         this.editMode = true;
         this.eventId = paramMap.get('eventId')!;
+        this.isLoading = true;
         this.eventService.getEvent(this.eventId).subscribe((eventData) => {
+          this.isLoading = false;
           this.event = {
             id: eventData._id,
             title: eventData.title,
@@ -49,6 +52,7 @@ export class CreateEventComponent implements OnInit {
     if (form.invalid) {
       return;
     }
+    this.isLoading = true;
     if (!this.editMode) {
       this.eventService.addEvent(
         form.value.title,

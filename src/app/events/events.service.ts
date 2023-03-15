@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { map, Subject } from 'rxjs';
 import { Event } from './event.model';
 
@@ -9,6 +10,8 @@ import { Event } from './event.model';
 export class EventsService {
   private events: Event[] = [];
   private eventsUpdated = new Subject<Event[]>();
+
+  constructor(private http: HttpClient, private router: Router) {}
 
   getEvents() {
     this.http
@@ -62,6 +65,7 @@ export class EventsService {
         event.id = id;
         this.events.push(event);
         this.eventsUpdated.next([...this.events]);
+        this.router.navigate(['/']);
       });
   }
 
@@ -110,8 +114,7 @@ export class EventsService {
         updatedEvents[oldEventIndex] = event;
         this.events = updatedEvents;
         this.eventsUpdated.next([...this.events]);
+        this.router.navigate(['/']);
       });
   }
-
-  constructor(private http: HttpClient) {}
 }

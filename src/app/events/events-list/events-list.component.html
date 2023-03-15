@@ -1,5 +1,6 @@
 <ion-content>
-    <main *ngIf="events.length > 0">
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+    <main *ngIf="events.length > 0 && !isLoading">
         <button routerLink="/events/create">Create Event</button>
         <ion-card *ngFor="let event of events">
             <ion-item>
@@ -23,7 +24,7 @@
         </ion-card>
     </main>
 
-    <main *ngIf="events.length === 0">
+    <main *ngIf="events.length === 0 && !isLoading">
         <ion-card>
             <ion-card-content>
                 <p style="text-align: center;">No events yet</p>

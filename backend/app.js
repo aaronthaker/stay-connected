@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 app.use(cors());
 
+const eventsRoutes = require("./routes/events");
+
 mongoose.connect('mongodb+srv://190088169:MX2mOQCX1GUrktZY@cluster0.5lzxrui.mongodb.net/stay-connected?retryWrites=true&w=majority')
     .then(() => {
         console.log('Connected to database!')
@@ -31,31 +33,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post("/api/events", (req, res, next) => {
-    const event = new Event({
-        title: req.body.title,
-        location: req.body.location,
-        date: req.body.date,
-        description: req.body.description
-    });
-    event.save().then(createdEvent => {
-        res.status(201).json({
-            message: 'Event added successfully',
-            eventId: createdEvent._id
-        });
-    });
-})
-
-app.get('/api/events', (req, res, next) => {
-    Event.find().then(documents => {
-        res.status(200).json({
-            message: 'Events fetched successfully',
-            events: documents
-        });
-    })
-})
-
-
 app.use('/api/home', (req, res, next) => {
     people = [
         { id: "3827432487", name: 'Hash Farnsworth', photo: '../src/assets/faces/face1.jpg' },
@@ -69,35 +46,6 @@ app.use('/api/home', (req, res, next) => {
     })
 })
 
-app.delete("/api/events/:id", (req, res, next) => {
-    Event.deleteOne({ _id: req.params.id }).then(() => {
-        console.log("Deleted on server")
-        res.status(200).json({ message: 'Event deleted!' });
-    })
-});
-
-app.put("/api/events/:id", (req, res, next) => {
-    const event = new Event({
-        _id: req.body.id,
-        title: req.body.title,
-        location: req.body.location,
-        date: req.body.date,
-        description: req.body.description
-    })
-    Event.updateOne({ _id: req.params.id }, event).then(result => {
-        console.log(event);
-        res.status(200).json({ message: "Updated successfully." })
-    })
-})
-
-app.get("/api/events/:id", (req, res, next) => {
-    Event.findById(req.params.id).then(event => {
-        if (event) {
-            res.status(200).json(event);
-        } else {
-            res.status(404).json({ message: 'Event not found.' })
-        }
-    })
-})
+app.use('/api/events', eventsRoutes);
 
 module.exports = app;
