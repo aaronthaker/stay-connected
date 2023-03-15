@@ -37,9 +37,11 @@ app.post("/api/events", (req, res, next) => {
         date: req.body.date,
         description: req.body.description
     });
-    event.save();
-    res.status(201).json({
-        message: 'Event added successfully'
+    event.save().then(createdEvent => {
+        res.status(201).json({
+            message: 'Event added successfully',
+            eventId: createdEvent._id
+        });
     });
 })
 
@@ -66,8 +68,11 @@ app.use('/api/home', (req, res, next) => {
     })
 })
 
-app.use((req, res, next) => {
-    res.send("Hello from express")
-})
+app.delete("/api/events/:id", (req, res, next) => {
+    Event.deleteOne({ _id: req.params.id }).then(() => {
+        console.log("Deleted on server")
+        res.status(200).json({ message: 'Event deleted!' });
+    })
+});
 
 module.exports = app;

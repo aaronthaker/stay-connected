@@ -1,4 +1,4 @@
-<ion-content *ngIf="events.length > 0">
+<main *ngIf="events.length > 0">
     <ion-card *ngFor="let event of events">
         <ion-item>
             <ion-icon name="pin" slot="start"></ion-icon>
@@ -14,11 +14,11 @@
                 <ion-button fill="outline" expand="block" color="primary">Edit</ion-button>
             </ion-col>
             <ion-col>
-                <ion-button fill="outline" expand="block" color="danger">Delete</ion-button>
+                <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id)">Delete</ion-button>
             </ion-col>
         </ion-row>
     </ion-card>
-</ion-content>
+</main>
 <ion-content *ngIf="events.length === 0">
     <ion-card>
         <ion-card-content>

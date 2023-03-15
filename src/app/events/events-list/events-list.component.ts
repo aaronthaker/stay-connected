@@ -21,6 +21,10 @@ export class EventsListComponent implements OnInit, OnDestroy {
     });
   }
 
+  onDelete(eventId: string) {
+    this.eventService.deleteEvent(eventId);
+  }
+
   ngOnDestroy() {
     this.eventsSub.unsubscribe();
   }

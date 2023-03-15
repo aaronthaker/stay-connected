@@ -44,12 +44,21 @@ export class EventsService {
       date: date,
       location: location
     }
-    this.http.post<{message: string}>('http://localhost:3000/api/events', event).subscribe((res) => {
-      console.log(res.message);
+    this.http.post<{message: string, eventId: string}>('http://localhost:3000/api/events', event).subscribe((res) => {
+      const id = res.eventId;
+      event.id = id;
+      this.events.push(event);
+      this.eventsUpdated.next([...this.events])
     })
-    // Should put two below inside response above^
-    this.events.push(event);
-    this.eventsUpdated.next([...this.events])
+  }
+
+  deleteEvent(eventId: string) {
+    this.http.delete("http://localhost:3000/api/events/" + eventId)
+    .subscribe(() => {
+      const updatedEvents = this.events.filter(event => event.id !== eventId);
+      this.events = updatedEvents;
+      this.eventsUpdated.next([...this.events]);
+    })
   }
 
   constructor(private http: HttpClient) { }
