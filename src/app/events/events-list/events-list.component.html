@@ -1,28 +1,33 @@
-<main *ngIf="events.length > 0">
-    <ion-card *ngFor="let event of events">
-        <ion-item>
-            <ion-icon name="pin" slot="start"></ion-icon>
-            <ion-label>{{ event.location }}</ion-label>
-        </ion-item>
-        <ion-card-content>
-            <ion-card-title>{{event.title}}</ion-card-title>
-            <ion-card-subtitle>{{event.date}}</ion-card-subtitle>
-            <p>{{event.description}}</p>
-        </ion-card-content>
-        <ion-row>
-            <ion-col>
-                <ion-button fill="outline" expand="block" color="primary">Edit</ion-button>
-            </ion-col>
-            <ion-col>
-                <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id)">Delete</ion-button>
-            </ion-col>
-        </ion-row>
-    </ion-card>
-</main>
-<ion-content *ngIf="events.length === 0">
-    <ion-card>
-        <ion-card-content>
-            <p style="text-align: center;">No events yet</p>
-        </ion-card-content>
-    </ion-card>
+<ion-content>
+    <main *ngIf="events.length > 0">
+        <button routerLink="/events/create">Create Event</button>
+        <ion-card *ngFor="let event of events">
+            <ion-item>
+                <ion-icon name="pin" slot="start"></ion-icon>
+                <ion-label>{{ event.location }}</ion-label>
+            </ion-item>
+            <ion-card-content>
+                <ion-card-title>{{event.title}}</ion-card-title>
+                <ion-card-subtitle>{{event.date}}</ion-card-subtitle>
+                <p>{{event.description}}</p>
+            </ion-card-content>
+            <ion-row>
+                <ion-col>
+                    <!-- <ion-button fill="outline" expand="block" color="primary">Edit</ion-button> -->
+                    <a mat-button color="primary" [routerLink]="['/events/edit', event.id]">EDIT</a>
+                </ion-col>
+                <ion-col>
+                    <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id!)">Delete</ion-button>
+                </ion-col>
+            </ion-row>
+        </ion-card>
+    </main>
+
+    <main *ngIf="events.length === 0">
+        <ion-card>
+            <ion-card-content>
+                <p style="text-align: center;">No events yet</p>
+            </ion-card-content>
+        </ion-card>
+    </main>
 </ion-content>

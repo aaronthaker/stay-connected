@@ -1,26 +1,26 @@
 <ion-card>
-    <form (submit)="onAddEvent(eventForm)" #eventForm="ngForm">
+    <form (submit)="onSaveEvent(eventForm)" #eventForm="ngForm">
 
         <ion-item>
             <ion-label>Event Title:</ion-label>
-            <ion-input matInput name="title" ngModel></ion-input>
+            <ion-input matInput [ngModel]="event?.title" name="title"></ion-input>
         </ion-item>
 
         <ion-item>
             <ion-label>Event Location:</ion-label>
-            <ion-input matInput ngModel name="location"></ion-input>
+            <ion-input matInput [ngModel]="event?.location" name="location"></ion-input>
         </ion-item>
 
         <ion-item>
             <ion-label>Event Date:</ion-label>
-            <ion-input matInput ngModel name="date"></ion-input>
+            <ion-input matInput [ngModel]="event?.date" name="date"></ion-input>
         </ion-item>
 
         <ion-item>
             <ion-label>Event Description:</ion-label>
-            <ion-input matInput ngModel name="description"></ion-input>
+            <ion-input matInput [ngModel]="event?.description" name="description"></ion-input>
         </ion-item>
 
-        <ion-button type="submit">Submit</ion-button>
+        <ion-button type="submit" (click)="onSubmitClick()">Submit</ion-button>
     </form>
 </ion-card>

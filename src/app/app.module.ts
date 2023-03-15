@@ -14,7 +14,6 @@ import { CreateEventComponent } from './events/create-event/create-event.compone
 import { UserDetailsComponent } from './home/user-details/user-details.component';
 import { HomeComponent } from './home/home.component';
 import { MatchesComponent } from './matches/matches.component';
-import { EventsPageComponent } from './events/events-page/events-page.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpClientModule } from "@angular/common/http"
 
@@ -26,7 +25,6 @@ import { HttpClientModule } from "@angular/common/http"
     UserDetailsComponent,
     HomeComponent,
     MatchesComponent,
-    EventsPageComponent
   ],
   imports: [
     BrowserModule,
