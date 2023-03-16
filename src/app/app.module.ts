@@ -16,9 +16,10 @@ import { UserDetailsComponent } from './home/user-details/user-details.component
 import { HomeComponent } from './home/home.component';
 import { MatchesComponent } from './matches/matches.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { HttpClientModule } from "@angular/common/http"
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
+import { AuthInterceptor } from './auth/auth-interceptor';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,10 @@ import { SignupComponent } from './auth/signup/signup.component';
     HttpClientModule,
     MatProgressSpinnerModule
   ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

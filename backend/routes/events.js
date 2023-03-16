@@ -1,8 +1,9 @@
 const express = require('express');
 const Event = require("../models/event")
 const router = express.Router();
+const checkAuth = require("../middleware/check-auth")
 
-router.post('', (req, res, next) => {
+router.post('', checkAuth, (req, res, next) => {
     const event = new Event({
         title: req.body.title,
         location: req.body.location,
@@ -26,14 +27,14 @@ router.get('', (req, res, next) => {
     })
 })
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', checkAuth, (req, res, next) => {
     Event.deleteOne({ _id: req.params.id }).then(() => {
         console.log("Deleted on server")
         res.status(200).json({ message: 'Event deleted!' });
     })
 });
 
-router.put('/:id', (req, res, next) => {
+router.put('/:id', checkAuth, (req, res, next) => {
     const event = new Event({
         _id: req.body.id,
         title: req.body.title,
