@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { LoginComponent } from './auth/login/login.component';
+import { SignupComponent } from './auth/signup/signup.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
 import { EventsListComponent } from './events/events-list/events-list.component';
 import { HomeComponent } from './home/home.component';
@@ -28,6 +30,12 @@ const routes: Routes = [
   },
   { path: 'events/edit/:eventId',
     component: CreateEventComponent
+  },
+  { path: 'login',
+    component: LoginComponent
+  },
+  { path: 'signup',
+    component: SignupComponent
   },
 ];
 

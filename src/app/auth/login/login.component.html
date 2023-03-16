@@ -1,0 +1,17 @@
+<ion-card>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+    <form (submit)="onLogin(loginForm)" #loginForm="ngForm" *ngIf="!isLoading">
+
+        <ion-item>
+            <ion-input type="email" name="email" ngModel placeholder="email" #emailInput="ngModel" required email></ion-input>
+            <mat-error *ngIf="emailInput.invalid">Enter valid email</mat-error>
+        </ion-item>
+
+        <ion-item>
+            <ion-input type="password" name="password" ngModel placeholder="password" #passwordInput="ngModel"></ion-input>
+            <mat-error *ngIf="passwordInput.invalid">Enter valid password</mat-error>
+        </ion-item>
+
+        <ion-button type="submit">Login</ion-button>
+    </form>
+</ion-card>

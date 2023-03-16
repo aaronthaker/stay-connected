@@ -6,6 +6,7 @@ const cors = require('cors');
 app.use(cors());
 
 const eventsRoutes = require("./routes/events");
+const userRoutes = require("./routes/user");
 
 mongoose.connect('mongodb+srv://190088169:MX2mOQCX1GUrktZY@cluster0.5lzxrui.mongodb.net/stay-connected?retryWrites=true&w=majority')
     .then(() => {
@@ -47,5 +48,6 @@ app.use('/api/home', (req, res, next) => {
 })
 
 app.use('/api/events', eventsRoutes);
+app.use('/api/user', userRoutes);
 
 module.exports = app;
