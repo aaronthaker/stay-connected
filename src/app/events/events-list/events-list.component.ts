@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 import { Event } from '../event.model';
 import { EventsService } from '../events.service';
 @Component({
@@ -12,8 +13,10 @@ export class EventsListComponent implements OnInit, OnDestroy {
   events: Event[] = [];
   private eventsSub: Subscription
   isLoading = false;
+  private authStatusSub: Subscription;
+  public userIsAuthenticated = false;
 
-  constructor(public eventService: EventsService) {}
+  constructor(public eventService: EventsService, private authService: AuthService) {}
 
   ngOnInit() {
     this.isLoading = true;
@@ -21,6 +24,10 @@ export class EventsListComponent implements OnInit, OnDestroy {
     this.eventsSub = this.eventService.getEventUpdateListener().subscribe((events: Event[]) => {
       this.isLoading = false;
       this.events = events;
+    });
+    this.userIsAuthenticated = this.authService.getIsAuth();
+    this.authStatusSub = this.authService.getAuthStatusListener().subscribe(isAuthenticated => {
+      this.userIsAuthenticated = isAuthenticated;
     });
   }
 
@@ -30,6 +37,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.eventsSub.unsubscribe();
+    this.authStatusSub.unsubscribe();
   }
 
 }
