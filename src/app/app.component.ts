@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -16,21 +17,21 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 })
 export class AppComponent implements OnInit, OnDestroy {
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   public appPages = [
     { title: 'Home', url: '/home', icon: 'heart' },
     { title: 'Matches', url: '/matches', icon: 'people' },
     { title: 'Messages', url: '/messages', icon: 'chatbox' },
-    { title: 'Login', url: '/login', icon: 'chatbox', needsAuth: false },
-    { title: 'Signup', url: '/signup', icon: 'chatbox', needsAuth: false },
     { title: 'Events', url: '/events', icon: 'calendar' }
-  ];
+];
 
   private authListenerSubs: Subscription;
   userIsAuthenticated = false;
 
   ngOnInit(): void {
+    this.userIsAuthenticated = this.authService.getIsAuth();
+    this.authService.autoAuthUser();
     this.authListenerSubs = this.authService
     .getAuthStatusListener()
     .subscribe(isAuthenticated => {
@@ -42,8 +43,22 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authListenerSubs.unsubscribe();
   }
 
+  // logAuthenticated() {
+  //   if (this.userIsAuthenticated) {
+  //     console.log('User is authenticated');
+  //   }
+  // }
+
   onLogout() {
     this.authService.logout();
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  goToSignup() {
+    this.router.navigate(['/signup']);
   }
 
 }

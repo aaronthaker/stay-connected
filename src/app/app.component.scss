@@ -21,6 +21,12 @@
     color: #d3d3d3;
 }
 
+.settings-button,
+.profile-button {
+    display: flex;
+    align-items: center;
+}
+
 .settings-button {
     width: 2em;
     height: 2em;

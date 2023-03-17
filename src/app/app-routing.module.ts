@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './auth/auth.guard';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
@@ -12,29 +13,36 @@ const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'matches',
     component: MatchesComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'messages',
     component: MessagesComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'events',
     component: EventsListComponent,
+    canActivate: [AuthGuard]
   },
   { path: 'events/create',
-    component: CreateEventComponent
+    component: CreateEventComponent,
+    canActivate: [AuthGuard]
   },
   { path: 'events/edit/:eventId',
-    component: CreateEventComponent
+    component: CreateEventComponent,
+    canActivate: [AuthGuard]
   },
   { path: 'login',
     component: LoginComponent
   },
-  { path: 'signup',
+  {
+    path: 'signup',
     component: SignupComponent
   },
 ];
@@ -44,5 +52,6 @@ const routes: Routes = [
     RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
   exports: [RouterModule],
+  providers: [AuthGuard]
 })
 export class AppRoutingModule {}

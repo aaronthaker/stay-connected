@@ -12,6 +12,6 @@
             <mat-error *ngIf="passwordInput.invalid">Enter valid password</mat-error>
         </ion-item>
 
-        <ion-button type="submit">Signup</ion-button>
+        <ion-button type="submit" *ngIf="!isLoading">Sign Up</ion-button>
     </form>
 </ion-card>

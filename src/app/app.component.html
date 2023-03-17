@@ -9,8 +9,8 @@
                             <ion-icon slot="start" ios="person-outline" md="person-sharp"></ion-icon>
                         </a>
                         <div>
-                            <ion-title class="ion-text-center">Welcome, Aaron.</ion-title>
-                            <ion-label class="ion-text-center">user.email@gmail.com</ion-label>
+                            <ion-title class="ion-text-center">Stay Connected</ion-title>
+                            <!-- <ion-label class="ion-text-center">user.email@gmail.com</ion-label> -->
                         </div>
 
                         <a routerDirection="root" [routerLink]="['/settings']" lines="none" detail="false" routerLinkActive="selected" class="settings-button">
@@ -21,7 +21,7 @@
 
                 <div class="sidenav-container">
                     <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
-                        <ng-container *ngIf="p.needsAuth === undefined || p.needsAuth === userIsAuthenticated">
+                        <ng-container *ngIf="userIsAuthenticated">
                             <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected" class="sidenav-items" [@fadeInOut]>
                                 <ion-item style="margin-left: 10px;width: 100%;">
                                     <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-outline'"></ion-icon>
@@ -30,15 +30,33 @@
                             </ion-item>
                         </ng-container>
                     </ion-menu-toggle>
-                    <ng-container *ngIf="userIsAuthenticated">
-                        <ion-item lines="none" detail="false" class="sidenav-items" [@fadeInOut]>
-                            <ion-item style="margin-left: 10px;width: 100%;">
-                                <ion-icon aria-hidden="true" slot="start"></ion-icon>
-                                <!-- <ion-label style="font-size: smaller">Log Out</ion-label> -->
-                                <button mat-button (click)="onLogout()">Log Out</button>
+
+                    <div class="bottom-buttons">
+                        <ng-container *ngIf="!userIsAuthenticated">
+                            <ion-item lines="none" detail="false" class="sidenav-items" [@fadeInOut]>
+                                <ion-item style="margin-left: 10px;width: 100%;" routerLink="/login">
+                                    <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                                    <ion-label style="font-size: smaller">Log In</ion-label>
+                                </ion-item>
                             </ion-item>
-                        </ion-item>
-                    </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="!userIsAuthenticated">
+                            <ion-item lines="none" detail="false" class="sidenav-items" [@fadeInOut]>
+                                <ion-item style="margin-left: 10px;width: 100%;" routerLink="/signup">
+                                    <ion-icon name="person-add-outline" slot="start"></ion-icon>
+                                    <ion-label style="font-size: smaller">Sign Up</ion-label>
+                                </ion-item>
+                            </ion-item>
+                        </ng-container>
+                        <ng-container *ngIf="userIsAuthenticated">
+                            <ion-item lines="none" detail="false" class="sidenav-items" [@fadeInOut] style="user-select: cursor;">
+                                <ion-item style="margin-left: 10px;width: 100%;" (click)="onLogout()">
+                                    <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                                    <ion-label style="font-size: smaller">Log Out</ion-label>
+                                </ion-item>
+                            </ion-item>
+                        </ng-container>
+                    </div>
                 </div>
             </ion-list>
 
