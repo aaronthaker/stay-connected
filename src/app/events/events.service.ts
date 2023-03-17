@@ -25,6 +25,7 @@ export class EventsService {
               location: any;
               date: any;
               _id: any;
+              creator: any;
             }) => {
               return {
                 title: event.title,
@@ -32,6 +33,7 @@ export class EventsService {
                 location: event.location,
                 date: event.date,
                 id: event._id,
+                creator: event.creator
               };
             }
           );

@@ -15,12 +15,14 @@ export class EventsListComponent implements OnInit, OnDestroy {
   isLoading = false;
   private authStatusSub: Subscription;
   public userIsAuthenticated = false;
+  userId: string | null;
 
   constructor(public eventService: EventsService, private authService: AuthService) {}
 
   ngOnInit() {
     this.isLoading = true;
     this.eventService.getEvents();
+    this.userId = this.authService.getUserId();
     this.eventsSub = this.eventService.getEventUpdateListener().subscribe((events: Event[]) => {
       this.isLoading = false;
       this.events = events;
@@ -28,6 +30,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.authStatusSub = this.authService.getAuthStatusListener().subscribe(isAuthenticated => {
       this.userIsAuthenticated = isAuthenticated;
+      this.userId = this.authService.getUserId();
     });
   }
 
