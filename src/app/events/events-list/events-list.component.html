@@ -1,7 +1,7 @@
 <ion-content>
     <mat-spinner *ngIf="isLoading"></mat-spinner>
     <main *ngIf="events.length > 0 && !isLoading">
-        <button routerLink="events/create">Create Event</button>
+        <button routerLink="create">Create Event</button>
         <ion-card *ngFor="let event of events">
             <ion-item>
                 <ion-icon name="pin" slot="start"></ion-icon>
