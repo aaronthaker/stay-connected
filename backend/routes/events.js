@@ -45,7 +45,8 @@ router.put('/:id', checkAuth, (req, res, next) => {
         title: req.body.title,
         location: req.body.location,
         date: req.body.date,
-        description: req.body.description
+        description: req.body.description,
+        creator: req.userData.userId
     })
     Event.updateOne({ _id: req.params.id, creator: req.userData.userId }, event).then(result => {
       if (result.modifiedCount > 0) {

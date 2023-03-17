@@ -91,6 +91,7 @@ export class EventsService {
       description: string;
       location: string;
       date: string;
+      creator: string;
     }>('http://localhost:3000/api/events/' + id);
   }
 
@@ -107,6 +108,7 @@ export class EventsService {
       description: description,
       location: location,
       date: date,
+      creator: null
     };
     this.http
       .put('http://localhost:3000/api/events/' + id, event)

@@ -39,6 +39,7 @@ export class CreateEventComponent implements OnInit {
             description: eventData.description,
             location: eventData.location,
             date: eventData.date,
+            creator: eventData.creator
           };
         });
       } else {
