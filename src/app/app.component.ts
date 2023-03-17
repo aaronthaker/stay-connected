@@ -43,11 +43,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authListenerSubs.unsubscribe();
   }
 
-  // logAuthenticated() {
-  //   if (this.userIsAuthenticated) {
-  //     console.log('User is authenticated');
-  //   }
-  // }
 
   onLogout() {
     this.authService.logout();
