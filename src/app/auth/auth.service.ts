@@ -13,6 +13,7 @@ export class AuthService {
   private isAuthenticated = false;
   private tokenTimer: NodeJS.Timer;
   private userId: string | null;
+  private userEmail: string | null;
 
   getToken() {
     return this.token;
@@ -38,12 +39,17 @@ export class AuthService {
     })
   }
 
+  getUserEmail() {
+    return this.userEmail;
+  }
+
   login(email: string, password: string) {
     const authData: AuthData = {email: email, password: password};
-    this.http.post<{ token: string, expiresIn: number, userId: string }>("http://localhost:3000/api/user/login", authData)
+    this.http.post<{ token: string, expiresIn: number, userId: string, email:string }>("http://localhost:3000/api/user/login", authData)
     .subscribe(response => {
       const token = response.token;
       this.token = token;
+      this.userEmail = response.email;
       if (token) {
         const expiresInDuration = response.expiresIn;
         this.setAuthTimer(expiresInDuration);

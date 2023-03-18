@@ -17,6 +17,8 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements OnInit, OnDestroy {
 
+  userEmail: string | null;
+
   constructor(private authService: AuthService, private router: Router) {}
 
   public appPages = [
@@ -32,11 +34,13 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
+    this.userEmail = this.authService.getUserEmail(); // Get userEmail from AuthService
     this.authListenerSubs = this.authService
-    .getAuthStatusListener()
-    .subscribe(isAuthenticated => {
-      this.userIsAuthenticated = isAuthenticated;
-    });
+      .getAuthStatusListener()
+      .subscribe(isAuthenticated => {
+        this.userIsAuthenticated = isAuthenticated;
+        this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
+      });
   }
 
   ngOnDestroy(): void {
