@@ -4,6 +4,7 @@ import { MessagesService } from '../messages.service';
 import { UserService } from '../../users/users.service';
 import { Message } from '../message.model';
 import { User } from 'src/app/users/user.model';
+import { AnimationController } from '@ionic/angular';
 
 @Component({
   selector: 'app-conversation',
@@ -18,7 +19,8 @@ export class ConversationComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     public messagesService: MessagesService,
-    private userService: UserService
+    private userService: UserService,
+    private animationCtrl: AnimationController
   ) { }
 
   ngOnInit() {
@@ -38,11 +40,26 @@ export class ConversationComponent implements OnInit {
       senderId: this.messagesService.currentUserId,
       receiverId: this.user._id,
       content: this.newMessage,
-      timestamp: new Date()
+      timestamp: new Date
     };
     this.messagesService.sendMessage(message).subscribe(() => {
       this.messages.push(message);
       this.newMessage = '';
+
+      // Animation
+      setTimeout(() => {
+        const index = this.messages.length - 1;
+        const messageElement = document.querySelector(`[data-index="${index}"]`);
+        if (messageElement) {
+          const animation = this.animationCtrl.create()
+            .addElement(messageElement)
+            .duration(300)
+            .iterations(1)
+            .fromTo('opacity', '0', '1')
+            .fromTo('transform', 'translateY(30px)', 'translateY(0)');
+          animation.play();
+        }
+      }, 0);
     });
   }
 }

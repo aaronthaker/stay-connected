@@ -1,23 +1,28 @@
-<div class="conversation-container">
-  <div class="messages-container">
-    <div class="message" *ngFor="let message of messages">
-      <div class="message-content" [class.sender]="message.senderId === user._id">
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/messages"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ user?.name }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list class="message-list">
+    <ion-item *ngFor="let message of messages; let i = index" [class.sender]="message.senderId === user._id"
+      [attr.data-index]="i">
+      <div class="message-content">
         {{ message.content }}
       </div>
-    </div>
-  </div>
-
-  <div class="new-message-container">
-    <form #messageForm="ngForm" (ngSubmit)="sendMessage()">
-      <input type="text"
-             name="newMessage"
-             [(ngModel)]="newMessage"
-             required
-             minlength="1"
-             maxlength="500"
-             placeholder="Type a message..."
-             #newMessageInput="ngModel">
-      <button type="submit" [disabled]="!messageForm.form.valid">Send</button>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <form #messageForm="ngForm" (ngSubmit)="sendMessage()" class="message-input">
+      <ion-input type="text" name="newMessage" [(ngModel)]="newMessage" required minlength="1" maxlength="500"
+        placeholder="Type a message..." #newMessageInput="ngModel"></ion-input>
+      <ion-button type="submit" [disabled]="!messageForm.form.valid">Send</ion-button>
     </form>
-  </div>
-</div>
+  </ion-toolbar>
+</ion-footer>

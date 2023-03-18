@@ -5,7 +5,7 @@ import {MatInputModule} from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
-import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { AnimationController, IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -50,7 +50,8 @@ import { ConversationComponent } from './messages/conversation/conversation.comp
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    AnimationController
   ],
   bootstrap: [AppComponent],
 })
