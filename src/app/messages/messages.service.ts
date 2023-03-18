@@ -19,6 +19,7 @@ export class MessagesService {
   }
 
   getConversation(otherUserIds: string[]): Observable<Message[]> {
+    console.log({ userIds: otherUserIds })
     const apiUrl = `http://localhost:3000/api/messages/conversation`;
 
     return this.http
@@ -33,10 +34,12 @@ export class MessagesService {
               content: message.content,
               timestamp: new Date(message.timestamp)
             };
+          }).sort((a: { timestamp: string | number | Date; }, b: { timestamp: string | number | Date; }) => {
+            return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
           });
         })
       );
-  }
+}
 
   sendMessage(message: Message): Observable<{ message: string }> {
     const apiUrl = 'http://localhost:3000/api/messages';

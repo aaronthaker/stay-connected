@@ -3,7 +3,9 @@ const User = require('../models/user');
 
 exports.getConversation = (req, res, next) => {
   const currentUserId = req.userData.userId;
-  const otherUserId = req.params.otherUserId;
+  // ERROR IS HERE!
+  // const otherUserId = req.params.otherUserId;
+  const otherUserId = '6414c6f1cbf9978d29c0baf9';
 
   Message.find({
       $or: [
@@ -13,20 +15,20 @@ exports.getConversation = (req, res, next) => {
     })
     .populate('senderId', 'email')
     .populate('receiverId', 'email')
-    .exec((err, messages) => {
-      if (err) {
-        return res.status(500).json({
-          message: 'An error occurred while retrieving the conversation.',
-          error: err
-        });
-      }
-
+    .then(messages => {
       res.status(200).json({
         message: 'Conversation retrieved successfully.',
         messages: messages
       });
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'An error occurred while retrieving the conversation.',
+        error: error
+      });
     });
 };
+
 
 exports.sendMessage = (req, res, next) => {
   const message = new Message({
