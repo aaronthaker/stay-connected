@@ -2,6 +2,11 @@
     <mat-spinner *ngIf="isLoading"></mat-spinner>
     <form (submit)="onSignup(signupForm)" #signupForm="ngForm" *ngIf="!isLoading">
 
+      <ion-item>
+        <ion-input type="text" name="name" ngModel placeholder="name" #nameInput="ngModel"></ion-input>
+        <mat-error *ngIf="nameInput.invalid">Enter valid name</mat-error>
+      </ion-item>
+
         <ion-item>
             <ion-input type="email" name="email" ngModel placeholder="email" #emailInput="ngModel" required email></ion-input>
             <mat-error *ngIf="emailInput.invalid">Enter valid email</mat-error>
@@ -10,6 +15,11 @@
         <ion-item>
             <ion-input type="password" name="password" ngModel placeholder="password" #passwordInput="ngModel"></ion-input>
             <mat-error *ngIf="passwordInput.invalid">Enter valid password</mat-error>
+        </ion-item>
+
+        <ion-item>
+            <ion-input type="text" name="gender" ngModel placeholder="gender" #genderInput="ngModel"></ion-input>
+            <mat-error *ngIf="genderInput.invalid">Enter valid gender</mat-error>
         </ion-item>
 
         <ion-button type="submit" *ngIf="!isLoading">Sign Up</ion-button>

@@ -5,9 +5,10 @@ const jwt = require("jsonwebtoken");
 // const uniqueValidator = require("mongoose-unique-validator")
 
 const userSchema = mongoose.Schema({
+  name: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  // name: { type: String, required: true },
+  gender: { type: String },
   // profilePicture: { type: String, required: true }
 });
 
