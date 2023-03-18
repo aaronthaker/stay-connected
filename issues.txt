@@ -1,2 +1,3 @@
 Email disappears from sidenav after reload
 Messages not real-time
+Infinite loading screen after signing in
