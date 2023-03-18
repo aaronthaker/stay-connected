@@ -1,0 +1,2 @@
+Email disappears from sidenav after reload
+Messages not real-time
