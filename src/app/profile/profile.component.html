@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Profile
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="profile-header">
+    <img src="https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg" alt="Profile Picture" class="profile-picture">
+    <h1 class="profile-name">John Doe</h1>
+    <p class="profile-bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sit amet lorem magna.</p>
+  </div>
+
+  <ion-card class="profile-card">
+    <ion-card-header>
+      <ion-card-title>Profile Information</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label>Username</ion-label>
+          <ion-text>{{ dummyData.username }}</ion-text>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Email</ion-label>
+          <ion-text>{{ dummyData.email }}</ion-text>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Phone Number</ion-label>
+          <ion-text>{{ dummyData.phoneNumber }}</ion-text>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Location</ion-label>
+          <ion-text>{{ dummyData.location }}</ion-text>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

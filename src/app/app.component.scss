@@ -1,8 +1,7 @@
-/* Add a small white strip to the left side of the selected item */
-
-.selected {
-    border-left: 3px solid #fff;
-}
+/* Add a small white strip to the left side of the selected item but not profile */
+.selected:not(#profile-a) {
+  border-left: 3px solid #fff;
+  }
 
 .sidenav-container {
     background: #df1c6b;

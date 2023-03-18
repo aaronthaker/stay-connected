@@ -9,6 +9,7 @@ import { HomeComponent } from './home/home.component';
 import { MatchesComponent } from './matches/matches.component';
 import { ConversationComponent } from './messages/conversation/conversation.component';
 import { MessagesComponent } from './messages/messages.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const routes: Routes = [
   {
@@ -31,24 +32,32 @@ const routes: Routes = [
     component: EventsListComponent,
     canActivate: [AuthGuard]
   },
-  { path: 'events/create',
+  {
+    path: 'events/create',
     component: CreateEventComponent,
     canActivate: [AuthGuard]
   },
-  { path: 'events/edit/:eventId',
+  {
+    path: 'events/edit/:eventId',
     component: CreateEventComponent,
     canActivate: [AuthGuard]
   },
-  { path: 'login',
+  {
+    path: 'login',
     component: LoginComponent
   },
   {
     path: 'signup',
     component: SignupComponent
   },
-  { path: 'conversation/:id',
-  component: ConversationComponent
-  } // Add this route
+  {
+    path: 'conversation/:id',
+    component: ConversationComponent
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent
+  },
 
 ];
 
@@ -59,4 +68,4 @@ const routes: Routes = [
   exports: [RouterModule],
   providers: [AuthGuard]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
