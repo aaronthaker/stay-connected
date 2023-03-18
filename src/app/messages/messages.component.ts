@@ -1,10 +1,10 @@
-// messages.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserService } from '../users/users.service';
 import { MessagesService } from './messages.service';
 import { User } from '../users/user.model';
 import { Message } from './message.model';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-messages',
@@ -19,7 +19,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
   userSub: Subscription;
   messageSub: Subscription;
 
-  constructor(public userService: UserService, public messagesService: MessagesService) {}
+  constructor(
+    public userService: UserService,
+    public messagesService: MessagesService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.userSub = this.userService.getUsers().subscribe(users => {
@@ -37,7 +41,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   onUserSelected(user: User) {
-    console.log(user)
+    this.selectedUser = user;
+    this.router.navigate(['/conversation', user._id]);
   }
 
   get currentUserId() {

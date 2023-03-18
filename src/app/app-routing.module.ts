@@ -7,6 +7,7 @@ import { CreateEventComponent } from './events/create-event/create-event.compone
 import { EventsListComponent } from './events/events-list/events-list.component';
 import { HomeComponent } from './home/home.component';
 import { MatchesComponent } from './matches/matches.component';
+import { ConversationComponent } from './messages/conversation/conversation.component';
 import { MessagesComponent } from './messages/messages.component';
 
 const routes: Routes = [
@@ -45,6 +46,10 @@ const routes: Routes = [
     path: 'signup',
     component: SignupComponent
   },
+  { path: 'conversation/:id',
+  component: ConversationComponent
+  } // Add this route
+
 ];
 
 @NgModule({

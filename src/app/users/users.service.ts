@@ -10,6 +10,18 @@ import { User } from './user.model';
 export class UserService {
   constructor(private http: HttpClient) {}
 
+  getUser(userId: string): Observable<User> {
+    const apiUrl = `http://localhost:3000/api/users/${userId}`;
+
+    return this.http.get<{ message: string; user: any }>(apiUrl).pipe(
+      map(response => {
+        return {
+          ...response.user
+        };
+      })
+    );
+  }
+
   getUsers(): Observable<User[]> {
     const apiUrl = 'http://localhost:3000/api/users';
 

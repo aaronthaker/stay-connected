@@ -18,4 +18,24 @@ router.get('/', (req, res, next) => {
     });
 });
 
+router.get('/:userId', (req, res, next) => {
+  User.findById(req.params.userId)
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found"
+        });
+      }
+      res.status(200).json({
+        message: "Successful",
+        user: user
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
+    });
+});
+
 module.exports = router;

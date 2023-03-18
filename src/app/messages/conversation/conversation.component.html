@@ -1,3 +1,23 @@
-<p>
-  conversation works!
-</p>
+<div class="conversation-container">
+  <div class="messages-container">
+    <div class="message" *ngFor="let message of messages">
+      <div class="message-content" [class.sender]="message.senderId === user._id">
+        {{ message.content }}
+      </div>
+    </div>
+  </div>
+
+  <div class="new-message-container">
+    <form #messageForm="ngForm" (ngSubmit)="sendMessage()">
+      <input type="text"
+             name="newMessage"
+             [(ngModel)]="newMessage"
+             required
+             minlength="1"
+             maxlength="500"
+             placeholder="Type a message..."
+             #newMessageInput="ngModel">
+      <button type="submit" [disabled]="!messageForm.form.valid">Send</button>
+    </form>
+  </div>
+</div>
