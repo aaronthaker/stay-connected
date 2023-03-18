@@ -29,8 +29,8 @@ export class MessagesService {
           return response.messages.map((message: any) => {
             return {
               id: message._id,
-              senderId: message.sender,
-              receiverId: message.receiver,
+              senderId: message.senderId._id,
+              receiverId: message.receiverId._id,
               content: message.content,
               timestamp: new Date(message.timestamp)
             };
