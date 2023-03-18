@@ -13,22 +13,4 @@
       <ion-label>{{ user.email }}</ion-label>
     </ion-item>
 
-  <div id="main-content">
-    Test
-    <app-conversation *ngIf="selectedUser" [user]="selectedUser" [userId]="currentUserId"></app-conversation>
-    <ion-footer *ngIf="selectedUser">
-      <ion-toolbar>
-        <ion-row>
-          <ion-col size="10">
-            <ion-textarea [(ngModel)]="messageContent" placeholder="Type a message..."></ion-textarea>
-          </ion-col>
-          <ion-col size="2">
-            <ion-button expand="block" fill="clear" color="primary" (click)="onSendMessage()">
-              <ion-icon name="send"></ion-icon>
-            </ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-toolbar>
-    </ion-footer>
-  </div>
 </ion-content>

@@ -1,15 +1,3 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ user?.name }}</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
-  <ion-list>
-    <ion-item *ngFor="let message of messages$ | async">
-      <div [ngClass]="{ 'my-message': message.senderId === userId, 'other-message': message.senderId !== userId }">
-        {{ message.content }}
-      </div>
-    </ion-item>
-  </ion-list>
-</ion-content>
+<p>
+  conversation works!
+</p>

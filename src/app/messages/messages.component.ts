@@ -37,26 +37,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   onUserSelected(user: User) {
-    this.selectedUser = user;
-
-    this.messageSub = this.messagesService.getMessages(this.currentUserId, user._id).subscribe(messages => {
-      this.messages = messages;
-    });
-  }
-
-  onSendMessage() {
-    if (this.messageContent && this.messageContent.trim()) {
-      const message: NewMessage = {
-        senderId: this.currentUserId,
-        receiverId: this.selectedUser._id,
-        content: this.messageContent
-      };
-
-      this.messagesService.sendMessage(message).subscribe((newMessage: Message) => {
-        this.messages.push(newMessage);
-        this.messageContent = '';
-      });
-    }
+    console.log(user)
   }
 
   get currentUserId() {

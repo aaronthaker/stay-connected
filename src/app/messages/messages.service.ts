@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Message } from './message.model';
 import { AuthService } from '../auth/auth.service';
 
@@ -18,11 +18,4 @@ export class MessagesService {
     return this.authService.getUserId();
   }
 
-  getMessages(userId: string | null, recipientId: string | null): Observable<Message[]> {
-    return this.http.get<Message[]>(`${this.apiUrl}/messages?userId=${userId}&recipientId=${recipientId}`);
-  }
-
-  sendMessage(message: Message): Observable<Message> {
-    return this.http.post<Message>(`${this.apiUrl}/messages`, message);
-  }
 }
