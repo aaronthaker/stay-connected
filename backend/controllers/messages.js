@@ -5,7 +5,7 @@ exports.getConversation = (req, res, next) => {
   const currentUserId = req.userData.userId;
   // ERROR IS HERE!
   // const otherUserId = req.params.otherUserId;
-  const otherUserId = '6414c6f1cbf9978d29c0baf9';
+  const otherUserId = req.body.userIds[1];
 
   Message.find({
       $or: [
