@@ -20,6 +20,8 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { AuthInterceptor } from './auth/auth-interceptor';
+import { MessagesComponent } from './messages/messages.component';
+import { ConversationComponent } from './messages/conversation/conversation.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,9 @@ import { AuthInterceptor } from './auth/auth-interceptor';
     HomeComponent,
     MatchesComponent,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    MessagesComponent,
+    ConversationComponent
   ],
   imports: [
     BrowserModule,

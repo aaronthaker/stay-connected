@@ -1,3 +1,4 @@
+// app.js
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
@@ -7,6 +8,8 @@ app.use(cors());
 
 const eventsRoutes = require("./routes/events");
 const userRoutes = require("./routes/user");
+const messagesRoutes = require("./routes/messages");
+const usersRoutes = require("./routes/users"); // Add this line
 
 mongoose.connect('mongodb+srv://190088169:MX2mOQCX1GUrktZY@cluster0.5lzxrui.mongodb.net/stay-connected?retryWrites=true&w=majority')
     .then(() => {
@@ -35,7 +38,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/home', (req, res, next) => {
-    people = [
+    users = [
         { id: "3827432487", name: 'Hash Farnsworth', photo: '../src/assets/faces/face1.jpg' },
         { id: "3224323233", name: 'Jane', photo: '../src/assets/faces/face2.jpg' },
         { id: "3243423423", name: 'Jack', photo: '../src/assets/faces/face3.jpg' },
@@ -43,11 +46,13 @@ app.use('/api/home', (req, res, next) => {
     ];
     res.status(200).json({
         message: "Successful",
-        people: people
+        users: users
     })
 })
 
 app.use('/api/events', eventsRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/messages', messagesRoutes);
+app.use('/api/users', usersRoutes); // Add this line
 
 module.exports = app;

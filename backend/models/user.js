@@ -5,9 +5,12 @@ const jwt = require("jsonwebtoken");
 // const uniqueValidator = require("mongoose-unique-validator")
 
 const userSchema = mongoose.Schema({
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-})
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  name: { type: String, required: true },
+  // profilePicture: { type: String, required: true }
+});
+
 
 router.post("/login", (req, res, next) => {
     User.find({ email: req.body.email })
