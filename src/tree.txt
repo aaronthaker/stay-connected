@@ -1,87 +1,99 @@
 Folder PATH listing for volume Windows
 Volume serial number is F8BC-F593
 C:.
-|   global.scss
-|   index.html
-|   main.ts
-|   polyfills.ts
-|   test.ts
-|   tree.txt
-|   zone-flags.ts
-|   
-+---app
-|   |   app-routing.module.ts
-|   |   app.component.html
-|   |   app.component.scss
-|   |   app.component.ts
-|   |   app.module.ts
-|   |   
-|   +---auth
-|   |   |   auth-data.model.ts
-|   |   |   auth.service.ts
-|   |   |   
-|   |   +---login
-|   |   |       login.component.html
-|   |   |       login.component.scss
-|   |   |       login.component.ts
-|   |   |       
-|   |   \---signup
-|   |           signup.component.html
-|   |           signup.component.scss
-|   |           signup.component.ts
-|   |           
-|   +---events
-|   |   |   event.model.ts
-|   |   |   events.service.ts
-|   |   |   
-|   |   +---create-event
-|   |   |       create-event.component.html
-|   |   |       create-event.component.scss
-|   |   |       create-event.component.ts
-|   |   |       
-|   |   \---events-list
-|   |           events-list.component.html
-|   |           events-list.component.scss
-|   |           events-list.component.ts
-|   |           
-|   +---home
-|   |   |   home.component.html
-|   |   |   home.component.scss
-|   |   |   home.component.ts
-|   |   |   
-|   |   \---user-details
-|   |           user-details.component.html
-|   |           user-details.component.scss
-|   |           user-details.component.ts
-|   |           
-|   +---matches
-|   |       matches.component.html
-|   |       matches.component.scss
-|   |       matches.component.spec.ts
-|   |       matches.component.ts
-|   |       
-|   \---messages
-|           messages.component.html
-|           messages.component.scss
-|           messages.component.spec.ts
-|           messages.component.ts
-|           
-+---assets
-|   |   image.png
-|   |   shapes.svg
-|   |   
-|   +---faces
-|   |       face1.jpg
-|   |       face2.jpg
-|   |       face3.jpg
-|   |       
-|   \---icon
-|           favicon.png
-|           
-+---environments
-|       environment.prod.ts
-|       environment.ts
-|       
-\---theme
+³   global.scss
+³   index.html
+³   main.ts
+³   polyfills.ts
+³   test.ts
+³   tree.txt
+³   zone-flags.ts
+³   
+ÃÄÄÄapp
+³   ³   app-routing.module.ts
+³   ³   app.component.html
+³   ³   app.component.scss
+³   ³   app.component.ts
+³   ³   app.module.ts
+³   ³   
+³   ÃÄÄÄauth
+³   ³   ³   auth-data.model.ts
+³   ³   ³   auth-interceptor.ts
+³   ³   ³   auth.guard.ts
+³   ³   ³   auth.service.ts
+³   ³   ³   
+³   ³   ÃÄÄÄlogin
+³   ³   ³       login.component.html
+³   ³   ³       login.component.scss
+³   ³   ³       login.component.ts
+³   ³   ³       
+³   ³   ÀÄÄÄsignup
+³   ³           signup.component.html
+³   ³           signup.component.scss
+³   ³           signup.component.ts
+³   ³           
+³   ÃÄÄÄevents
+³   ³   ³   event.model.ts
+³   ³   ³   events.service.ts
+³   ³   ³   
+³   ³   ÃÄÄÄcreate-event
+³   ³   ³       create-event.component.html
+³   ³   ³       create-event.component.scss
+³   ³   ³       create-event.component.ts
+³   ³   ³       
+³   ³   ÀÄÄÄevents-list
+³   ³           events-list.component.html
+³   ³           events-list.component.scss
+³   ³           events-list.component.ts
+³   ³           
+³   ÃÄÄÄhome
+³   ³   ³   home.component.html
+³   ³   ³   home.component.scss
+³   ³   ³   home.component.ts
+³   ³   ³   
+³   ³   ÀÄÄÄuser-details
+³   ³           user-details.component.html
+³   ³           user-details.component.scss
+³   ³           user-details.component.ts
+³   ³           
+³   ÃÄÄÄmatches
+³   ³       matches.component.html
+³   ³       matches.component.scss
+³   ³       matches.component.spec.ts
+³   ³       matches.component.ts
+³   ³       
+³   ÃÄÄÄmessages
+³   ³   ³   message.model.ts
+³   ³   ³   messages.component.html
+³   ³   ³   messages.component.scss
+³   ³   ³   messages.component.ts
+³   ³   ³   messages.service.ts
+³   ³   ³   
+³   ³   ÀÄÄÄconversation
+³   ³           conversation.component.html
+³   ³           conversation.component.scss
+³   ³           conversation.component.ts
+³   ³           
+³   ÀÄÄÄusers
+³           user.model.ts
+³           users.service.ts
+³           
+ÃÄÄÄassets
+³   ³   image.png
+³   ³   shapes.svg
+³   ³   
+³   ÃÄÄÄfaces
+³   ³       face1.jpg
+³   ³       face2.jpg
+³   ³       face3.jpg
+³   ³       
+³   ÀÄÄÄicon
+³           favicon.png
+³           
+ÃÄÄÄenvironments
+³       environment.prod.ts
+³       environment.ts
+³       
+ÀÄÄÄtheme
         variables.scss
         

@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserService } from '../users/users.service';
 import { MessagesService } from './messages.service';
 import { User } from '../users/user.model';
-import { Message, NewMessage } from './message.model';
+import { Message } from './message.model';
 import { Subscription } from 'rxjs';
 
 @Component({
