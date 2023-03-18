@@ -40,7 +40,7 @@ export class ConversationComponent implements OnInit {
       senderId: this.messagesService.currentUserId,
       receiverId: this.user._id,
       content: this.newMessage,
-      timestamp: new Date
+      timestamp: new Date()
     };
     this.messagesService.sendMessage(message).subscribe(() => {
       this.messages.push(message);

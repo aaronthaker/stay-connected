@@ -1,28 +1,28 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/messages"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ user?.name }}</ion-title>
+  <ion-buttons slot="start">
+  <ion-back-button defaultHref="/messages"></ion-back-button>
+  </ion-buttons>
+  <ion-title>{{ user?.name }}</ion-title>
   </ion-toolbar>
-</ion-header>
+  </ion-header>
 
-<ion-content>
-  <ion-list class="message-list">
-    <ion-item *ngFor="let message of messages; let i = index" [class.sender]="message.senderId === user._id"
-      [attr.data-index]="i">
-      <div class="message-content">
-        {{ message.content }}
-      </div>
-    </ion-item>
-  </ion-list>
-</ion-content>
-<ion-footer>
-  <ion-toolbar>
-    <form #messageForm="ngForm" (ngSubmit)="sendMessage()" class="message-input">
-      <ion-input type="text" name="newMessage" [(ngModel)]="newMessage" required minlength="1" maxlength="500"
-        placeholder="Type a message..." #newMessageInput="ngModel"></ion-input>
-      <ion-button type="submit" [disabled]="!messageForm.form.valid">Send</ion-button>
-    </form>
-  </ion-toolbar>
-</ion-footer>
+  <ion-content>
+    <ion-list class="message-list">
+      <ion-item *ngFor="let message of messages; let i = index"
+        [class.sent-message]="message.senderId === user._id" [class.received-message]="message.receiverId === user._id">
+        <div class="message-content">
+          {{ message.content }}
+        </div>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  <ion-footer>
+    <ion-toolbar>
+      <form #messageForm="ngForm" (ngSubmit)="sendMessage()" class="message-input">
+        <ion-input type="text" name="newMessage" [(ngModel)]="newMessage" required minlength="1" maxlength="500"
+          placeholder="Type a message..." #newMessageInput="ngModel"></ion-input>
+        <ion-button type="submit" [disabled]="!messageForm.form.valid">Send</ion-button>
+      </form>
+    </ion-toolbar>
+  </ion-footer>
