@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { MessagesService } from '../messages/messages.service';
+import { User } from '../users/user.model';
+import { UserService } from '../users/users.service';
 
 @Component({
   selector: 'app-profile',
@@ -13,10 +16,20 @@ export class ProfileComponent implements OnInit {
     phoneNumber: '123-456-7890',
     location: 'New York City, NY'
   };
+  currentUserId: string;
+  currentUser: User
 
 
-  constructor() { }
+  constructor(
+    private messagesService: MessagesService,
+    private userService: UserService,
+    ) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.currentUserId = this.messagesService.currentUserId!;
+    this.userService.getUser(this.currentUserId).subscribe((user: any) => {
+      this.currentUser = user;
+    });
+  }
 
 }

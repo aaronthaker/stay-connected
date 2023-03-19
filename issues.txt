@@ -1,3 +1,5 @@
 Email disappears from sidenav after reload
 Messages not real-time
 Infinite loading screen after signing in
+Need to add bio, gender and location to user but not in signup
+Need page for account settings and profile settings

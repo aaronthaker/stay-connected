@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { MessagesService } from 'src/app/messages/messages.service';
+import { User } from 'src/app/users/user.model';
+import { UserService } from 'src/app/users/users.service';
 
 @Component({
   selector: 'app-user-details',
@@ -7,32 +11,38 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserDetailsComponent implements OnInit {
 
-  user: any;
-  users: any[] = [
-    { name: 'Hash Farnsworth', photo: '../../../../assets/faces/face1.jpg' },
-    { name: 'Jane', photo: '../../../../assets/faces/face2.jpg' },
-    { name: 'Jack', photo: '../../../../assets/faces/face3.jpg' },
-    { name: 'Jill', photo: '../../../../assets/faces/face3.jpg' }
-  ];
+  // user: User;
+  displayedUsers: User[] = [];
+  currentUserId: string | null;
+  displayedUser: User;
+
+  userSub: Subscription;
   currentIndex = 0;
 
-  constructor() { }
+  constructor(
+    private messagesService: MessagesService,
+    private userService: UserService,
+    ) {}
 
   ngOnInit() {
-    // Get the current user
-    this.user = this.users[this.currentIndex];
+    this.currentUserId = this.messagesService.currentUserId;
+    this.userSub = this.userService.getUsers().subscribe(users => {
+      this.displayedUsers = users.filter(user => user._id !== this.currentUserId);
+      this.displayedUser = this.displayedUsers[this.currentIndex];
+    });
   }
 
   onCrossClick() {
     // Get the next user
     this.currentIndex++;
-    this.user = this.users[this.currentIndex];
+    this.displayedUser = this.displayedUsers[this.currentIndex];
+    // Logic to add the displayedUser._id to likedUsers
   }
 
   onTickClick() {
     // Get the next user
     this.currentIndex++;
-    this.user = this.users[this.currentIndex];
+    this.displayedUser = this.displayedUsers[this.currentIndex];
   }
 
 }

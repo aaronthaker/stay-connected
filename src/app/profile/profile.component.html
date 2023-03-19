@@ -9,7 +9,7 @@
 <ion-content class="ion-padding">
   <div class="profile-header">
     <img src="https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg" alt="Profile Picture" class="profile-picture">
-    <h1 class="profile-name">John Doe</h1>
+    <h1 class="profile-name">{{ currentUser?.name }}</h1>
     <p class="profile-bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sit amet lorem magna.</p>
   </div>
 
@@ -21,24 +21,30 @@
     <ion-card-content>
       <ion-list>
         <ion-item>
-          <ion-label>Username</ion-label>
-          <ion-text>{{ dummyData.username }}</ion-text>
+          <ion-label>Name</ion-label>
+          <ion-text>{{ currentUser?.name }}</ion-text>
         </ion-item>
 
         <ion-item>
           <ion-label>Email</ion-label>
-          <ion-text>{{ dummyData.email }}</ion-text>
+          <ion-text>{{ currentUser?.email }}</ion-text>
         </ion-item>
 
         <ion-item>
           <ion-label>Phone Number</ion-label>
-          <ion-text>{{ dummyData.phoneNumber }}</ion-text>
+          <ion-text>07864029920</ion-text>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Gender</ion-label>
+          <ion-text>{{ currentUser?.gender }}</ion-text>
         </ion-item>
 
         <ion-item>
           <ion-label>Location</ion-label>
-          <ion-text>{{ dummyData.location }}</ion-text>
+          <ion-text>{{ currentUser?.location }}</ion-text>
         </ion-item>
+
       </ion-list>
     </ion-card-content>
   </ion-card>
