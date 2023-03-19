@@ -5,3 +5,4 @@ Need to add bio, gender and location to user but not in signup
 Need page for account settings and profile settings
 Crashes on wrong sign in
 /api/home returns weird dummy data
+signup creates user but doesn't redirect
