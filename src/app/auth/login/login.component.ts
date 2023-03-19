@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 })
 export class LoginComponent implements OnInit {
   isLoading = false;
+  errorMessage: string;
 
   constructor(private authService: AuthService, private router: Router) { }
 

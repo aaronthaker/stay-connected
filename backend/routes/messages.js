@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Message = require('../models/message'); // Import the Message model
+const Message = require('../models/message');
 const messagesController = require('../controllers/messages');
 const checkAuth = require('../middleware/check-auth');
 
@@ -10,6 +10,8 @@ router.post('/conversation', checkAuth, messagesController.getConversation);
 
 // Send a message to a user
 router.post('/', checkAuth, messagesController.sendMessage);
+
+module.exports = router;
 
 // router.post('/conversation', checkAuth, (req, res, next) => {
 //   const userIds = req.body.userIds;
@@ -31,5 +33,3 @@ router.post('/', checkAuth, messagesController.sendMessage);
 //       });
 //     });
 // });
-
-module.exports = router;

@@ -38,21 +38,14 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/home', (req, res, next) => {
-    users = [
-        { id: "3827432487", name: 'Hash Farnsworth', photo: '../src/assets/faces/face1.jpg' },
-        { id: "3224323233", name: 'Jane', photo: '../src/assets/faces/face2.jpg' },
-        { id: "3243423423", name: 'Jack', photo: '../src/assets/faces/face3.jpg' },
-        { id: "4324323232", name: 'Jill', photo: '../src/assets/faces/face3.jpg' }
-    ];
     res.status(200).json({
-        message: "Successful",
-        users: users
+        message: "Successful"
     })
 })
 
 app.use('/api/events', eventsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/messages', messagesRoutes);
-app.use('/api/users', usersRoutes); // Add this line
+app.use('/api/users', usersRoutes);
 
 module.exports = app;

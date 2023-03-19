@@ -9,7 +9,7 @@
 
         <ion-item>
             <ion-input type="password" name="password" ngModel placeholder="password" #passwordInput="ngModel"></ion-input>
-            <mat-error *ngIf="passwordInput.invalid">Enter valid password</mat-error>
+            <mat-error *ngIf="passwordInput.invalid || errorMessage">{{ errorMessage || 'Enter valid password' }}</mat-error>
         </ion-item>
 
         <ion-button type="submit" *ngIf="!isLoading">Login</ion-button>
