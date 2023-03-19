@@ -29,40 +29,40 @@ router.post("/signup", (req, res, next) => {
 
 router.post("/login", (req, res, next) => {
   let fetchedUser;
-  User.find({ email: req.body.email })
+  User.findOne({ email: req.body.email })
     .then(user => {
-      if (user.length === 0) { // check if the array is empty
+      if (user === null) {
         return res.status(401).json({
           message: "Auth failed"
         });
+      } else {
+          fetchedUser = user;
+          return bcrypt.compare(req.body.password, user.password);
       }
-      fetchedUser = user[0];
-      return bcrypt.compare(req.body.password, user[0].password);
     })
     .then(result => {
       if (!result) {
+        console.log("Email matched but password did not.")
         return res.status(401).json({
-          message: "Auth failed"
+          message: "Password was incorrect"
         });
       }
-      const token = jwt.sign(
-        { email: fetchedUser.email, userId: fetchedUser._id },
-        "secret_lol",
-        { expiresIn: "1h" }
-      );
-      res.status(200).json({
-        token: token,
-        expiresIn: 3600,
-        userId: fetchedUser._id,
-        email: fetchedUser.email
-      });
+      if (result === true) {
+        const token = jwt.sign(
+          { email: fetchedUser.email, userId: fetchedUser._id },
+          "secret_lol",
+          { expiresIn: "1h" }
+        );
+        res.status(200).json({
+          token: token,
+          expiresIn: 3600,
+          userId: fetchedUser._id,
+          email: fetchedUser.email
+        });
+      }
     })
     .catch(err => {
       console.log(err);
-      return res.status(401).json({
-        message: "Auth failed",
-        error: err
-      });
     });
 });
 
