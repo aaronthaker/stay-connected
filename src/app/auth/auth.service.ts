@@ -34,9 +34,11 @@ export class AuthService {
   createUser(name: string, email: string, password: string, gender: string) {
     const authData: AuthData = { name: name, email: email, password: password, gender: gender };
     this.http.post("http://localhost:3000/api/user/signup", authData)
-    .subscribe(response => {
-      console.log(response);
-    })
+    .subscribe(() => {
+      this.router.navigate(["/home"]);
+    }, error => {
+      this.authStatusListener.next(false);
+    });
   }
 
   getUserEmail() {
@@ -62,6 +64,8 @@ export class AuthService {
         localStorage.setItem('userEmail', response.email);
         this.router.navigate(['/home']);
       }
+    }, error => {
+      this.authStatusListener.next(false);
     })
   }
 
