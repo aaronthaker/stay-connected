@@ -34,12 +34,11 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
-    this.userEmail = this.authService.getUserEmail(); // Get userEmail from AuthService
+    this.userEmail = localStorage.getItem('userEmail'); // Get the userEmail from local storage
     this.authListenerSubs = this.authService
       .getAuthStatusListener()
       .subscribe(isAuthenticated => {
         this.userIsAuthenticated = isAuthenticated;
-        this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
       });
   }
 

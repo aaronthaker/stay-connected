@@ -59,6 +59,7 @@ export class AuthService {
         const now = new Date();
         const expirationDate = new Date(now.getTime() + (expiresInDuration * 1000));
         this.saveAuthData(token, expirationDate, this.userId);
+        localStorage.setItem('userEmail', response.email);
         this.router.navigate(['/home']);
       }
     })
@@ -84,6 +85,7 @@ export class AuthService {
         this.userId = authInformation.userId;
         this.setAuthTimer(expiresIn / 1000);
         this.authStatusListener.next(true);
+        this.userEmail = localStorage.getItem('userEmail');
       }
     }
   }
@@ -109,7 +111,8 @@ export class AuthService {
     this.userId = null;
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
-    this.router.navigate(["/login"]);
+    localStorage.removeItem('userEmail');
+    this.router.navigate(['/login']);
   }
 
   private saveAuthData(token: string, expirationDate: Date, userId: string) {
