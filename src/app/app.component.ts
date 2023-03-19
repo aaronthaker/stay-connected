@@ -39,6 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .getAuthStatusListener()
       .subscribe(isAuthenticated => {
         this.userIsAuthenticated = isAuthenticated;
+        this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
       });
   }
 
