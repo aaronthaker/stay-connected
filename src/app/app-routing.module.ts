@@ -9,6 +9,12 @@ import { HomeComponent } from './home/home.component';
 import { ConversationComponent } from './messages/conversation/conversation.component';
 import { MessagesComponent } from './messages/messages.component';
 import { ProfileComponent } from './profile/profile.component';
+import { AccessibilityComponent } from './settings/accessibility/accessibility.component';
+import { HelpComponent } from './settings/help/help.component';
+import { LanguageComponent } from './settings/language/language.component';
+import { NotificationsComponent } from './settings/notifications/notifications.component';
+import { PreferencesComponent } from './settings/preferences/preferences.component';
+import { PrivacyComponent } from './settings/privacy/privacy.component';
 import { SettingsComponent } from './settings/settings.component';
 
 const routes: Routes = [
@@ -58,7 +64,36 @@ const routes: Routes = [
     component: SettingsComponent,
     canActivate: [AuthGuard]
   },
-
+  {
+    path: 'settings/notifications',
+    component: NotificationsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings/accessibility',
+    component: AccessibilityComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings/help',
+    component: HelpComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings/language',
+    component: LanguageComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings/preferences',
+    component: PreferencesComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings/privacy',
+    component: PrivacyComponent,
+    canActivate: [AuthGuard]
+  },
 ];
 
 @NgModule({

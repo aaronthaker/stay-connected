@@ -24,6 +24,12 @@ import { MessagesComponent } from './messages/messages.component';
 import { ConversationComponent } from './messages/conversation/conversation.component';
 import { ProfileComponent } from './profile/profile.component';
 import { SettingsComponent } from './settings/settings.component';
+import { AccessibilityComponent } from './settings/accessibility/accessibility.component';
+import { HelpComponent } from './settings/help/help.component';
+import { LanguageComponent } from './settings/language/language.component';
+import { NotificationsComponent } from './settings/notifications/notifications.component';
+import { PreferencesComponent } from './settings/preferences/preferences.component';
+import { PrivacyComponent } from './settings/privacy/privacy.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +43,13 @@ import { SettingsComponent } from './settings/settings.component';
     MessagesComponent,
     ConversationComponent,
     ProfileComponent,
-    SettingsComponent
+    SettingsComponent,
+    AccessibilityComponent,
+    HelpComponent,
+    LanguageComponent,
+    NotificationsComponent,
+    PreferencesComponent,
+    PrivacyComponent
   ],
   imports: [
     BrowserModule,
