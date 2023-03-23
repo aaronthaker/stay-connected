@@ -23,6 +23,7 @@ import { AuthInterceptor } from './auth/auth-interceptor';
 import { MessagesComponent } from './messages/messages.component';
 import { ConversationComponent } from './messages/conversation/conversation.component';
 import { ProfileComponent } from './profile/profile.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { ProfileComponent } from './profile/profile.component';
     SignupComponent,
     MessagesComponent,
     ConversationComponent,
-    ProfileComponent
+    ProfileComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,

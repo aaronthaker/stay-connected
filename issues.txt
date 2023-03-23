@@ -1,5 +1,3 @@
-/api/home returns weird dummy data
-Need page for account settings and profile settings
 Need to add bio, gender and location to user but not in signup
 Bio page stuff isnt editable
 Home should display lots of users
@@ -8,4 +6,9 @@ No message on incorrect sign in/log in
 signup creates user but doesn't redirect
 Events should be styled nicely and include image
 Style login / signup
+Change password
 Messages not real-time
+
+
+Qs
+Do I need to add signup with real email verification

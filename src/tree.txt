@@ -1,6 +1,3 @@
-Folder PATH listing for volume Windows
-Volume serial number is F8BC-F593
-C:.
 ³   global.scss
 ³   index.html
 ³   main.ts
@@ -56,12 +53,6 @@ C:.
 ³   ³           user-details.component.scss
 ³   ³           user-details.component.ts
 ³   ³           
-³   ÃÄÄÄmatches
-³   ³       matches.component.html
-³   ³       matches.component.scss
-³   ³       matches.component.spec.ts
-³   ³       matches.component.ts
-³   ³       
 ³   ÃÄÄÄmessages
 ³   ³   ³   message.model.ts
 ³   ³   ³   messages.component.html
@@ -73,7 +64,13 @@ C:.
 ³   ³           conversation.component.html
 ³   ³           conversation.component.scss
 ³   ³           conversation.component.ts
+³   ³           conversation.module.ts
 ³   ³           
+³   ÃÄÄÄprofile
+³   ³       profile.component.html
+³   ³       profile.component.scss
+³   ³       profile.component.ts
+³   ³       
 ³   ÀÄÄÄusers
 ³           user.model.ts
 ³           users.service.ts

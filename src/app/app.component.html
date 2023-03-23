@@ -5,7 +5,7 @@
 
                 <ion-list padding class="ion-text-center" id="welcome">
                     <div class="profile-container">
-                        <a routerDirection="root" [routerLink]="['/profile']" lines="none" detail="false" routerLinkActive="selected" class="profile-button">
+                        <a routerDirection="root" id="profile-a" [routerLink]="['/profile']" lines="none" detail="false" routerLinkActive="selected" class="profile-button">
                             <ion-icon slot="start" ios="person-outline" md="person-sharp"></ion-icon>
                         </a>
                         <div>
@@ -13,7 +13,7 @@
                             <ion-label class="ion-text-center">{{ userEmail }}</ion-label>
                         </div>
 
-                        <a routerDirection="root" [routerLink]="['/settings']" lines="none" detail="false" routerLinkActive="selected" class="settings-button">
+                        <a routerDirection="root" id="profile-a" [routerLink]="['/settings']" lines="none" detail="false" routerLinkActive="selected" class="settings-button">
                             <ion-icon slot="start" ios="settings-outline" md="settings-sharp"></ion-icon>
                         </a>
                     </div>

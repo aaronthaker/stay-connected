@@ -9,6 +9,7 @@ import { HomeComponent } from './home/home.component';
 import { ConversationComponent } from './messages/conversation/conversation.component';
 import { MessagesComponent } from './messages/messages.component';
 import { ProfileComponent } from './profile/profile.component';
+import { SettingsComponent } from './settings/settings.component';
 
 const routes: Routes = [
   {
@@ -46,11 +47,16 @@ const routes: Routes = [
   },
   {
     path: 'conversation/:id',
-    component: ConversationComponent
+    component: ConversationComponent,
   },
   {
     path: 'profile',
     component: ProfileComponent
+  },
+  {
+    path: 'settings',
+    component: SettingsComponent,
+    canActivate: [AuthGuard]
   },
 
 ];
