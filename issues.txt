@@ -1,8 +1,11 @@
-Email disappears from sidenav after reload
-Messages not real-time
-Infinite loading screen after signing in
-Need to add bio, gender and location to user but not in signup
-Need page for account settings and profile settings
-Crashes on wrong sign in
 /api/home returns weird dummy data
+Need page for account settings and profile settings
+Need to add bio, gender and location to user but not in signup
+Bio page stuff isnt editable
+Home should display lots of users
+Add  image to user
+No message on incorrect sign in/log in
 signup creates user but doesn't redirect
+Events should be styled nicely and include image
+Style login / signup
+Messages not real-time

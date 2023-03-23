@@ -23,7 +23,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public appPages = [
     { title: 'Home', url: '/home', icon: 'heart' },
-    { title: 'Matches', url: '/matches', icon: 'people' },
     { title: 'Messages', url: '/messages', icon: 'chatbox' },
     { title: 'Events', url: '/events', icon: 'calendar' }
 ];

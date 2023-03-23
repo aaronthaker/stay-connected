@@ -15,7 +15,6 @@ import { EventsListComponent } from './events/events-list/events-list.component'
 import { CreateEventComponent } from './events/create-event/create-event.component';
 import { UserDetailsComponent } from './home/user-details/user-details.component';
 import { HomeComponent } from './home/home.component';
-import { MatchesComponent } from './matches/matches.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
 import { LoginComponent } from './auth/login/login.component';
@@ -32,7 +31,6 @@ import { ProfileComponent } from './profile/profile.component';
     CreateEventComponent,
     UserDetailsComponent,
     HomeComponent,
-    MatchesComponent,
     LoginComponent,
     SignupComponent,
     MessagesComponent,
