@@ -15,7 +15,7 @@
   --inner-padding-bottom: 0;
 }
 
-.received-message {
+.sent-message {
   align-self: flex-start;
   background-color: #ddd;
   border-radius: 12px 12px 0 12px;
@@ -34,7 +34,7 @@
   }
 }
 
-.sent-message {
+.received-message {
   align-self: flex-end;
   background-color: #4caf50;
   color: white;

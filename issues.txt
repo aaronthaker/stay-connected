@@ -1,5 +1,5 @@
-Need to add bio, gender and location to user but not in signup
 Bio page stuff isnt editable
+Need to add bio, gender and location to user but not in signup
 Home should display lots of users
 Add  image to user
 No message on incorrect sign in/log in
