@@ -1,8 +1,7 @@
-// users.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, catchError  } from 'rxjs/operators';
 
 import { User } from './user.model';
 
@@ -36,8 +35,19 @@ export class UserService {
     );
   }
 
+  updateUser(user: User): Observable<User> {
+    const apiUrl = `http://localhost:3000/api/users/${user._id}`;
 
-  // getUserUpdateListener() {
-  //   return this.usersUpdated.asObservable();
-  // }
+    return this.http.put<{ message: string; user: any }>(apiUrl, user).pipe(
+      map(response => {
+        return {
+          ...response.user
+        };
+      }),
+      catchError(error => {
+        console.error('Error updating user:', error);
+        throw error;
+      })
+    );
+  }
 }

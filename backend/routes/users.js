@@ -18,6 +18,27 @@ router.get('/', (req, res, next) => {
     });
 });
 
+router.put('/:userId', (req, res, next) => {
+  const userId = req.params.userId;
+  User.findByIdAndUpdate(userId, req.body)
+    .then(updatedUser => {
+      if (!updatedUser) {
+        return res.status(404).json({
+          message: "User not found"
+        });
+      }
+      res.status(200).json({
+        message: "User updated successfully",
+        user: updatedUser
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
+    });
+});
+
 router.get('/:userId', (req, res, next) => {
   User.findById(req.params.userId)
     .then(user => {

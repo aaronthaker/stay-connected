@@ -17,19 +17,28 @@ export class ProfileComponent implements OnInit {
     location: 'New York City, NY'
   };
   currentUserId: string;
-  currentUser: User
-
+  currentUser: User;
+  editMode = false;
 
   constructor(
     private messagesService: MessagesService,
     private userService: UserService,
-    ) { }
+  ) {}
 
   ngOnInit() {
     this.currentUserId = this.messagesService.currentUserId!;
     this.userService.getUser(this.currentUserId).subscribe((user: any) => {
       this.currentUser = user;
     });
+  }
+
+  toggleEditMode() {
+    if (this.editMode) {
+      this.userService.updateUser(this.currentUser).subscribe((user: User) => {
+        console.log('User updated:', user);
+      });
+    }
+    this.editMode = !this.editMode;
   }
 
 }
