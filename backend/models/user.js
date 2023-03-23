@@ -8,7 +8,9 @@ const userSchema = mongoose.Schema({
   name: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  gender: { type: String },
+  gender: { type: String, required: false},
+  location: { type: String, required: false},
+  bio: { type: String, required: false},
   // profilePicture: { type: String, required: true }
 });
 

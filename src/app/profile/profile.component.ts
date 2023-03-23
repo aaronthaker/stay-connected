@@ -10,12 +10,6 @@ import { UserService } from '../users/users.service';
 })
 export class ProfileComponent implements OnInit {
 
-  dummyData = {
-    username: 'johndoe',
-    email: 'johndoe@example.com',
-    phoneNumber: '123-456-7890',
-    location: 'New York City, NY'
-  };
   currentUserId: string;
   currentUser: User;
   editMode = false;

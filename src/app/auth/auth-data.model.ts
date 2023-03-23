@@ -3,4 +3,6 @@ export interface AuthData {
   email: string;
   password: string;
   gender?: string;
+  location?: string;
+  bio?: string;
 }

@@ -4,7 +4,8 @@ export class User {
     public name: string,
     public email: string,
     public gender?: string,
-    public location?: string
+    public location?: string,
+    public bio?: string
     // public profilePicture: string
   ) {}
 }
