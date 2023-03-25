@@ -11,10 +11,12 @@ import { UserService } from 'src/app/users/users.service';
 })
 export class UserDetailsComponent implements OnInit {
 
-  // user: User;
   displayedUsers: User[] = [];
   currentUserId: string | null;
   displayedUser: User;
+  currentUser: User;
+  currentUserDislikes: string[] | undefined;
+  currentUserLikes: string[] | undefined;
 
   userSub: Subscription;
   currentIndex = 0;
@@ -26,10 +28,19 @@ export class UserDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.currentUserId = this.messagesService.currentUserId;
-    this.userSub = this.userService.getUsers().subscribe(users => {
-      this.displayedUsers = users.filter(user => user._id !== this.currentUserId);
-      this.displayedUser = this.displayedUsers[this.currentIndex];
-    });
+    this.userService.getUser(this.currentUserId).subscribe((user) => {
+      this.currentUser = user;
+      this.currentUserLikes = user.likedUsers;
+      this.currentUserDislikes = user.dislikedUsers;
+      this.userSub = this.userService.getUsers().subscribe(users => {
+        this.displayedUsers = users.filter(user =>
+          user._id !== this.currentUserId &&
+          !this.currentUserDislikes?.includes(user._id) &&
+          !this.currentUserLikes?.includes(user._id)
+        );
+        this.displayedUser = this.displayedUsers[this.currentIndex];
+      });
+    })
   }
 
   onCrossClick(displayedUser: User) {

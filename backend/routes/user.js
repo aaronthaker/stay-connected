@@ -123,6 +123,22 @@ router.put('/:userId/dislike', checkAuth, (req, res, next) => {
     .catch((error) => res.status(500).json({ message: 'An error occurred while disliking the user', error }));
 });
 
+// Update matchedUsers arrays for both users
+router.put('/match', checkAuth, (req, res, next) => {
+  const { userId1, userId2 } = req.body;
+
+  const updateMatchedUsers = (userId, matchedUserId) =>
+    User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { matchedUsers: matchedUserId } },
+      { new: true, useFindAndModify: false }
+    );
+
+  Promise.all([updateMatchedUsers(userId1, userId2), updateMatchedUsers(userId2, userId1)])
+    .then(() => res.status(200).json({ message: 'Users matched successfully' }))
+    .catch((error) => res.status(500).json({ message: 'An error occurred while matching the users', error }));
+});
+
 // Get matched users for the current user
 router.get('/:userId/matches', checkAuth, (req, res, next) => {
   const { userId } = req.params;
