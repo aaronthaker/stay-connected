@@ -113,9 +113,9 @@ export class AuthService {
     this.isAuthenticated = false;
     this.authStatusListener.next(false);
     this.userId = null;
+    this.userEmail = null;
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
-    localStorage.removeItem('userEmail');
     this.router.navigate(['/login']);
   }
 
@@ -126,6 +126,7 @@ export class AuthService {
   }
 
   private clearAuthData() {
+    localStorage.removeItem('userEmail');
     localStorage.removeItem('token');
     localStorage.removeItem('expiration');
     localStorage.removeItem("userId");
