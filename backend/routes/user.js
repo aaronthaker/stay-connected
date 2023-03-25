@@ -73,7 +73,29 @@ router.put('/:userId/like', checkAuth, (req, res, next) => {
   User.findById(likedUserId)
     .then((likedUser) => {
       if (likedUser.likedUsers.includes(userId)) {
-        res.status(200).json({ message: 'User liked successfully', matched: true });
+        // Add to matchedUsers and likedUsers for both users
+        const updateUser = (userId, matchedUserId) =>
+          User.findByIdAndUpdate(
+            userId,
+            {
+              $addToSet: {
+                likedUsers: matchedUserId,
+                matchedUsers: matchedUserId,
+              },
+            },
+            { new: true, useFindAndModify: false }
+          );
+
+        Promise.all([
+          updateUser(userId, likedUserId),
+          updateUser(likedUserId, userId),
+        ])
+          .then(() =>
+            res.status(200).json({ message: 'User liked successfully', matched: true })
+          )
+          .catch((error) =>
+            res.status(500).json({ message: 'An error occurred while liking the user', error })
+          );
       } else {
         User.findByIdAndUpdate(
           userId,
