@@ -63,7 +63,7 @@
 
         <ion-item *ngIf="editMode">
           <ion-label>Age</ion-label>
-          <ion-input [(ngModel)]="currentUser.age"></ion-input>
+          <ion-input type="number" [(ngModel)]="currentUser.age"></ion-input>
         </ion-item>
 
         <ion-item *ngIf="!editMode">
