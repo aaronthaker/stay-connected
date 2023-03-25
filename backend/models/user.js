@@ -9,6 +9,7 @@ const userSchema = mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   gender: { type: String, required: false},
+  age: { type: Number, required: false},
   location: { type: String, required: false},
   bio: { type: String, required: false},
   likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

@@ -57,6 +57,16 @@
         </ion-item> -->
 
         <ion-item *ngIf="!editMode">
+          <ion-label>Age</ion-label>
+          <ion-text>{{ currentUser?.age }}</ion-text>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>Age</ion-label>
+          <ion-input [(ngModel)]="currentUser.age"></ion-input>
+        </ion-item>
+
+        <ion-item *ngIf="!editMode">
           <ion-label>Gender</ion-label>
           <ion-text>{{ currentUser?.gender }}</ion-text>
         </ion-item>
