@@ -44,8 +44,7 @@ export class UserDetailsComponent implements OnInit {
   }
 
   onCrossClick(displayedUser: User) {
-    this.userService.updateDislikedUsers(this.currentUserId, displayedUser._id).subscribe((response) => {
-      console.log(response);
+    this.userService.updateDislikedUsers(this.currentUserId, displayedUser._id).subscribe(() => {
     });
     this.currentIndex++;
     this.displayedUser = this.displayedUsers[this.currentIndex];

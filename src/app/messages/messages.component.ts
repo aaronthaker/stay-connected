@@ -50,7 +50,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
   getMatchedUsers(): void {
     this.messagesService.getMatchedUsers(this.currentUserId).subscribe((users: User[]) => {
       this.matchedUsers = users;
-      console.log(this.matchedUsers)
     });
   }
 

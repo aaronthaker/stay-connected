@@ -20,7 +20,6 @@ export class MessagesService {
   }
 
   getConversation(otherUserIds: string[]): Observable<Message[]> {
-    console.log({ userIds: otherUserIds })
     const apiUrl = `http://localhost:3000/api/messages/conversation`;
 
     return this.http

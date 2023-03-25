@@ -29,7 +29,6 @@ export class ProfileComponent implements OnInit {
   toggleEditMode() {
     if (this.editMode) {
       this.userService.updateUser(this.currentUser).subscribe((user: User) => {
-        console.log('User updated:', user);
       });
     }
     this.editMode = !this.editMode;
