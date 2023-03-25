@@ -7,6 +7,7 @@ export class User {
     public location?: string,
     public bio?: string,
     public likedUsers?: string[],
+    public dislikedUsers?: string[],
     public matchedUsers?: string[],
     // public profilePicture: string
   ) {}

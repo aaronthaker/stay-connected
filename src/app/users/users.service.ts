@@ -51,12 +51,14 @@ export class UserService {
     );
   }
 
-  // Update the likedUsers array
+  updateDislikedUsers(userId: string | null, dislikedUserId: string | null): Observable<any> {
+    return this.http.put(`http://localhost:3000/api/user/${userId}/dislike`, { dislikedUserId });
+  }
+
   updateLikedUsers(userId: string | null, likedUserId: string | null): Observable<any> {
     return this.http.put(`http://localhost:3000/api/user/${userId}/like`, { likedUserId });
   }
 
-  // Update the matchedUsers arrays for both users
   updateMatchedUsers(userId1: string | null, userId2: string | null): Observable<any> {
     return this.http.put(`http://localhost:3000/api/user/match`, { userId1, userId2 });
   }

@@ -22,7 +22,7 @@ export class UserDetailsComponent implements OnInit {
   constructor(
     private messagesService: MessagesService,
     private userService: UserService,
-    ) {}
+  ) { }
 
   ngOnInit() {
     this.currentUserId = this.messagesService.currentUserId;
@@ -32,11 +32,12 @@ export class UserDetailsComponent implements OnInit {
     });
   }
 
-  onCrossClick() {
-    // Get the next user
+  onCrossClick(displayedUser: User) {
+    this.userService.updateDislikedUsers(this.currentUserId, displayedUser._id).subscribe((response) => {
+      console.log(response);
+    });
     this.currentIndex++;
     this.displayedUser = this.displayedUsers[this.currentIndex];
-    // Logic to add the displayedUser._id to likedUsers
   }
 
   onTickClick(displayedUser: User) {
