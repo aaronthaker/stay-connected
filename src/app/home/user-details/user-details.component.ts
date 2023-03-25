@@ -40,9 +40,9 @@ export class UserDetailsComponent implements OnInit {
   }
 
   onTickClick(displayedUser: User) {
-    this.userService.updateLikedUsers(this.currentUserId, displayedUser._id).subscribe(() => {
+    this.userService.updateLikedUsers(this.currentUserId, displayedUser._id).subscribe((response) => {
       // Check if the displayed user has liked the current user
-      if (displayedUser?.likedUsers?.includes(this.currentUserId!)) {
+      if (response.matched) {
         // Update the matchedUsers arrays for both users
         this.userService.updateMatchedUsers(this.currentUserId, displayedUser._id).subscribe();
       }
@@ -50,5 +50,6 @@ export class UserDetailsComponent implements OnInit {
     this.currentIndex++;
     this.displayedUser = this.displayedUsers[this.currentIndex];
   }
+
 
 }
