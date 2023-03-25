@@ -2,7 +2,8 @@
 
   <ion-list>
     <ion-item *ngFor="let matchedUser of matchedUsers" (click)="onUserSelected(matchedUser)">
-      <ion-label>{{ matchedUser.name }}</ion-label>
+      <ion-label>{{ matchedUser.email }}</ion-label>
+      <ion-label></ion-label>
     </ion-item>
   </ion-list>
 

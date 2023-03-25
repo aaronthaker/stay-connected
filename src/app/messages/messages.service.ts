@@ -50,7 +50,7 @@ export class MessagesService {
 
   getMatchedUsers(userId: string | null): Observable<User[]> {
     // Replace with the correct API endpoint
-    return this.http.get<User[]>(`http://localhost:3000/api/users/${userId}/matches`);
+    return this.http.get<User[]>(`http://localhost:3000/api/user/${userId}/matches`);
 }
 
 }

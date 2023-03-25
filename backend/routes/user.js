@@ -123,20 +123,26 @@ router.put('/:userId/dislike', checkAuth, (req, res, next) => {
     .catch((error) => res.status(500).json({ message: 'An error occurred while disliking the user', error }));
 });
 
-// Update matchedUsers arrays for both users
-router.put('/match', checkAuth, (req, res, next) => {
-  const { userId1, userId2 } = req.body;
+// Get matched users for the current user
+router.get('/:userId/matches', checkAuth, (req, res, next) => {
+  const { userId } = req.params;
 
-  const updateMatchedUsers = (userId, matchedUserId) =>
-    User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { matchedUsers: matchedUserId } },
-      { new: true, useFindAndModify: false }
-    );
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
 
-  Promise.all([updateMatchedUsers(userId1, userId2), updateMatchedUsers(userId2, userId1)])
-    .then(() => res.status(200).json({ message: 'Users matched successfully' }))
-    .catch((error) => res.status(500).json({ message: 'An error occurred while matching the users', error }));
+      User.find({ _id: { $in: user.matchedUsers } })
+        .then((matchedUsers) => {
+          res.status(200).json(matchedUsers);
+        })
+        .catch((error) =>
+          res.status(500).json({ message: 'An error occurred while fetching matched users', error })
+        );
+    })
+    .catch((error) => res.status(500).json({ message: 'An error occurred while fetching the user', error }));
 });
+
 
 module.exports = router;
