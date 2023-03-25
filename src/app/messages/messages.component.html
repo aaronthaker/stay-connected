@@ -1,5 +1,11 @@
 <ion-content>
 
+  <ion-list>
+    <ion-item *ngFor="let matchedUser of matchedUsers" (click)="onUserSelected(matchedUser)">
+      <ion-label>{{ matchedUser.name }}</ion-label>
+    </ion-item>
+  </ion-list>
+
   <ion-title>Messages</ion-title>
 
   <ion-title>Users</ion-title>

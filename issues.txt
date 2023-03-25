@@ -1,9 +1,13 @@
-Need to remove gender and location from signup
 Home should display lots of users
 Refine home -> message flow
+Implement unread messages
 Add image to user
 No message on incorrect sign in/log in
 signup creates user but doesn't redirect
+Filter users by interests, audio onboarding, voice chatrooms
+Audio message on bio
+Implement accessibility stuff
+Implement location API
 Events should be styled nicely and include image
 Style login / signup
 Change password

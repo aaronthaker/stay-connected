@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 import { Message } from './message.model';
+import { User } from '../users/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -46,4 +47,10 @@ export class MessagesService {
 
     return this.http.post<{ message: string }>(apiUrl, message);
   }
+
+  getMatchedUsers(userId: string | null): Observable<User[]> {
+    // Replace with the correct API endpoint
+    return this.http.get<User[]>(`http://localhost:3000/api/users/${userId}/matches`);
+}
+
 }

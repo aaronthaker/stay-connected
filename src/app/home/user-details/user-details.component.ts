@@ -39,8 +39,14 @@ export class UserDetailsComponent implements OnInit {
     // Logic to add the displayedUser._id to likedUsers
   }
 
-  onTickClick() {
-    // Get the next user
+  onTickClick(displayedUser: User) {
+    this.userService.updateLikedUsers(this.currentUserId, displayedUser._id).subscribe(() => {
+      // Check if the displayed user has liked the current user
+      if (displayedUser?.likedUsers?.includes(this.currentUserId!)) {
+        // Update the matchedUsers arrays for both users
+        this.userService.updateMatchedUsers(this.currentUserId, displayedUser._id).subscribe();
+      }
+    });
     this.currentIndex++;
     this.displayedUser = this.displayedUsers[this.currentIndex];
   }

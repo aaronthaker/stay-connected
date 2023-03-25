@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map, catchError  } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 
 import { User } from './user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getUser(userId: string): Observable<User> {
     const apiUrl = `http://localhost:3000/api/users/${userId}`;
@@ -50,4 +50,16 @@ export class UserService {
       })
     );
   }
+
+  // Update the likedUsers array
+  updateLikedUsers(userId: string | null, likedUserId: string | null): Observable<any> {
+    return this.http.put(`http://localhost:3000/api/user/${userId}/like`, { likedUserId });
+  }
+
+  // Update the matchedUsers arrays for both users
+  updateMatchedUsers(userId1: string | null, userId2: string | null): Observable<any> {
+    return this.http.put(`http://localhost:3000/api/user/match`, { userId1, userId2 });
+  }
+
+
 }

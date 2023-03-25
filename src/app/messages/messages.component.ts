@@ -18,6 +18,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   messageContent: string;
   userSub: Subscription;
   messageSub: Subscription;
+  matchedUsers: User[] = [];
 
   constructor(
     public userService: UserService,
@@ -29,6 +30,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.userSub = this.userService.getUsers().subscribe(users => {
       this.users = users;
     });
+    this.getMatchedUsers();
   }
 
   ngOnDestroy() {
@@ -43,6 +45,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
   onUserSelected(user: User) {
     this.selectedUser = user;
     this.router.navigate(['/conversation', user._id]);
+  }
+
+  getMatchedUsers(): void {
+    this.messagesService.getMatchedUsers(this.currentUserId).subscribe((users: User[]) => {
+      this.matchedUsers = users;
+    });
   }
 
   get currentUserId() {

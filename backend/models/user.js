@@ -11,38 +11,9 @@ const userSchema = mongoose.Schema({
   gender: { type: String, required: false},
   location: { type: String, required: false},
   bio: { type: String, required: false},
+  likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  matchedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   // profilePicture: { type: String, required: true }
 });
-
-
-router.post("/login", (req, res, next) => {
-    User.find({ email: req.body.email })
-        .then(user => {
-            if (!user) {
-                return res.status(401).json({
-                    message: "Auth failed"
-                })
-            }
-            return bcrypt.compare(req.body.password, user.password)
-        })
-        .then(result => {
-            if (!result) {
-                return res.status(401).json({
-                    message: "Auth failed"
-                });
-            }
-            const token = jwt.sign({
-                    email: user.email,
-                    userId: user._id
-                },
-                'secret_lol', { expiresIn: '1h' }
-            );
-        })
-        .catch(err => {
-            return res.status(401).json({
-                message: "Auth failed"
-            })
-        })
-})
 
 module.exports = mongoose.model('User', userSchema)
