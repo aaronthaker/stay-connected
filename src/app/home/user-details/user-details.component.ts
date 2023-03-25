@@ -70,13 +70,15 @@ export class UserDetailsComponent implements OnInit {
         // Update the matchedUsers arrays for both users
         this.userService.updateMatchedUsers(this.currentUserId, displayedUser._id).subscribe();
         this.showMatchMessage = true;
-        setTimeout(() => {
-          this.showMatchMessage = false;
-        }, 3000);
       }
+
+      // Set a delay before showing the next user and hiding the match message
+      setTimeout(() => {
+        this.currentIndex++;
+        this.displayedUser = this.displayedUsers[this.currentIndex];
+        this.showMatchMessage = false;
+      }, 5000); // Set the delay in milliseconds, e.g., 1000ms = 1s
     });
-    this.currentIndex++;
-    this.displayedUser = this.displayedUsers[this.currentIndex];
   }
 
 
