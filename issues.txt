@@ -1,8 +1,7 @@
-Make dislikedUsers not show up
-Make people already voted not show up
+Make it api/user/id not /api/users/id
+Add age functionality
 add popup if user liked has liked u
 read reciepts to messages to see new messages
-Home should display lots of users
 Refine home -> message flow
 Implement unread messages
 Add image to user

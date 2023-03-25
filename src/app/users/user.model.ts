@@ -4,6 +4,7 @@ export class User {
     public name: string,
     public email: string,
     public gender?: string,
+    public age?: string,
     public location?: string,
     public bio?: string,
     public likedUsers?: string[],
