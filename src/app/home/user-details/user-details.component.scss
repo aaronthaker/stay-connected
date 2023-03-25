@@ -34,3 +34,16 @@ ion-card-title {
 ion-card-title {
     font-weight: 100;
 }
+
+.match-message {
+  background-color: rgba(76, 175, 80, 0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+  margin-top: 1rem;
+  text-align: center;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}

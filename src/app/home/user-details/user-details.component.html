@@ -1,21 +1,24 @@
 <ion-card>
-    <img [src]="'https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg'" width="300px" height="300px" />
-    <ion-card-header>
-        <ion-card-title>{{displayedUser?.email}}, {{displayedUser?.age}}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-        <p>{{displayedUser?.bio}}</p>
-    </ion-card-content>
-    <ion-row class="justify-content-around" class="button-row">
-        <ion-col>
-            <ion-button (click)="onCrossClick(displayedUser)" fill="clear" color="danger">
-                <ion-icon name="close-circle-outline"></ion-icon>
-            </ion-button>
-        </ion-col>
-        <ion-col dir="rtl">
-            <ion-button (click)="onTickClick(displayedUser)" fill="clear" color="success">
-                <ion-icon name="heart-outline"></ion-icon>
-            </ion-button>
-        </ion-col>
-    </ion-row>
+  <img
+    [src]="'https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg'"
+    width="300px" height="300px" />
+  <ion-card-header>
+    <ion-card-title>{{displayedUser?.email}}, {{displayedUser?.age}}</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <p>{{displayedUser?.bio}}</p>
+    <div *ngIf="showMatchMessage" class="match-message" [@fadeInOut]>{{displayedUser?.name}} also liked you!</div>
+  </ion-card-content>
+  <ion-row class="justify-content-around" class="button-row">
+    <ion-col>
+      <ion-button (click)="onCrossClick(displayedUser)" fill="clear" color="danger">
+        <ion-icon name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-col>
+    <ion-col dir="rtl">
+      <ion-button (click)="onTickClick(displayedUser)" fill="clear" color="success">
+        <ion-icon name="heart-outline"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
 </ion-card>

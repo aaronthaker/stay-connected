@@ -1,10 +1,10 @@
-Make it api/user/id not /api/users/id
-Add age functionality
 add popup if user liked has liked u
 read reciepts to messages to see new messages
 Refine home -> message flow
+Add age functionality
 Implement unread messages
 Add image to user
+Make it api/user/id not /api/users/id
 No message on incorrect sign in/log in
 signup creates user but doesn't redirect
 Filter users by interests, audio onboarding, voice chatrooms
