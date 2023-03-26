@@ -5,7 +5,6 @@ const io = require('../socket');
 exports.getConversation = (req, res, next) => {
   const currentUserId = req.userData.userId;
   const otherUserId = req.params.otherUserId;
-  console.log
 
   Message.find({
       $or: [

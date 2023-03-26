@@ -1,3 +1,4 @@
+const http = require('http');
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
@@ -8,7 +9,7 @@ app.use(cors());
 const eventsRoutes = require("./routes/events");
 const userRoutes = require("./routes/user");
 const messagesRoutes = require("./routes/messages");
-const usersRoutes = require("./routes/users"); // Add this line
+const usersRoutes = require("./routes/users");
 
 mongoose.connect('mongodb+srv://190088169:MX2mOQCX1GUrktZY@cluster0.5lzxrui.mongodb.net/stay-connected?retryWrites=true&w=majority')
   .then(() => {
@@ -47,14 +48,8 @@ app.use('/api/user', userRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/users', usersRoutes);
 
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
-
-io.on('connection', socket => {
-  console.log('Client connected');
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-});
+const socket = require('./socket');
+const server = http.createServer(app);
+socket.init(server);
 
 module.exports = app;

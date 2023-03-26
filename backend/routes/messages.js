@@ -7,7 +7,6 @@ const io = require('../socket');
 
 // Retrieve a conversation between two users
 router.get('/conversation/:otherUserId', checkAuth, messagesController.getConversation);
-router.post('/conversation', checkAuth, messagesController.getConversation);
 
 // Send a message to a user
 router.post('/', checkAuth, (req, res, next) => {
@@ -20,7 +19,7 @@ router.post('/', checkAuth, (req, res, next) => {
 
   message.save()
     .then(() => {
-      io.emit('newMessage', message); // Emit a new message event
+      io.getIO().emit('newMessage', message); // Emit a new message event
       res.status(201).json({
         message: 'Message sent successfully'
       });

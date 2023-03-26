@@ -26,12 +26,9 @@ export class ConversationComponent implements OnInit {
   ngOnInit() {
     const otherUserId = this.route.snapshot.params['id'];
     this.userService.getUser(otherUserId).subscribe(user => {
-      console.log("Triggered getUser: ", user);
       this.user = user;
     });
-    const currentUserId = this.messagesService.currentUserId;
-    this.messagesService.getConversation([currentUserId, otherUserId]).subscribe(messages => {
-      console.log("Triggered getConvo: ", messages);
+    this.messagesService.getConversation(otherUserId).subscribe(messages => {
       this.messages = messages;
       this.markMessagesAsRead();
     });
