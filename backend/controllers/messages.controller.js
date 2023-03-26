@@ -49,11 +49,9 @@ exports.getUnreadMessages = (req, res, next) => {
 
 exports.markMessageAsRead = (req, res, next) => {
   const messageId = req.params.messageId;
-  console.log("Inside")
 
   Message.findByIdAndUpdate(messageId, { unread: false })
     .then(result => {
-      console.log(result)
       if (result) {
         res.status(200).json({
           message: 'Message marked as read!'
