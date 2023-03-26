@@ -19,6 +19,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   userSub: Subscription;
   messageSub: Subscription;
   matchedUsers: User[] = [];
+  unreadMessages: Message[] = [];
 
   constructor(
     public userService: UserService,
@@ -31,6 +32,13 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.users = users;
     });
     this.getMatchedUsers();
+    this.messagesService.getUnreadMessages().subscribe(messages => {
+      this.unreadMessages = messages;
+    });
+  }
+
+  getUnreadCount(userId: string): number {
+    return this.unreadMessages.filter(message => message.senderId === userId).length;
   }
 
   ngOnDestroy() {

@@ -13,7 +13,7 @@ export class MessagesService {
   constructor(
     private authService: AuthService,
     private http: HttpClient
-  ) {}
+  ) { }
 
   get currentUserId(): string | null {
     return this.authService.getUserId();
@@ -39,17 +39,44 @@ export class MessagesService {
           });
         })
       );
-}
+  }
 
   sendMessage(message: Message): Observable<{ message: string }> {
     const apiUrl = 'http://localhost:3000/api/messages';
-
+    message.unread = true;
     return this.http.post<{ message: string }>(apiUrl, message);
+  }
+
+  markMessageAsRead(messageId: string | null): Observable<{ message: string }> {
+    const apiUrl = `http://localhost:3000/api/messages/${messageId}/read`;
+
+    return this.http.patch<{ message: string }>(apiUrl, {});
+  }
+
+  getUnreadMessages(): Observable<Message[]> {
+    const apiUrl = `http://localhost:3000/api/messages/unread/${this.currentUserId}`;
+
+    return this.http.get<{ message: string; messages: any }>(apiUrl).pipe(
+      map(response => {
+        return response.messages.map((message: any) => {
+          return {
+            id: message._id,
+            senderId: message.senderId._id,
+            receiverId: message.receiverId._id,
+            content: message.content,
+            timestamp: new Date(message.timestamp),
+            unread: message.unread
+          };
+        }).sort((a: { timestamp: string | number | Date; }, b: { timestamp: string | number | Date; }) => {
+          return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+        });
+      })
+    );
   }
 
   getMatchedUsers(userId: string | null): Observable<User[]> {
     // Replace with the correct API endpoint
     return this.http.get<User[]>(`http://localhost:3000/api/user/${userId}/matches`);
-}
+  }
 
 }

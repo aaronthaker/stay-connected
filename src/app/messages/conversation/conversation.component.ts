@@ -31,6 +31,15 @@ export class ConversationComponent implements OnInit {
     const currentUserId = this.messagesService.currentUserId;
     this.messagesService.getConversation([currentUserId, otherUserId]).subscribe(messages => {
       this.messages = messages;
+      this.markMessagesAsRead();
+    });
+  }
+
+  markMessagesAsRead() {
+    this.messages.forEach(message => {
+      if (message.unread && message.receiverId === this.messagesService.currentUserId) {
+        this.messagesService.markMessageAsRead(message.id).subscribe();
+      }
     });
   }
 
@@ -40,7 +49,8 @@ export class ConversationComponent implements OnInit {
       senderId: this.messagesService.currentUserId,
       receiverId: this.user._id,
       content: this.newMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
+      unread: true
     };
     this.messagesService.sendMessage(message).subscribe(() => {
       this.messages.push(message);

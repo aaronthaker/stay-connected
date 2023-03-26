@@ -29,6 +29,47 @@ exports.getConversation = (req, res, next) => {
     });
 };
 
+exports.getUnreadMessages = (req, res, next) => {
+  const receiverId = req.params.userId;
+
+  Message.find({ receiverId, unread: true })
+    .populate('senderId', 'name')
+    .then(messages => {
+      res.status(200).json({
+        message: 'Unread messages fetched successfully!',
+        messages: messages
+      });
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Fetching unread messages failed!'
+      });
+    });
+};
+
+exports.markMessageAsRead = (req, res, next) => {
+  const messageId = req.params.messageId;
+  console.log("Inside")
+
+  Message.findByIdAndUpdate(messageId, { unread: false })
+    .then(result => {
+      console.log(result)
+      if (result) {
+        res.status(200).json({
+          message: 'Message marked as read!'
+        });
+      } else {
+        res.status(404).json({
+          message: 'Message not found!'
+        });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Marking message as read failed!'
+      });
+    });
+};
 
 exports.sendMessage = (req, res, next) => {
   const message = new Message({

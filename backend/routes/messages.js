@@ -11,6 +11,12 @@ router.post('/conversation', checkAuth, messagesController.getConversation);
 // Send a message to a user
 router.post('/', checkAuth, messagesController.sendMessage);
 
+// Fetch unread messages for a user
+router.get('/unread/:userId', checkAuth, messagesController.getUnreadMessages);
+
+// Mark a message as read
+router.patch('/:messageId/read', checkAuth, messagesController.markMessageAsRead);
+
 module.exports = router;
 
 // router.post('/conversation', checkAuth, (req, res, next) => {
