@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router } from '@angular/router';
+import { MessagesService } from './messages/messages.service';
 
 @Component({
   selector: 'app-root',
@@ -18,14 +19,15 @@ import { Router } from '@angular/router';
 export class AppComponent implements OnInit, OnDestroy {
 
   userEmail: string | null;
+  unreadMessagesCount = 0;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private messagesService: MessagesService) { }
 
   public appPages = [
     { title: 'Home', url: '/home', icon: 'heart' },
     { title: 'Messages', url: '/messages', icon: 'chatbox' },
     { title: 'Events', url: '/events', icon: 'calendar' }
-];
+  ];
 
   private authListenerSubs: Subscription;
   userIsAuthenticated = false;
@@ -35,11 +37,18 @@ export class AppComponent implements OnInit, OnDestroy {
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.userEmail = localStorage.getItem('userEmail'); // Get the userEmail from local storage
     this.authListenerSubs = this.authService
-      .getAuthStatusListener()
-      .subscribe(isAuthenticated => {
-        this.userIsAuthenticated = isAuthenticated;
-        this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
+    .getAuthStatusListener()
+    .subscribe(isAuthenticated => {
+      this.userIsAuthenticated = isAuthenticated;
+      this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
+      this.updateUnreadMessagesCount();
       });
+  }
+
+  updateUnreadMessagesCount() {
+    this.messagesService.getUnreadMessages().subscribe((messages) => {
+      this.unreadMessagesCount = messages.length;
+    });
   }
 
   ngOnDestroy(): void {

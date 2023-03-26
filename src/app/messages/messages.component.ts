@@ -32,9 +32,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.users = users;
     });
     this.getMatchedUsers();
-    this.messagesService.getUnreadMessages().subscribe(messages => {
-      this.unreadMessages = messages;
-    });
   }
 
   getUnreadCount(userId: string): number {
@@ -58,6 +55,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
   getMatchedUsers(): void {
     this.messagesService.getMatchedUsers(this.currentUserId).subscribe((users: User[]) => {
       this.matchedUsers = users;
+    });
+  }
+
+  ionViewWillEnter() {
+    this.messagesService.getUnreadMessages().subscribe(messages => {
+      this.unreadMessages = messages;
     });
   }
 
