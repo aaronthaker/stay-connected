@@ -38,6 +38,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
     console.log('Socket connection initialized:', this.socket);
   }
 
+  getUnreadCount(userId: string): number {
+    return this.unreadMessages.filter(message => message?.senderId === userId).length;
+  }
+
   ngOnDestroy() {
     if (this.userSub) {
       this.userSub.unsubscribe();
