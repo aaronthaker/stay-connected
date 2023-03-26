@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/message');
-const messagesController = require('../controllers/messages');
+const messagesController = require('../controllers/messages.controller');
 const checkAuth = require('../middleware/check-auth');
 
 // Retrieve a conversation between two users

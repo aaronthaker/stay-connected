@@ -32,6 +32,7 @@ export class MessagesService {
               senderId: message.senderId._id,
               receiverId: message.receiverId._id,
               content: message.content,
+              unread: message.unread,
               timestamp: new Date(message.timestamp)
             };
           }).sort((a: { timestamp: string | number | Date; }, b: { timestamp: string | number | Date; }) => {
