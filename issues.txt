@@ -6,7 +6,6 @@ Very Hard - Hard - Medium - Easy - Very Easy:
 
 VH - voice chatrooms
 
-H - Implement unread messages functionality - show in messages
 H - Add image to user
 H - Audio message on bio
 H - Implement accessibility stuff

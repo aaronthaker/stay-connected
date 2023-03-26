@@ -5,6 +5,7 @@ import { User } from '../users/user.model';
 import { Message } from './message.model';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { Socket } from 'ngx-socket-io'; // Add this line
 
 @Component({
   selector: 'app-messages',
@@ -24,7 +25,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
   constructor(
     public userService: UserService,
     public messagesService: MessagesService,
-    private router: Router
+    private router: Router,
+    private socket: Socket // Add this line
   ) {}
 
   ngOnInit() {
@@ -32,6 +34,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.users = users;
     });
     this.getMatchedUsers();
+    this.listenForNewMessages();
   }
 
   getUnreadCount(userId: string): number {
@@ -67,5 +70,19 @@ export class MessagesComponent implements OnInit, OnDestroy {
   get currentUserId() {
     return this.messagesService.currentUserId;
   }
+
+  listenForNewMessages(): void {
+    this.socket.fromEvent<Message>('newMessage').subscribe((message: Message) => {
+      if (message.senderId === this.selectedUser._id) {
+        this.messages.push(message);
+      } else {
+        const index = this.matchedUsers.findIndex(user => user._id === message.senderId);
+        if (index >= 0) {
+          this.matchedUsers[index].lastMessage = message.content;
+        }
+      }
+    });
+  }
+
 
 }

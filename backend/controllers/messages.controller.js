@@ -1,11 +1,11 @@
 const Message = require('../models/message');
 const User = require('../models/user');
+const io = require('../socket');
 
 exports.getConversation = (req, res, next) => {
   const currentUserId = req.userData.userId;
-  // ERROR IS HERE!
-  // const otherUserId = req.params.otherUserId;
-  const otherUserId = req.body.userIds[1];
+  const otherUserId = req.params.otherUserId;
+  console.log
 
   Message.find({
       $or: [
@@ -79,6 +79,8 @@ exports.sendMessage = (req, res, next) => {
 
   message.save()
     .then(() => {
+      // Emit a newMessage event to the Socket.IO server
+      io.getIO().emit('newMessage', { message: message });
       res.status(201).json({
         message: 'Message sent successfully'
       });

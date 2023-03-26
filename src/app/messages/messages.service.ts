@@ -19,13 +19,13 @@ export class MessagesService {
     return this.authService.getUserId();
   }
 
-  getConversation(otherUserIds: string[]): Observable<Message[]> {
+  getConversation(otherUserIds: string[] | undefined): Observable<Message[]> {
     const apiUrl = `http://localhost:3000/api/messages/conversation`;
-
     return this.http
       .post<{ message: string; messages: any }>(apiUrl, { userIds: otherUserIds })
       .pipe(
         map(response => {
+          console.log(response)
           return response.messages.map((message: any) => {
             return {
               id: message._id,

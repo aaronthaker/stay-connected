@@ -30,6 +30,7 @@ import { LanguageComponent } from './settings/language/language.component';
 import { NotificationsComponent } from './settings/notifications/notifications.component';
 import { PreferencesComponent } from './settings/preferences/preferences.component';
 import { PrivacyComponent } from './settings/privacy/privacy.component';
+import { SocketIoModule } from 'ngx-socket-io';
 
 @NgModule({
   declarations: [
@@ -62,7 +63,11 @@ import { PrivacyComponent } from './settings/privacy/privacy.component';
     MatButtonModule,
     MatFormFieldModule,
     HttpClientModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    SocketIoModule.forRoot({
+      url: 'http://localhost:3000',
+      options: {}
+    })
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
