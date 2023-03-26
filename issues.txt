@@ -1,21 +1,31 @@
-add popup if user liked has liked u
-read reciepts to messages to see new messages
-Refine home -> message flow
-Add age functionality
-Make it api/user/id not /api/users/id
-Fix it showing too much in api/users GET route
-Implement unread messages
-Add image to user
-No message on incorrect sign in/log in
-signup creates user but doesn't redirect
-Filter users by interests, audio onboarding, voice chatrooms
-Audio message on bio
-Implement accessibility stuff
-Implement location API
-Events should be styled nicely and include image
-Style login / signup
-Change password
-Messages not real-time
+// Before
+- Studied for IS test
+- Do ethics and technical report
+
+Very Hard - Hard - Medium - Easy - Very Easy:
+
+VH - voice chatrooms
+
+H - Implement unread messages functionality - show in messages
+H - Add image to user
+H - Audio message on bio
+H - Implement accessibility stuff
+H - Add filtering functionality
+H - Messages not real-time
+
+M - Change password functionality
+M - Add audio onboarding
+
+E - Implement location API
+E - Implement 'message now' button on user liked you too
+E - No message on incorrect sign in/log in
+E - signup creates user but doesn't redirect
+E - Events should be styled nicely and include image
+E - Style login / signup
+
+VE - needs to load bottom of conversation when loading convo
+VE - Make it api/user/id not /api/users/id
+VE - Fix it showing too much in api/users GET route
 
 Qs
 Do I need to add signup with real email verification
