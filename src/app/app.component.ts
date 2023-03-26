@@ -36,12 +36,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.userEmail = localStorage.getItem('userEmail'); // Get the userEmail from local storage
+    this.updateUnreadMessagesCount();
     this.authListenerSubs = this.authService
     .getAuthStatusListener()
     .subscribe(isAuthenticated => {
       this.userIsAuthenticated = isAuthenticated;
       this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
-      this.updateUnreadMessagesCount();
       });
   }
 
