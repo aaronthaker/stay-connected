@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { MessagesService } from './messages/messages.service';
 
 @Component({
@@ -33,10 +33,15 @@ export class AppComponent implements OnInit, OnDestroy {
   userIsAuthenticated = false;
 
   ngOnInit(): void {
+    // Below is hacky - if user clicks to different page it'll trigger updateUnreadMessagesCount
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.updateUnreadMessagesCount();
+      }
+    });
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.userEmail = localStorage.getItem('userEmail'); // Get the userEmail from local storage
-    this.updateUnreadMessagesCount();
     this.authListenerSubs = this.authService
     .getAuthStatusListener()
     .subscribe(isAuthenticated => {
