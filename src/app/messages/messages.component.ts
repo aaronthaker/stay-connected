@@ -5,7 +5,7 @@ import { User } from '../users/user.model';
 import { Message } from './message.model';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import { Socket } from 'ngx-socket-io'; // Add this line
+import { Socket } from 'ngx-socket-io';
 
 @Component({
   selector: 'app-messages',
@@ -26,19 +26,20 @@ export class MessagesComponent implements OnInit, OnDestroy {
     public userService: UserService,
     public messagesService: MessagesService,
     private router: Router,
-    private socket: Socket // Add this line
+    private socket: Socket
   ) {}
 
   ngOnInit() {
     this.userSub = this.userService.getUsers().subscribe(users => {
       this.users = users;
+      this.getMatchedUsers();
+      this.listenForNewMessages();
     });
-    this.getMatchedUsers();
-    this.listenForNewMessages();
+    console.log('Socket connection initialized:', this.socket);
   }
 
   getUnreadCount(userId: string): number {
-    return this.unreadMessages.filter(message => message.senderId === userId).length;
+    return this.unreadMessages.filter(message => message?.senderId === userId).length;
   }
 
   ngOnDestroy() {
@@ -73,16 +74,16 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   listenForNewMessages(): void {
     this.socket.fromEvent<Message>('newMessage').subscribe((message: Message) => {
-      if (message.senderId === this.selectedUser._id) {
+      console.log('Received newMessage event with message:', message);
+      if (message.senderId === this.selectedUser?._id) {
         this.messages.push(message);
       } else {
         const index = this.matchedUsers.findIndex(user => user._id === message.senderId);
         if (index >= 0) {
           this.matchedUsers[index].lastMessage = message.content;
+          this.unreadMessages.push(message);
         }
       }
     });
   }
-
-
 }

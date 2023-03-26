@@ -48,20 +48,16 @@ app.set("port", port);
 
 const server = http.createServer(app);
 
-// add cors middleware
-const io = require("socket.io")(server, {
-  cors: {
-    origin: "http://localhost:4200",
-    methods: ["GET", "POST"]
-  }
-});
+const io = require("./backend/socket").init(server);
 
 io.on("connection", socket => {
-  console.log("Client connected");
+  console.log("Client connected:", socket.id);
+
   socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    console.log("Client disconnected:", socket.id);
   });
 });
+
 
 server.on("error", onError);
 server.on("listening", onListening);

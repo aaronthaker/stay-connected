@@ -7,11 +7,11 @@ exports.getConversation = (req, res, next) => {
   const otherUserId = req.params.otherUserId;
 
   Message.find({
-      $or: [
-        { senderId: currentUserId, receiverId: otherUserId },
-        { senderId: otherUserId, receiverId: currentUserId }
-      ]
-    })
+    $or: [
+      { senderId: currentUserId, receiverId: otherUserId },
+      { senderId: otherUserId, receiverId: currentUserId }
+    ]
+  })
     .populate('senderId', 'email')
     .populate('receiverId', 'email')
     .then(messages => {
@@ -73,7 +73,8 @@ exports.sendMessage = (req, res, next) => {
     senderId: req.userData.userId,
     receiverId: req.body.receiverId,
     content: req.body.content,
-    timestamp: new Date()
+    timestamp: new Date(),
+    unread: true // set unread to true by default for new messages
   });
 
   message.save()

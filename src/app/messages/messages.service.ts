@@ -25,7 +25,6 @@ export class MessagesService {
       .get<{ message: string; messages: any }>(apiUrl)
       .pipe(
         map(response => {
-          console.log(response)
           return response.messages.map((message: any) => {
             return {
               id: message._id,

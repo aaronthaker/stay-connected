@@ -36,17 +36,20 @@ export class AppComponent implements OnInit, OnDestroy {
     // Below is hacky - if user clicks to different page it'll trigger updateUnreadMessagesCount
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.updateUnreadMessagesCount();
+        // Exclude the '/login', '/home', and '/signup' routes
+        if (event.url !== '/login' && event.url !== '/home' && event.url !== '/signup') {
+          this.updateUnreadMessagesCount();
+        }
       }
     });
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.userEmail = localStorage.getItem('userEmail'); // Get the userEmail from local storage
     this.authListenerSubs = this.authService
-    .getAuthStatusListener()
-    .subscribe(isAuthenticated => {
-      this.userIsAuthenticated = isAuthenticated;
-      this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
+      .getAuthStatusListener()
+      .subscribe(isAuthenticated => {
+        this.userIsAuthenticated = isAuthenticated;
+        this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
       });
   }
 
