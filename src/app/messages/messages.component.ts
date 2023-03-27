@@ -54,6 +54,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   onUserSelected(user: User) {
     this.selectedUser = user;
     this.router.navigate(['/conversation', user._id]);
+    this.getUnreadMessages();
   }
 
   getMatchedUsers(): void {
@@ -63,11 +64,14 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter() {
+    this.getUnreadMessages();
+  }
+
+  getUnreadMessages() {
     this.messagesService.getUnreadMessages().subscribe(messages => {
       this.unreadMessages = messages;
     });
   }
-
   get currentUserId() {
     return this.messagesService.currentUserId;
   }
