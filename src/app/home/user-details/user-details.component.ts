@@ -49,11 +49,16 @@ export class UserDetailsComponent implements OnInit {
         this.displayedUsers = users.filter(user =>
           user._id !== this.currentUserId &&
           !this.currentUserDislikes?.includes(user._id) &&
-          !this.currentUserLikes?.includes(user._id)
+          !this.currentUserLikes?.includes(user._id) &&
+          this.hasCommonInterests(user, this.currentUser)
         );
         this.displayedUser = this.displayedUsers[this.currentIndex];
       });
     })
+  }
+
+  hasCommonInterests(user1: User, user2: User): boolean {
+    return user1.interests!.some(interest => user2.interests?.includes(interest));
   }
 
   onCrossClick(displayedUser: User) {
