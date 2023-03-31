@@ -5,10 +5,13 @@
   <ion-card-header>
     <ion-card-title>{{ displayedUser?.name }}<span *ngIf="displayedUser?.age">, {{ displayedUser?.age }}</span>
     </ion-card-title> </ion-card-header>
-  <ion-card-content>
-    <p>{{displayedUser?.bio}}</p>
-    <div *ngIf="showMatchMessage" class="match-message" [@fadeInOut]>{{displayedUser?.name}} also liked you!</div>
-  </ion-card-content>
+    <ion-card-content>
+      <p>{{displayedUser?.bio}}</p>
+      <div *ngIf="commonInterests.length > 0" class="common-interests">
+        You have common interests with this person: {{ commonInterests.join(', ') }}
+      </div>
+      <div *ngIf="showMatchMessage" class="match-message" [@fadeInOut]>{{displayedUser?.name}} also liked you!</div>
+    </ion-card-content>
   <ion-row class="justify-content-around" class="button-row">
     <ion-col>
       <ion-button (click)="onCrossClick(displayedUser)" fill="clear" color="danger">

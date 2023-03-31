@@ -34,6 +34,8 @@ export class UserDetailsComponent implements OnInit {
   userSub: Subscription;
   currentIndex = 0;
 
+  commonInterests: string[] = [];
+
   constructor(
     private messagesService: MessagesService,
     private userService: UserService,
@@ -53,12 +55,13 @@ export class UserDetailsComponent implements OnInit {
           this.hasCommonInterests(user, this.currentUser)
         );
         this.displayedUser = this.displayedUsers[this.currentIndex];
+        this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
       });
     })
   }
 
-  hasCommonInterests(user1: User, user2: User): boolean {
-    return user1.interests!.some(interest => user2.interests?.includes(interest));
+  hasCommonInterests(user1: User, user2: User): string[] {
+    return user1.interests!.filter(interest => user2.interests?.includes(interest));
   }
 
   onCrossClick(displayedUser: User) {
@@ -66,6 +69,7 @@ export class UserDetailsComponent implements OnInit {
     });
     this.currentIndex++;
     this.displayedUser = this.displayedUsers[this.currentIndex];
+    this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
   }
 
   onTickClick(displayedUser: User) {
@@ -82,6 +86,7 @@ export class UserDetailsComponent implements OnInit {
         this.currentIndex++;
         this.displayedUser = this.displayedUsers[this.currentIndex];
         this.showMatchMessage = false;
+        this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
       }, 5000); // Set the delay in milliseconds, e.g., 1000ms = 1s
     });
   }
