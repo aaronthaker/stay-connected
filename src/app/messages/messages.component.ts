@@ -28,7 +28,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     public userService: UserService,
     public messagesService: MessagesService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.userSub = this.userService.getUsers().subscribe(users => {
@@ -47,15 +47,15 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
   }
 
-ngOnDestroy() {
-  this.stopTimer();
-  if (this.userSub) {
-    this.userSub.unsubscribe();
+  ngOnDestroy() {
+    this.stopTimer();
+    if (this.userSub) {
+      this.userSub.unsubscribe();
+    }
+    if (this.messageSub) {
+      this.messageSub.unsubscribe();
+    }
   }
-  if (this.messageSub) {
-    this.messageSub.unsubscribe();
-  }
-}
 
   startTimer() {
     this.interval = setInterval(() => {
