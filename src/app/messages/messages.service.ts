@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 import { Message } from './message.model';
 import { User } from '../users/user.model';
@@ -80,14 +80,15 @@ export class MessagesService {
     return this.http.get<User[]>(`http://localhost:3000/api/user/${userId}/matches`);
   }
 
-  listenForNewMessages(): void {
+  listenForNewMessages(): Observable<Message> {
     console.log('Socket connection initialized:', this.socket);
-    this.socket.fromEvent<Message>('newMessage').subscribe((message: any) => {
-      if (message.message.receiverId == this.authService.getUserId()) {
-        console.log('Received newMessage event with message:', message);
-        this.socket.emit('newMessageReceived');
-      }
-    });
+    return this.socket.fromEvent<Message>('newMessage').pipe(
+      filter((message: any) => message.message.receiverId == this.authService.getUserId())
+    );
+  }
+
+  listenForUnreadMessages(): Observable<Message> {
+    return this.socket.fromEvent<Message>('newUnreadMessage');
   }
 
 }

@@ -28,6 +28,45 @@ exports.getConversation = (req, res, next) => {
     });
 };
 
+exports.getContacts = (req, res, next) => {
+  const currentUserId = req.userData.userId;
+
+  Message.find({
+    $or: [
+      { senderId: currentUserId },
+      { receiverId: currentUserId }
+    ]
+  })
+    .populate('senderId', 'email')
+    .populate('receiverId', 'email')
+    .then(messages => {
+      const contacts = [];
+      messages.forEach(message => {
+        if (message.senderId._id.toString() === currentUserId) {
+          if (!contacts.some(contact => contact._id.toString() === message.receiverId._id.toString())) {
+            contacts.push(message.receiverId);
+          }
+        } else {
+          if (!contacts.some(contact => contact._id.toString() === message.senderId._id.toString())) {
+            contacts.push(message.senderId);
+          }
+        }
+      });
+
+      res.status(200).json({
+        message: 'Contacts retrieved successfully.',
+        contacts: contacts
+      });
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'An error occurred while retrieving contacts.',
+        error: error
+      });
+    });
+};
+
+
 exports.getUnreadMessages = (req, res, next) => {
   const receiverId = req.params.userId;
 

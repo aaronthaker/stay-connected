@@ -8,6 +8,9 @@ const io = require('../socket');
 // Retrieve a conversation between two users
 router.get('/conversation/:otherUserId', checkAuth, messagesController.getConversation);
 
+// Add this line to the list of routes
+router.get('/contacts', checkAuth, messagesController.getContacts);
+
 // Send a message to a user
 router.post('/', checkAuth, messagesController.sendMessage);
 

@@ -40,9 +40,7 @@
                   <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
                     [md]="p.icon + '-outline'"></ion-icon>
                   <ion-label style="font-size: smaller">{{ p.title }}</ion-label>
-                  <ion-badge *ngIf="unreadMessagesCount > 0" slot="end">{{
-                    unreadMessagesCount
-                    }}</ion-badge>
+                  <ion-badge *ngIf="unreadMessagesCount > 0" slot="end">{{ unreadMessagesCount }}</ion-badge>
                 </ion-item>
               </ion-item>
             </ng-container>

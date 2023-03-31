@@ -38,8 +38,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.getMatchedUsers();
       this.messagesService.listenForNewMessages();
     });
-    this.startTimer();
+    this.messagesService.listenForUnreadMessages().subscribe(message => {
+      this.unreadMessages.push(message);
+      this.updateUnreadCounts();
+    });
   }
+
 
   getUnreadCount(userId: string): number {
     if (this.unreadCounts[userId]) {
@@ -50,23 +54,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.stopTimer();
     if (this.userSub) {
       this.userSub.unsubscribe();
     }
     if (this.messageSub) {
       this.messageSub.unsubscribe();
     }
-  }
-
-  startTimer() {
-    this.interval = setInterval(() => {
-      this.getUnreadMessages();
-    }, 1000);
-  }
-
-  stopTimer() {
-    clearInterval(this.interval);
   }
 
   onUserSelected(user: User) {

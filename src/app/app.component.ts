@@ -38,27 +38,19 @@ export class AppComponent implements OnInit, OnDestroy {
   userIsAuthenticated = false;
 
   ngOnInit(): void {
-    this.messagesService.listenForNewMessages();
+    this.messagesService.listenForNewMessages().subscribe(message => {
+      this.updateUnreadMessagesCount();
+    });
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
-    this.userEmail = localStorage.getItem('userEmail'); // Get the userEmail from local storage
+    this.userEmail = localStorage.getItem('userEmail');
     this.authListenerSubs = this.authService
       .getAuthStatusListener()
       .subscribe(isAuthenticated => {
         this.userIsAuthenticated = isAuthenticated;
-        this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
+        this.userEmail = this.authService.getUserEmail();
       });
-    this.startTimer();
-  }
-
-  startTimer() {
-    this.interval = setInterval(() => {
-      this.updateUnreadMessagesCount();
-    }, 1000);
-  }
-
-  stopTimer() {
-    clearInterval(this.interval);
+    this.updateUnreadMessagesCount();
   }
 
   updateUnreadMessagesCount() {
@@ -71,7 +63,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.authListenerSubs.unsubscribe();
-    this.stopTimer();
   }
 
   onLogout() {
