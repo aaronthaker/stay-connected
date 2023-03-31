@@ -6,6 +6,7 @@ import { Message } from './message.model';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-messages',
@@ -27,7 +28,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
   constructor(
     public userService: UserService,
     public messagesService: MessagesService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -84,10 +86,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   getUnreadMessages() {
-    this.messagesService.getUnreadMessages().subscribe(messages => {
-      this.unreadMessages = messages;
-      this.updateUnreadCounts();
-    });
+    if (this.authService.getIsAuth()) {
+      this.messagesService.getUnreadMessages().subscribe(messages => {
+        this.unreadMessages = messages;
+        this.updateUnreadCounts();
+      });
+    }
   }
 
   updateUnreadCounts() {

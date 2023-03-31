@@ -22,7 +22,11 @@ export class AppComponent implements OnInit, OnDestroy {
   unreadMessagesCount = 0;
   interval: any;
 
-  constructor(private authService: AuthService, private router: Router, private messagesService: MessagesService) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private messagesService: MessagesService
+  ) { }
 
   public appPages = [
     { title: 'Home', url: '/home', icon: 'heart' },
@@ -44,7 +48,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.userIsAuthenticated = isAuthenticated;
         this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
       });
-      this.startTimer();
+    this.startTimer();
   }
 
   startTimer() {
@@ -58,9 +62,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   updateUnreadMessagesCount() {
-    this.messagesService.getUnreadMessages().subscribe((messages) => {
-      this.unreadMessagesCount = messages.length;
-    });
+    if (this.authService.getIsAuth()) {
+      this.messagesService.getUnreadMessages().subscribe((messages) => {
+        this.unreadMessagesCount = messages.length;
+      });
+    }
   }
 
   ngOnDestroy(): void {
