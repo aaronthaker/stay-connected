@@ -42,6 +42,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.unreadMessages.push(message);
       this.updateUnreadCounts();
     });
+
+    this.messagesService.listenForNewMessages().subscribe(message => {
+      this.unreadMessages.push(message);
+      this.updateUnreadCounts();
+    });
   }
 
 

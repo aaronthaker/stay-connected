@@ -1,22 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Messages</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content>
 
+  <ion-title>Matched Users</ion-title>
   <ion-list>
     <ion-item *ngFor="let matchedUser of matchedUsers" (click)="onUserSelected(matchedUser)">
       <ion-label>{{ matchedUser.email }}</ion-label>
-      <ion-label></ion-label>
+      <ion-badge *ngIf="getUnreadCount(matchedUser._id) > 0" slot="end">{{ getUnreadCount(matchedUser._id) }}</ion-badge>
     </ion-item>
   </ion-list>
 
-  <ion-title>Messages</ion-title>
-
   <ion-title>Users</ion-title>
-
-  <ion-item (click)="onUserSelected(user)" *ngFor="let user of users">
-    <ion-avatar slot="start">
-      <img [src]="'https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg'" />
-    </ion-avatar>
-    <ion-label>{{ user.email }}</ion-label>
-    <ion-badge *ngIf="getUnreadCount(user._id) > 0" slot="end">{{ getUnreadCount(user._id) }}</ion-badge>
-  </ion-item>
+  <ion-list>
+    <ion-item (click)="onUserSelected(user)" *ngFor="let user of users">
+      <ion-avatar slot="start">
+        <img [src]="'https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg'" />
+      </ion-avatar>
+      <ion-label>{{ user.email }}</ion-label>
+      <ion-badge *ngIf="getUnreadCount(user._id) > 0" slot="end">{{ getUnreadCount(user._id) }}</ion-badge>
+    </ion-item>
+  </ion-list>
 
 </ion-content>

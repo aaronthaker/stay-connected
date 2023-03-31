@@ -83,7 +83,8 @@ export class MessagesService {
   listenForNewMessages(): Observable<Message> {
     console.log('Socket connection initialized:', this.socket);
     return this.socket.fromEvent<Message>('newMessage').pipe(
-      filter((message: any) => message.message.receiverId == this.authService.getUserId())
+      filter((message: any) => message.message.receiverId == this.authService.getUserId()),
+      map((message: any) => message.message)
     );
   }
 
