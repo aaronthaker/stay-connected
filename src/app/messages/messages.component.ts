@@ -21,6 +21,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
   messageSub: Subscription;
   matchedUsers: User[] = [];
   unreadMessages: Message[] = [];
+  unreadCountMap: { [userId: string]: number } = {};
+
+  interval: any;
 
   constructor(
     public userService: UserService,
@@ -36,19 +39,35 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.listenForNewMessages();
     });
     console.log('Socket connection initialized:', this.socket);
+    this.startTimer();
   }
 
   getUnreadCount(userId: string): number {
-    return this.unreadMessages.filter(message => message?.senderId === userId).length;
+    if (!this.unreadCountMap[userId]) {
+      const count = this.unreadMessages.filter(message => message?.senderId === userId).length;
+      this.unreadCountMap[userId] = count;
+    }
+    return this.unreadCountMap[userId];
   }
 
-  ngOnDestroy() {
-    if (this.userSub) {
-      this.userSub.unsubscribe();
-    }
-    if (this.messageSub) {
-      this.messageSub.unsubscribe();
-    }
+ngOnDestroy() {
+  this.stopTimer();
+  if (this.userSub) {
+    this.userSub.unsubscribe();
+  }
+  if (this.messageSub) {
+    this.messageSub.unsubscribe();
+  }
+}
+
+  startTimer() {
+    this.interval = setInterval(() => {
+      this.getUnreadMessages();
+    }, 1000);
+  }
+
+  stopTimer() {
+    clearInterval(this.interval);
   }
 
   onUserSelected(user: User) {
