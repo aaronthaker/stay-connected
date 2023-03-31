@@ -31,6 +31,8 @@ import { NotificationsComponent } from './settings/notifications/notifications.c
 import { PreferencesComponent } from './settings/preferences/preferences.component';
 import { PrivacyComponent } from './settings/privacy/privacy.component';
 import { SocketIoModule } from 'ngx-socket-io';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -61,9 +63,11 @@ import { SocketIoModule } from 'ngx-socket-io';
     BrowserAnimationsModule,
     MatInputModule,
     MatButtonModule,
+    MatChipsModule,
     MatFormFieldModule,
     HttpClientModule,
     MatProgressSpinnerModule,
+    MatAutocompleteModule,
     SocketIoModule.forRoot({
       url: 'http://localhost:3000',
       options: {}
