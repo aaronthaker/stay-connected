@@ -30,11 +30,10 @@ export class UserDetailsComponent implements OnInit {
   currentUserDislikes: string[] | undefined;
   currentUserLikes: string[] | undefined;
   showMatchMessage: boolean;
+  commonInterests: boolean = false;
 
   userSub: Subscription;
   currentIndex = 0;
-
-  commonInterests: string[] = [];
 
   constructor(
     private messagesService: MessagesService,
@@ -48,20 +47,29 @@ export class UserDetailsComponent implements OnInit {
       this.currentUserLikes = user.likedUsers;
       this.currentUserDislikes = user.dislikedUsers;
       this.userSub = this.userService.getUsers().subscribe(users => {
-        this.displayedUsers = users.filter(user =>
+        const usersWithCommonInterests = users.filter(user =>
           user._id !== this.currentUserId &&
           !this.currentUserDislikes?.includes(user._id) &&
           !this.currentUserLikes?.includes(user._id) &&
           this.hasCommonInterests(user, this.currentUser)
         );
+        const usersWithoutCommonInterests = users.filter(user =>
+          user._id !== this.currentUserId &&
+          !this.currentUserDislikes?.includes(user._id) &&
+          !this.currentUserLikes?.includes(user._id) &&
+          !this.hasCommonInterests(user, this.currentUser)
+        );
+        console.log(usersWithCommonInterests, usersWithoutCommonInterests)
+        this.displayedUsers = [...usersWithCommonInterests, ...usersWithoutCommonInterests];
         this.displayedUser = this.displayedUsers[this.currentIndex];
         this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
       });
     })
   }
 
-  hasCommonInterests(user1: User, user2: User): string[] {
-    return user1.interests!.filter(interest => user2.interests?.includes(interest));
+
+  hasCommonInterests(user1: User, user2: User): boolean {
+    return user1.interests!.some(interest => user2.interests?.includes(interest));
   }
 
   onCrossClick(displayedUser: User) {
