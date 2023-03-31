@@ -59,7 +59,6 @@ export class UserDetailsComponent implements OnInit {
           !this.currentUserLikes?.includes(user._id) &&
           !this.hasCommonInterests(user, this.currentUser)
         );
-        console.log(usersWithCommonInterests, usersWithoutCommonInterests)
         this.displayedUsers = [...usersWithCommonInterests, ...usersWithoutCommonInterests];
         this.displayedUser = this.displayedUsers[this.currentIndex];
         this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
