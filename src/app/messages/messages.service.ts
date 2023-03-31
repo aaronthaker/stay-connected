@@ -14,7 +14,7 @@ export class MessagesService {
   constructor(
     private authService: AuthService,
     private http: HttpClient,
-    private socket: Socket
+    public socket: Socket
   ) { }
 
   get currentUserId(): string | null {
