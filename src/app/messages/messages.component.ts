@@ -22,6 +22,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   matchedUsers: User[] = [];
   unreadMessages: Message[] = [];
   interval: any;
+  unreadCounts: { [userId: string]: number } = {};
 
   constructor(
     public userService: UserService,
@@ -41,7 +42,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   getUnreadCount(userId: string): number {
-    return this.unreadMessages.filter(message => message?.senderId === userId).length;
+    if (this.unreadCounts[userId]) {
+      return this.unreadCounts[userId];
+    } else {
+      return 0;
+    }
   }
 
 ngOnDestroy() {
@@ -83,8 +88,20 @@ ngOnDestroy() {
   getUnreadMessages() {
     this.messagesService.getUnreadMessages().subscribe(messages => {
       this.unreadMessages = messages;
+      this.updateUnreadCounts();
     });
   }
+
+  updateUnreadCounts() {
+    this.unreadCounts = {};
+    for (const message of this.unreadMessages) {
+      if (!this.unreadCounts[message.senderId!]) {
+        this.unreadCounts[message.senderId!] = 0;
+      }
+      this.unreadCounts[message.senderId!]++;
+    }
+  }
+
   get currentUserId() {
     return this.messagesService.currentUserId;
   }
@@ -98,7 +115,10 @@ ngOnDestroy() {
         const index = this.matchedUsers.findIndex(user => user._id === message.senderId);
         if (index >= 0) {
           this.matchedUsers[index].lastMessage = message.content;
-          this.unreadMessages.push(message);
+          if (!this.unreadCounts[message.senderId!]) {
+            this.unreadCounts[message.senderId!] = 0;
+          }
+          this.unreadCounts[message.senderId!]++;
         }
       }
     });
