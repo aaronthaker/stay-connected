@@ -27,17 +27,15 @@ export class MessagesComponent implements OnInit, OnDestroy {
   constructor(
     public userService: UserService,
     public messagesService: MessagesService,
-    private router: Router,
-    private socket: Socket
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.userSub = this.userService.getUsers().subscribe(users => {
       this.users = users;
       this.getMatchedUsers();
-      this.listenForNewMessages();
+      this.messagesService.listenForNewMessages();
     });
-    console.log('Socket connection initialized:', this.socket);
     this.startTimer();
   }
 
@@ -106,21 +104,4 @@ ngOnDestroy() {
     return this.messagesService.currentUserId;
   }
 
-  listenForNewMessages(): void {
-    this.socket.fromEvent<Message>('newMessage').subscribe((message: Message) => {
-      console.log('Received newMessage event with message:', message);
-      if (message.senderId === this.selectedUser?._id) {
-        this.messages.push(message);
-      } else {
-        const index = this.matchedUsers.findIndex(user => user._id === message.senderId);
-        if (index >= 0) {
-          this.matchedUsers[index].lastMessage = message.content;
-          if (!this.unreadCounts[message.senderId!]) {
-            this.unreadCounts[message.senderId!] = 0;
-          }
-          this.unreadCounts[message.senderId!]++;
-        }
-      }
-    });
-  }
 }

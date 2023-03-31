@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 import { Message } from './message.model';
 import { User } from '../users/user.model';
+import { Socket } from 'ngx-socket-io';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,8 @@ import { User } from '../users/user.model';
 export class MessagesService {
   constructor(
     private authService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private socket: Socket
   ) { }
 
   get currentUserId(): string | null {
@@ -77,6 +79,13 @@ export class MessagesService {
   getMatchedUsers(userId: string | null): Observable<User[]> {
     // Replace with the correct API endpoint
     return this.http.get<User[]>(`http://localhost:3000/api/user/${userId}/matches`);
+  }
+
+  listenForNewMessages(): void {
+    console.log('Socket connection initialized:', this.socket);
+    this.socket.fromEvent<Message>('newMessage').subscribe((message: Message) => {
+      console.log('Received newMessage event with message:', message);
+    });
   }
 
 }
