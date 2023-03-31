@@ -15,6 +15,10 @@ const userSchema = mongoose.Schema({
   likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   matchedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   dislikedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  interests: {
+    type: [String],
+    default: [],
+  },
   // profilePicture: { type: String, required: true }
 });
 

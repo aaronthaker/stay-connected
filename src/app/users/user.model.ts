@@ -13,6 +13,7 @@ export class User {
     public likedUsers?: string[],
     public dislikedUsers?: string[],
     public matchedUsers?: string[],
+    public interests?: string[],
     // public profilePicture: string
   ) {}
 }

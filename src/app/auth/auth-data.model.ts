@@ -6,4 +6,5 @@ export interface AuthData {
   age?: number;
   location?: string;
   bio?: string;
+  interests?: string[];
 }

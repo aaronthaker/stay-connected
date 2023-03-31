@@ -86,22 +86,33 @@
           <ion-input [(ngModel)]="currentUser.location"></ion-input>
         </ion-item>
 
-        <ion-item>
-          <ion-label>Interests</ion-label>
-          <mat-form-field appearance="outline" class="interest-input">
-            <input matInput placeholder="Add an interest" [formControl]="interestCtrl" [matAutocomplete]="auto">
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event.option.value)">
-              <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion">
-                {{suggestion}}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-        </ion-item>
+        <!-- Wrap the input field and chips in a div with *ngIf="editMode" -->
+        <div *ngIf="editMode">
+          <ion-item>
+            <ion-label>Interests</ion-label>
+            <mat-form-field appearance="outline" class="interest-input">
+              <input matInput placeholder="Add an interest" [formControl]="interestCtrl" [matAutocomplete]="auto">
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event.option.value)">
+                <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion">
+                  {{suggestion}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </ion-item>
 
-        <ion-chip *ngFor="let interest of interests">
-          <ion-label>{{interest}}</ion-label>
-          <ion-icon name="close" (click)="remove(interest)"></ion-icon>
-        </ion-chip>
+          <ion-chip *ngFor="let interest of interests">
+            <ion-label>{{interest}}</ion-label>
+            <ion-icon name="close" (click)="remove(interest)"></ion-icon>
+          </ion-chip>
+        </div>
+
+        <!-- Display interests as plain text when not in editMode -->
+        <div *ngIf="!editMode">
+          <ion-item>
+            <ion-label>Interests</ion-label>
+            <ion-text>{{ interests.join(', ') }}</ion-text>
+          </ion-item>
+        </div>
 
       </ion-list>
     </ion-card-content>
