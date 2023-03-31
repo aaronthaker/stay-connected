@@ -21,8 +21,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
   messageSub: Subscription;
   matchedUsers: User[] = [];
   unreadMessages: Message[] = [];
-  unreadCountMap: { [userId: string]: number } = {};
-
   interval: any;
 
   constructor(
@@ -43,11 +41,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   getUnreadCount(userId: string): number {
-    if (!this.unreadCountMap[userId]) {
-      const count = this.unreadMessages.filter(message => message?.senderId === userId).length;
-      this.unreadCountMap[userId] = count;
-    }
-    return this.unreadCountMap[userId];
+    return this.unreadMessages.filter(message => message?.senderId === userId).length;
   }
 
 ngOnDestroy() {
