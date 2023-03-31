@@ -82,8 +82,11 @@ export class MessagesService {
 
   listenForNewMessages(): void {
     console.log('Socket connection initialized:', this.socket);
-    this.socket.fromEvent<Message>('newMessage').subscribe((message: Message) => {
-      console.log('Received newMessage event with message:', message);
+    this.socket.fromEvent<Message>('newMessage').subscribe((message: any) => {
+      if (message.message.receiverId == this.authService.getUserId()) {
+        console.log('Received newMessage event with message:', message);
+        this.socket.emit('newMessageReceived');
+      }
     });
   }
 
