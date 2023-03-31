@@ -20,6 +20,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   userEmail: string | null;
   unreadMessagesCount = 0;
+  interval: any;
 
   constructor(private authService: AuthService, private router: Router, private messagesService: MessagesService) { }
 
@@ -33,15 +34,7 @@ export class AppComponent implements OnInit, OnDestroy {
   userIsAuthenticated = false;
 
   ngOnInit(): void {
-    // Below is hacky - if user clicks to different page it'll trigger updateUnreadMessagesCount
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        // Exclude the '/login', '/home', and '/signup' routes
-        if (event.url !== '/login' && event.url !== '/home' && event.url !== '/signup') {
-          this.updateUnreadMessagesCount();
-        }
-      }
-    });
+    this.messagesService.listenForNewMessages();
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.userEmail = localStorage.getItem('userEmail'); // Get the userEmail from local storage
@@ -51,6 +44,17 @@ export class AppComponent implements OnInit, OnDestroy {
         this.userIsAuthenticated = isAuthenticated;
         this.userEmail = this.authService.getUserEmail(); // Update userEmail on login/logout
       });
+      this.startTimer();
+  }
+
+  startTimer() {
+    this.interval = setInterval(() => {
+      this.updateUnreadMessagesCount();
+    }, 1000);
+  }
+
+  stopTimer() {
+    clearInterval(this.interval);
   }
 
   updateUnreadMessagesCount() {
@@ -61,6 +65,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.authListenerSubs.unsubscribe();
+    this.stopTimer();
   }
 
   onLogout() {
