@@ -6,6 +6,7 @@ import { AuthService } from '../auth/auth.service';
 import { Message } from './message.model';
 import { User } from '../users/user.model';
 import { Socket } from 'ngx-socket-io';
+import { MessagesComponent } from './messages.component';
 
 @Injectable({
   providedIn: 'root',

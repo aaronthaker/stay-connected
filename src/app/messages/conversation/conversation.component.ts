@@ -1,20 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessagesService } from '../messages.service';
 import { UserService } from '../../users/users.service';
 import { Message } from '../message.model';
 import { User } from 'src/app/users/user.model';
 import { AnimationController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-conversation',
   templateUrl: './conversation.component.html',
   styleUrls: ['./conversation.component.scss']
 })
-export class ConversationComponent implements OnInit {
+export class ConversationComponent implements OnInit, OnDestroy {
   public user: User;
   public messages: Message[] = [];
   public newMessage: string;
+  newMessageSub: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,6 +34,18 @@ export class ConversationComponent implements OnInit {
       this.messages = messages;
       this.markMessagesAsRead();
     });
+    this.newMessageSub = this.messagesService.listenForNewMessages().subscribe((message: Message) => {
+      if (message.senderId === this.user._id && message.receiverId === this.messagesService.currentUserId) {
+        this.messages.push(message);
+        this.markMessagesAsRead();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.newMessageSub) {
+      this.newMessageSub.unsubscribe();
+    }
   }
 
   markMessagesAsRead() {

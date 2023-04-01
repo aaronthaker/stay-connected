@@ -1,16 +1,12 @@
-// Before
-- Studied for IS test
-- Do ethics and technical report
-
 Very Hard - Hard - Medium - Easy - Very Easy:
 
 VH - voice chatrooms
 
+H - Implement all settings pages
 H - Add image to user
 H - Audio message on bio
 H - Implement accessibility stuff
 H - Add filtering functionality
-H - Messages not real-time
 
 M - Change password functionality
 M - Add audio onboarding
@@ -24,7 +20,7 @@ E - Style login / signup
 
 VE - needs to load bottom of conversation when loading convo
 VE - Make it api/user/id not /api/users/id
-VE - Fix it showing too much in api/users GET route
+VE - Fix it showing too much in api/users GET route + listing users in user-details
 
 Qs
 Do I need to add signup with real email verification

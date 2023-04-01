@@ -3,9 +3,8 @@ import { UserService } from '../users/users.service';
 import { MessagesService } from './messages.service';
 import { User } from '../users/user.model';
 import { Message } from './message.model';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import { Socket } from 'ngx-socket-io';
 import { AuthService } from '../auth/auth.service';
 
 @Component({
@@ -24,6 +23,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   unreadMessages: Message[] = [];
   interval: any;
   unreadCounts: { [userId: string]: number } = {};
+  conversationSelected = new Subject<string>();
 
   constructor(
     public userService: UserService,
@@ -70,6 +70,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   onUserSelected(user: User) {
     this.selectedUser = user;
     this.router.navigate(['/conversation', user._id]);
+    this.conversationSelected.next(user._id);
     this.getUnreadMessages();
   }
 
