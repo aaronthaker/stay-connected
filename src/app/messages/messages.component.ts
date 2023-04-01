@@ -6,6 +6,7 @@ import { Message } from './message.model';
 import { Subject, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { SharedService } from '../shared.service';
 
 @Component({
   selector: 'app-messages',
@@ -23,13 +24,13 @@ export class MessagesComponent implements OnInit, OnDestroy {
   unreadMessages: Message[] = [];
   interval: any;
   unreadCounts: { [userId: string]: number } = {};
-  conversationSelected = new Subject<string>();
 
   constructor(
     public userService: UserService,
     public messagesService: MessagesService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private sharedService: SharedService
   ) { }
 
   ngOnInit() {
@@ -70,7 +71,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   onUserSelected(user: User) {
     this.selectedUser = user;
     this.router.navigate(['/conversation', user._id]);
-    this.conversationSelected.next(user._id);
+    this.sharedService.conversationSelected.next(user._id);
     this.getUnreadMessages();
   }
 

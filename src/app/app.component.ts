@@ -4,6 +4,7 @@ import { AuthService } from './auth/auth.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { NavigationEnd, Router } from '@angular/router';
 import { MessagesService } from './messages/messages.service';
+import { SharedService } from './shared.service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,8 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private messagesService: MessagesService
+    private messagesService: MessagesService,
+    private sharedService: SharedService
   ) { }
 
   public appPages = [
@@ -38,6 +40,11 @@ export class AppComponent implements OnInit, OnDestroy {
   userIsAuthenticated = false;
 
   ngOnInit(): void {
+    this.sharedService.conversationSelected.subscribe(() => {
+      setTimeout(() => {
+        this.updateUnreadMessagesCount();
+      }, 500);
+    });
     this.messagesService.listenForNewMessages().subscribe(message => {
       this.updateUnreadMessagesCount();
     });
