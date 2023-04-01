@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
 })
 export class ConversationComponent implements OnInit, OnDestroy {
   public user: User;
-  public messages: Message[] = [];
+  public messages: any[] = [];
   public newMessage: string;
   newMessageSub: Subscription;
   @ViewChild('content', { static: false }) content: IonContent;
@@ -60,6 +60,10 @@ export class ConversationComponent implements OnInit, OnDestroy {
   markMessagesAsRead() {
     this.messages.forEach(message => {
       if (message.unread && message.receiverId === this.messagesService.currentUserId) {
+        if (message._id) {
+          message.id = message._id;
+          delete message._id;
+        }
         this.messagesService.markMessageAsRead(message.id).subscribe();
       }
     });

@@ -18,8 +18,6 @@ E - signup creates user but doesn't redirect
 E - Events should be styled nicely and include image
 E - Style login / signup
 
-VE - needs to load bottom of conversation when loading convo
-VE - Make it api/user/id not /api/users/id
 VE - Fix it showing too much in api/users GET route + listing users in user-details
 
 Qs
