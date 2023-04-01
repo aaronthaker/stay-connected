@@ -1,4 +1,5 @@
 <ion-app>
+  <!-- Remove ng-container to show sidenav when not logged in -->
   <ng-container *ngIf="userIsAuthenticated">
     <ion-split-pane contentId="main-content">
       <ion-menu class="sidemenu" contentId="main-content" type="overlay">
