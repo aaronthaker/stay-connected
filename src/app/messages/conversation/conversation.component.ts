@@ -1,10 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessagesService } from '../messages.service';
 import { UserService } from '../../users/users.service';
 import { Message } from '../message.model';
 import { User } from 'src/app/users/user.model';
-import { AnimationController } from '@ionic/angular';
+import { AnimationController, IonContent } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -17,6 +17,7 @@ export class ConversationComponent implements OnInit, OnDestroy {
   public messages: Message[] = [];
   public newMessage: string;
   newMessageSub: Subscription;
+  @ViewChild('content', { static: false }) content: IonContent;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,11 +34,13 @@ export class ConversationComponent implements OnInit, OnDestroy {
     this.messagesService.getConversation(otherUserId).subscribe(messages => {
       this.messages = messages;
       this.markMessagesAsRead();
+      this.scrollToBottom();
     });
     this.newMessageSub = this.messagesService.listenForNewMessages().subscribe((message: Message) => {
       if (message.senderId === this.user._id && message.receiverId === this.messagesService.currentUserId) {
         this.messages.push(message);
         this.markMessagesAsRead();
+        this.scrollToBottom();
       }
     });
   }
@@ -46,6 +49,12 @@ export class ConversationComponent implements OnInit, OnDestroy {
     if (this.newMessageSub) {
       this.newMessageSub.unsubscribe();
     }
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      this.content.scrollToBottom(300);
+    }, 300);
   }
 
   markMessagesAsRead() {
