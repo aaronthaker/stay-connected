@@ -18,6 +18,7 @@ import { PrivacyComponent } from './settings/privacy/privacy.component';
 import { SettingsComponent } from './settings/settings.component';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'home',
     component: HomeComponent,
