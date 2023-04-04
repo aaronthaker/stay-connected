@@ -1,4 +1,3 @@
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -20,15 +19,15 @@ export class LoginComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
-    ) { }
+  ) { }
 
   ngOnInit() {
-    this.authStatusSub = this.authService.getAuthStatusListener().subscribe(
-      authStatus => {
+    this.authStatusSub = this.authService
+      .getAuthStatusListener()
+      .subscribe((authStatus) => {
         this.isLoading = false;
-      }
-    );
-    this.route.queryParams.subscribe(params => {
+      });
+    this.route.queryParams.subscribe((params) => {
       if (params['signup'] === 'success') {
         this.successMessage = 'Signup successful, now login.';
       }
@@ -44,7 +43,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
     this.isLoading = true;
-    this.authService.login(form.value.email, form.value.password);
+    this.authService.login(form.value.email, form.value.password, (errorMessage) => {
+      this.isLoading = false;
+      this.errorMessage = errorMessage;
+    });
   }
-
 }

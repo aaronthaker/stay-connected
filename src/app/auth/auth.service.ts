@@ -34,42 +34,43 @@ export class AuthService {
   createUser(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
     this.http.post("http://localhost:3000/api/user/signup", authData)
-    .subscribe(() => {
-      this.router.navigate(["/login"], { queryParams: { signup: 'success' } });
-    }, error => {
-      this.authStatusListener.next(false);
-    });
+      .subscribe(() => {
+        this.router.navigate(["/login"], { queryParams: { signup: 'success' } });
+      }, error => {
+        this.authStatusListener.next(false);
+      });
   }
 
   getUserEmail() {
     return this.userEmail;
   }
 
-  login(email: string, password: string) {
-    const authData: AuthData = {email: email, password: password};
-    this.http.post<{ token: string, expiresIn: number, userId: string, email:string }>("http://localhost:3000/api/user/login", authData)
-    .subscribe(response => {
-      const token = response.token;
-      this.token = token;
-      this.userEmail = response.email;
-      if (token) {
-        const expiresInDuration = response.expiresIn;
-        this.setAuthTimer(expiresInDuration);
-        this.isAuthenticated = true;
-        this.userId = response.userId;
-        this.authStatusListener.next(true);
-        const now = new Date();
-        const expirationDate = new Date(now.getTime() + (expiresInDuration * 1000));
-        this.saveAuthData(token, expirationDate, this.userId);
-        localStorage.setItem('userEmail', response.email);
-        this.router.navigate(['/home']);
-      }
-    }, error => {
-      this.authStatusListener.next(false);
-    })
+  login(email: string, password: string, errorCallback: (errorMessage: string) => void) {
+    const authData: AuthData = { email: email, password: password };
+    this.http.post<{ token: string, expiresIn: number, userId: string, email: string }>("http://localhost:3000/api/user/login", authData)
+      .subscribe(response => {
+        const token = response.token;
+        this.token = token;
+        this.userEmail = response.email;
+        if (token) {
+          const expiresInDuration = response.expiresIn;
+          this.setAuthTimer(expiresInDuration);
+          this.isAuthenticated = true;
+          this.userId = response.userId;
+          this.authStatusListener.next(true);
+          const now = new Date();
+          const expirationDate = new Date(now.getTime() + (expiresInDuration * 1000));
+          this.saveAuthData(token, expirationDate, this.userId);
+          localStorage.setItem('userEmail', response.email);
+          this.router.navigate(['/home']);
+        }
+      }, error => {
+        this.authStatusListener.next(false);
+        errorCallback(error.error.message);
+      })
   }
 
-  private setAuthTimer (duration: number) {
+  private setAuthTimer(duration: number) {
     this.tokenTimer = setTimeout(() => {
       this.logout();
     }, duration * 1000);

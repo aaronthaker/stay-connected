@@ -34,7 +34,7 @@ router.post("/login", (req, res, next) => {
     .then(user => {
       if (user === null) {
         return res.status(401).json({
-          message: "Auth failed"
+          message: "Incorrect email or password. Please try again."
         });
       } else {
         fetchedUser = user;
