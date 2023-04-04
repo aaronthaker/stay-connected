@@ -5,6 +5,7 @@ import { UserService } from '../users/users.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { mimeType } from './mime-type.validator';
 
 @Component({
   selector: 'app-profile',
@@ -17,6 +18,7 @@ export class ProfileComponent implements OnInit {
   currentUser: User;
   editMode = false;
   form: FormGroup;
+  imagePreview: string;
 
   interests: string[] = [];
   interestCtrl = new FormControl();
@@ -33,13 +35,14 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit() {
     this.form = new FormGroup({
-      'name': new FormControl(),
-      'bio': new FormControl(),
-      'email': new FormControl(),
-      'age': new FormControl(),
-      'gender': new FormControl(),
-      'location': new FormControl(),
-      'interests': new FormControl(),
+      name: new FormControl(),
+      bio: new FormControl(),
+      email: new FormControl(),
+      age: new FormControl(),
+      gender: new FormControl(),
+      location: new FormControl(),
+      interests: new FormControl(),
+      profileImage: new FormControl()
     });
     this.currentUserId = this.messagesService.currentUserId!;
     this.userService.getUser(this.currentUserId).subscribe((user: any) => {
@@ -52,7 +55,8 @@ export class ProfileComponent implements OnInit {
         age: this.currentUser.age || 0, // Set age to 0 if it is undefined or null
         gender: this.currentUser.gender,
         location: this.currentUser.location || null,
-        interests: this.currentUser.interests
+        interests: this.currentUser.interests,
+        profileImage: this.currentUser.profileImage || ''
       });
 
     });
@@ -96,13 +100,25 @@ export class ProfileComponent implements OnInit {
         gender: this.form.value.gender,
         location: this.form.value.location,
         bio: this.form.value.bio,
-        interests: this.form.value.interests
+        interests: this.form.value.interests,
+        profileImage: this.form.value.profileImage
       };
 
       this.userService.updateUser(updatedUser).subscribe(user => {
         this.currentUser = user;
       });
     }
+  }
+
+  onImagePicked(event: Event) {
+    const file = (event.target as HTMLInputElement).files![0];
+    this.form.patchValue({profileImage: file});
+    this.form.get('profileImage')?.updateValueAndValidity();
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    }
+    reader.readAsDataURL(file);
   }
 
 }
