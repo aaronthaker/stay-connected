@@ -8,11 +8,17 @@
 
 <ion-content class="ion-padding">
   <div class="profile-header">
-    <!-- <img
-      src="https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg"
-      alt="Profile Picture" class="profile-picture"> -->
-      <img *ngIf="currentUser" [src]="'http://localhost:3000/' + currentUser?.profileImage" alt="Profile Picture" class="profile-picture">
-      <input type="file" (change)="onImageSelected($event)" *ngIf="editMode" class="image-upload" accept="image/*">
+
+    <img *ngIf="currentUser?.profileImage && !selectedImageFile; else previewImage"
+      [src]="'http://localhost:3000/' + currentUser?.profileImage + '?t=' + timestamp" alt="Profile Picture"
+      class="profile-picture">
+
+    <ng-template #previewImage>
+      <img *ngIf="selectedImageFile" [src]="currentUser?.profileImage" alt="Profile Picture Preview"
+        class="profile-picture">
+    </ng-template>
+
+    <input type="file" (change)="onImageSelected($event)" *ngIf="editMode" class="image-upload" accept="image/*">
     <h1 class="profile-name">{{ currentUser?.name }}</h1>
     <p class="profile-bio" *ngIf="!editMode">
       {{currentUser?.bio}}

@@ -16,6 +16,7 @@ export class ProfileComponent implements OnInit {
   currentUserId: string;
   currentUser: User;
   editMode = false;
+  timestamp: number;
 
   interests: string[] = [];
   interestCtrl = new FormControl();
@@ -28,7 +29,9 @@ export class ProfileComponent implements OnInit {
   constructor(
     private messagesService: MessagesService,
     private userService: UserService,
-  ) { }
+  ) {
+    this.timestamp = new Date().getTime();
+  }
 
   ngOnInit() {
     this.currentUserId = this.messagesService.currentUserId!;
@@ -84,6 +87,12 @@ export class ProfileComponent implements OnInit {
 
     if (this.isFileSizeValid(file, maxSizeMB)) {
       this.selectedImageFile = file;
+      // Preview the image
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.currentUser.profileImage = reader.result as string;
+      };
+      reader.readAsDataURL(file);
     } else {
       console.error('File size is too large, must be less than', maxSizeMB, 'MB');
     }
@@ -96,7 +105,8 @@ export class ProfileComponent implements OnInit {
     }
     this.userService.uploadProfilePicture(this.currentUserId, formData).subscribe(
       (response) => {
-        this.currentUser.profileImage = response.imagePath;
+        const modifiedString = 'http://localhost:3000/' + response.imagePath.replace(/\\/g, '/');
+        this.currentUser.profileImage = modifiedString;
       },
       (error) => {
         console.error('Error uploading profile picture:', error);
