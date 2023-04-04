@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const profileController = require('../controllers/profile.controller');
+
 
 router.get('/', (req, res, next) => {
   User.find()
@@ -59,5 +61,13 @@ router.get('/:userId', (req, res, next) => {
       });
     });
 });
+
+router.post(
+  "/:userId/upload-profile-picture",
+  // checkAuth,
+  profileController.upload.single('profileImage'),
+  profileController.uploadProfilePicture
+);
+
 
 module.exports = router;

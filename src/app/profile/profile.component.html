@@ -7,108 +7,116 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form">
-    <div class="profile-header">
-      <img
-        src="https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg"
-        alt="Profile Picture" class="profile-picture">
-        <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview">
-          <img [src]="imagePreview" [alt]="form.value.title">
+  <div class="profile-header">
+    <!-- <img
+      src="https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg"
+      alt="Profile Picture" class="profile-picture"> -->
+      <img [src]="'http://localhost:3000/' + currentUser?.profileImage" alt="Profile Picture" class="profile-picture">
+      <input type="file" (change)="onImageSelected($event)" *ngIf="editMode" class="image-upload" accept="image/*">
+    <h1 class="profile-name">{{ currentUser?.name }}</h1>
+    <p class="profile-bio" *ngIf="!editMode">
+      {{currentUser?.bio}}
+    </p>
+    <p class="profile-bio" *ngIf="editMode">
+      <ion-input [(ngModel)]="currentUser.bio"></ion-input>
+    </p>
+  </div>
+  <ion-card class="profile-card">
+    <ion-card-header>
+      <ion-card-title>Profile Information</ion-card-title>
+      <ion-button (click)="toggleEditMode()">{{ editMode ? 'Save' : 'Edit' }}</ion-button>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngIf="!editMode">
+          <ion-label>Name</ion-label>
+          <ion-text>{{ currentUser?.name }}</ion-text>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>Name</ion-label>
+          <ion-input [(ngModel)]="currentUser.name"></ion-input>
+        </ion-item>
+
+        <ion-item *ngIf="!editMode">
+          <ion-label>Email</ion-label>
+          <ion-text>{{ currentUser?.email }}</ion-text>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>Email</ion-label>
+          <ion-text>{{ currentUser?.email }}</ion-text>
+        </ion-item>
+
+        <!-- <ion-item *ngIf="!editMode">
+          <ion-label>Phone Number</ion-label>
+          <ion-text>{{ currentUser?.phoneNumber }}</ion-text>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>Phone Number</ion-label>
+          <ion-input [(ngModel)]="currentUser.phoneNumber"></ion-input>
+        </ion-item> -->
+
+        <ion-item *ngIf="!editMode">
+          <ion-label>Age</ion-label>
+          <ion-text>{{ currentUser?.age }}</ion-text>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>Age</ion-label>
+          <ion-input type="number" [(ngModel)]="currentUser.age"></ion-input>
+        </ion-item>
+
+        <ion-item *ngIf="!editMode">
+          <ion-label>Gender</ion-label>
+          <ion-text>{{ currentUser?.gender }}</ion-text>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>Gender</ion-label>
+          <ion-input [(ngModel)]="currentUser.gender"></ion-input>
+        </ion-item>
+
+        <ion-item *ngIf="!editMode">
+          <ion-label>Location</ion-label>
+          <ion-text>{{ currentUser?.location }}</ion-text>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>Location</ion-label>
+          <ion-input [(ngModel)]="currentUser.location"></ion-input>
+        </ion-item>
+
+        <!-- Wrap the input field and chips in a div with *ngIf="editMode" -->
+        <div *ngIf="editMode">
+          <ion-item>
+            <ion-label>Interests</ion-label>
+            <mat-form-field appearance="outline" class="interest-input">
+              <input matInput placeholder="Add an interest" [formControl]="interestCtrl" [matAutocomplete]="auto">
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event.option.value)">
+                <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion">
+                  {{suggestion}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </ion-item>
+
+          <ion-chip *ngFor="let interest of interests">
+            <ion-label>{{interest}}</ion-label>
+            <ion-icon name="close" (click)="remove(interest)"></ion-icon>
+          </ion-chip>
         </div>
 
-        <button mat-stroked-button type="button" (click)="filePicker.click()" *ngIf="editMode">Pick Image</button>
-        <input type="file" #filePicker (change)="onImagePicked($event)">
-      <h1 class="profile-name">{{ currentUser?.name }}</h1>
-
-      <p class="profile-bio" *ngIf="!editMode">
-        {{currentUser?.bio}}
-      </p>
-      <p class="profile-bio" *ngIf="editMode">
-        <ion-input formControlName="bio"></ion-input>
-      </p>
-    </div>
-
-    <ion-card class="profile-card">
-      <ion-card-header>
-        <ion-card-title>Profile Information</ion-card-title>
-        <ion-button (click)="toggleEditMode()">{{ editMode ? 'Save' : 'Edit' }}</ion-button>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list>
-          <ion-item *ngIf="!editMode">
-            <ion-label>Name</ion-label>
-            <ion-text>{{ currentUser?.name }}</ion-text>
-          </ion-item>
-
+        <!-- Display interests as plain text when not in editMode -->
+        <div *ngIf="!editMode">
           <ion-item>
-            <ion-label>Email</ion-label>
-            <ion-text>{{ currentUser?.email }}</ion-text>
+            <ion-label>Interests</ion-label>
+            <ion-text>{{ interests.join(', ') }}</ion-text>
           </ion-item>
+        </div>
 
-          <ion-item *ngIf="!editMode">
-            <ion-label>Age</ion-label>
-            <ion-text>{{ currentUser?.age }}</ion-text>
-          </ion-item>
-
-          <ion-item *ngIf="!editMode">
-            <ion-label>Gender</ion-label>
-            <ion-text>{{ currentUser?.gender }}</ion-text>
-          </ion-item>
-
-          <ion-item *ngIf="!editMode">
-            <ion-label>Location</ion-label>
-            <ion-text>{{ currentUser?.location }}</ion-text>
-          </ion-item>
-
-          <ion-item *ngIf="editMode">
-            <ion-label>Name</ion-label>
-            <ion-input formControlName="name"></ion-input>
-          </ion-item>
-          <ion-item *ngIf="editMode">
-            <ion-label>Age</ion-label>
-            <ion-input type="number" formControlName="age"></ion-input>
-          </ion-item>
-          <ion-item *ngIf="editMode">
-            <ion-label>Gender</ion-label>
-            <ion-input formControlName="gender"></ion-input>
-          </ion-item>
-          <ion-item *ngIf="editMode">
-            <ion-label>Location</ion-label>
-            <ion-input formControlName="location"></ion-input>
-          </ion-item>
-
-          <!-- Wrap the input field and chips in a div with *ngIf="editMode" -->
-          <div *ngIf="editMode">
-            <ion-item>
-              <ion-label>Interests</ion-label>
-              <mat-form-field appearance="outline" class="interest-input">
-                <input matInput placeholder="Add an interest" formControlName="interests" [formControl]="interestCtrl"
-                  [matAutocomplete]="auto">
-                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event.option.value)">
-                  <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion">
-                    {{suggestion}}
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-            </ion-item>
-
-            <ion-chip *ngFor="let interest of interests">
-              <ion-label>{{interest}}</ion-label>
-              <ion-icon name="close" (click)="remove(interest)"></ion-icon>
-            </ion-chip>
-          </div>
-
-          <!-- Display interests as plain text when not in editMode -->
-          <div *ngIf="!editMode">
-            <ion-item>
-              <ion-label>Interests</ion-label>
-              <ion-text>{{ interests.join(', ') }}</ion-text>
-            </ion-item>
-          </div>
-
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
-  </form>
-
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

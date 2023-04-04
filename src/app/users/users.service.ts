@@ -14,9 +14,20 @@ export class UserService {
 
     return this.http.get<{ message: string; user: any }>(apiUrl).pipe(
       map(response => {
-        return {
-          ...response.user
-        };
+        return new User(
+          response.user._id,
+          response.user.name,
+          response.user.email,
+          response.user.gender,
+          response.user.age,
+          response.user.location,
+          response.user.bio,
+          response.user.likedUsers,
+          response.user.dislikedUsers,
+          response.user.matchedUsers,
+          response.user.interests,
+          response.user.profileImage
+        );
       })
     );
   }
@@ -33,6 +44,11 @@ export class UserService {
         });
       })
     );
+  }
+
+  uploadProfilePicture(userId: string, formData: FormData): Observable<{ message: string; imagePath: string }> {
+    const apiUrl = `http://localhost:3000/api/users/${userId}/upload-profile-picture`;
+    return this.http.post<{ message: string; imagePath: string }>(apiUrl, formData);
   }
 
   updateUser(user: User): Observable<User> {

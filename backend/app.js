@@ -2,10 +2,13 @@ const http = require('http');
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
+const path = require('path');
+
 const mongoose = require('mongoose');
 const cors = require('cors');
 
 app.use(express.json({ limit: '50mb' }));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Increase payload size to 50mb
 app.use(express.urlencoded({ limit: '50mb', extended: true }));

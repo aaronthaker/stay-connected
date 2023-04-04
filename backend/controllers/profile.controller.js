@@ -5,14 +5,13 @@ const User = require('../models/user');
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, '../images/profile-pictures');
+    cb(null, 'backend/images/profile-pictures');
   },
   filename: (req, file, cb) => {
     const fileName = `${Date.now()}-${file.originalname}`;
     cb(null, fileName);
   },
 });
-
 const upload = multer({ storage: storage });
 
 const uploadProfilePicture = async (req, res, next) => {
@@ -20,7 +19,7 @@ const uploadProfilePicture = async (req, res, next) => {
     return res.status(400).json({ message: 'No image file provided' });
   }
 
-  const userId = req.userData.userId;
+  const userId = req.params.userId;
   const imagePath = path.join('images', 'profile-pictures', req.file.filename);
 
   try {
@@ -30,7 +29,7 @@ const uploadProfilePicture = async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.profileImageUrl = imagePath; // Change this line
+    user.profileImage = imagePath; // Update the profileImage field
     await user.save();
 
     res.status(200).json({
@@ -41,7 +40,6 @@ const uploadProfilePicture = async (req, res, next) => {
     res.status(500).json({ message: 'Failed to upload profile picture' });
   }
 };
-
 
 module.exports = {
   upload,

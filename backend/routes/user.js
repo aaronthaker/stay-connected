@@ -4,6 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const checkAuth = require('../middleware/check-auth');
+const profileController = require('../controllers/profile.controller');
 
 router.post("/signup", (req, res, next) => {
     bcrypt.hash(req.body.password, 10).then(hash => {
@@ -64,6 +65,7 @@ router.post("/login", (req, res, next) => {
       console.log(err);
     });
 });
+
 
 // Update likedUsers array
 router.put('/:userId/like', checkAuth, (req, res, next) => {
@@ -158,6 +160,22 @@ router.get('/:userId/matches', checkAuth, (req, res, next) => {
         );
     })
     .catch((error) => res.status(500).json({ message: 'An error occurred while fetching the user', error }));
+});
+
+// Get user by ID
+router.get("/:userId", checkAuth, (req, res, next) => {
+  const { userId } = req.params;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json(user);
+    })
+    .catch((error) =>
+      res.status(500).json({ message: "An error occurred while fetching the user", error })
+    );
 });
 
 

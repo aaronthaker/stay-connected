@@ -2,10 +2,9 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { MessagesService } from '../messages/messages.service';
 import { User } from '../users/user.model';
 import { UserService } from '../users/users.service';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { mimeType } from './mime-type.validator';
 
 @Component({
   selector: 'app-profile',
@@ -17,8 +16,6 @@ export class ProfileComponent implements OnInit {
   currentUserId: string;
   currentUser: User;
   editMode = false;
-  form: FormGroup;
-  imagePreview: string;
 
   interests: string[] = [];
   interestCtrl = new FormControl();
@@ -34,31 +31,10 @@ export class ProfileComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.form = new FormGroup({
-      name: new FormControl(),
-      bio: new FormControl(),
-      email: new FormControl(),
-      age: new FormControl(),
-      gender: new FormControl(),
-      location: new FormControl(),
-      interests: new FormControl(),
-      profileImage: new FormControl()
-    });
     this.currentUserId = this.messagesService.currentUserId!;
     this.userService.getUser(this.currentUserId).subscribe((user: any) => {
       this.currentUser = user;
       this.interests = this.currentUser.interests || [];
-      this.form.setValue({
-        name: this.currentUser.name,
-        bio: this.currentUser.bio,
-        email: this.currentUser.email,
-        age: this.currentUser.age || 0, // Set age to 0 if it is undefined or null
-        gender: this.currentUser.gender,
-        location: this.currentUser.location || null,
-        interests: this.currentUser.interests,
-        profileImage: this.currentUser.profileImage || ''
-      });
-
     });
     this.filteredInterests = this.interestCtrl.valueChanges.pipe(
       startWith(null),
@@ -88,37 +64,55 @@ export class ProfileComponent implements OnInit {
   }
 
   toggleEditMode() {
-    this.editMode = !this.editMode;
-
-    if (!this.editMode) {
-      // Update user information
-      const updatedUser: User = {
-        ...this.currentUser,
-        name: this.form.value.name,
-        email: this.form.value.email,
-        age: this.form.value.age,
-        gender: this.form.value.gender,
-        location: this.form.value.location,
-        bio: this.form.value.bio,
-        interests: this.form.value.interests,
-        profileImage: this.form.value.profileImage
-      };
-
-      this.userService.updateUser(updatedUser).subscribe(user => {
-        this.currentUser = user;
+    if (this.editMode) {
+      this.currentUser.interests = this.interests;
+      this.userService.updateUser(this.currentUser).subscribe((user) => {
+        if (this.selectedImageFile) {
+          this.uploadProfilePicture();
+        }
       });
+    }
+    this.editMode = !this.editMode;
+  }
+
+
+  selectedImageFile: File | null = null;
+
+  onImageSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files![0];
+    const maxSizeMB = 50; // Maximum sized image supported by payload limit in app.js (in MB)
+
+    if (this.isFileSizeValid(file, maxSizeMB)) {
+      this.selectedImageFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.currentUser.profileImage = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      console.error('File size is too large, must be less than', maxSizeMB, 'MB');
     }
   }
 
-  onImagePicked(event: Event) {
-    const file = (event.target as HTMLInputElement).files![0];
-    this.form.patchValue({profileImage: file});
-    this.form.get('profileImage')?.updateValueAndValidity();
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.imagePreview = reader.result as string;
+  uploadProfilePicture() {
+    const formData = new FormData();
+    if (this.selectedImageFile) {
+      formData.append('profileImage', this.selectedImageFile);
     }
-    reader.readAsDataURL(file);
+    this.userService.uploadProfilePicture(this.currentUserId, formData).subscribe(
+      (response) => {
+        this.currentUser.profileImage = response.imagePath;
+      },
+      (error) => {
+        console.error('Error uploading profile picture:', error);
+      }
+    );
+  }
+
+  isFileSizeValid(file: File, maxSizeMB: number): boolean {
+    const fileSizeInBytes = file.size;
+    const maxSizeInBytes = maxSizeMB * 1024 * 1024;
+    return fileSizeInBytes <= maxSizeInBytes;
   }
 
 }
