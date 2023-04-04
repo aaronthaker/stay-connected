@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { MessagesService } from '../messages/messages.service';
 import { User } from '../users/user.model';
 import { UserService } from '../users/users.service';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
@@ -16,6 +16,7 @@ export class ProfileComponent implements OnInit {
   currentUserId: string;
   currentUser: User;
   editMode = false;
+  form: FormGroup;
 
   interests: string[] = [];
   interestCtrl = new FormControl();
@@ -31,10 +32,29 @@ export class ProfileComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.form = new FormGroup({
+      'name': new FormControl(),
+      'bio': new FormControl(),
+      'email': new FormControl(),
+      'age': new FormControl(),
+      'gender': new FormControl(),
+      'location': new FormControl(),
+      'interests': new FormControl(),
+    });
     this.currentUserId = this.messagesService.currentUserId!;
     this.userService.getUser(this.currentUserId).subscribe((user: any) => {
       this.currentUser = user;
       this.interests = this.currentUser.interests || [];
+      this.form.setValue({
+        name: this.currentUser.name,
+        bio: this.currentUser.bio,
+        email: this.currentUser.email,
+        age: this.currentUser.age || 0, // Set age to 0 if it is undefined or null
+        gender: this.currentUser.gender,
+        location: this.currentUser.location || null,
+        interests: this.currentUser.interests
+      });
+
     });
     this.filteredInterests = this.interestCtrl.valueChanges.pipe(
       startWith(null),
@@ -64,12 +84,25 @@ export class ProfileComponent implements OnInit {
   }
 
   toggleEditMode() {
-    if (this.editMode) {
-
-      this.currentUser.interests = this.interests;
-
-      this.userService.updateUser(this.currentUser).subscribe(() => {});
-    }
     this.editMode = !this.editMode;
+
+    if (!this.editMode) {
+      // Update user information
+      const updatedUser: User = {
+        ...this.currentUser,
+        name: this.form.value.name,
+        email: this.form.value.email,
+        age: this.form.value.age,
+        gender: this.form.value.gender,
+        location: this.form.value.location,
+        bio: this.form.value.bio,
+        interests: this.form.value.interests
+      };
+
+      this.userService.updateUser(updatedUser).subscribe(user => {
+        this.currentUser = user;
+      });
+    }
   }
+
 }
