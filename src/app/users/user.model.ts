@@ -14,6 +14,6 @@ export class User {
     public dislikedUsers?: string[],
     public matchedUsers?: string[],
     public interests?: string[],
-    public profileImageUrl?: string,
+    // public profilePicture: string
   ) {}
 }

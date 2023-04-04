@@ -14,20 +14,9 @@ export class UserService {
 
     return this.http.get<{ message: string; user: any }>(apiUrl).pipe(
       map(response => {
-        return new User(
-          response.user._id,
-          response.user.name,
-          response.user.email,
-          response.user.gender,
-          response.user.age,
-          response.user.location,
-          response.user.bio,
-          response.user.likedUsers,
-          response.user.dislikedUsers,
-          response.user.matchedUsers,
-          response.user.interests,
-          response.user.profileImageUrl
-        );
+        return {
+          ...response.user
+        };
       })
     );
   }

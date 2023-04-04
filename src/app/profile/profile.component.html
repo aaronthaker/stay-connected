@@ -8,11 +8,9 @@
 
 <ion-content class="ion-padding">
   <div class="profile-header">
-    <!-- <img
+    <img
       src="https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg"
-      alt="Profile Picture" class="profile-picture"> -->
-      <img [src]="currentUser?.profileImageUrl" alt="Profile Picture" class="profile-picture">
-      <input type="file" (change)="onImageSelected($event)" *ngIf="editMode" class="image-upload" accept="image/*">
+      alt="Profile Picture" class="profile-picture">
     <h1 class="profile-name">{{ currentUser?.name }}</h1>
     <p class="profile-bio" *ngIf="!editMode">
       {{currentUser?.bio}}
