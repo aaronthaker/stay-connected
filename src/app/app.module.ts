@@ -55,6 +55,7 @@ import { MatChipsModule } from '@angular/material/chips';
     PrivacyComponent
   ],
   imports: [
+    IonicModule,
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,

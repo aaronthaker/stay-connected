@@ -74,14 +74,17 @@
           <ion-input type="number" [(ngModel)]="currentUser.age"></ion-input>
         </ion-item>
 
+        <ion-item *ngIf="editMode">
+          <ion-label>Gender</ion-label>
+          <ion-select [(ngModel)]="currentUser.gender">
+            <ion-select-option value="male">Male</ion-select-option>
+            <ion-select-option value="female">Female</ion-select-option>
+            <ion-select-option value="other">Other</ion-select-option>
+          </ion-select>
+        </ion-item>
         <ion-item *ngIf="!editMode">
           <ion-label>Gender</ion-label>
           <ion-text>{{ currentUser?.gender }}</ion-text>
-        </ion-item>
-
-        <ion-item *ngIf="editMode">
-          <ion-label>Gender</ion-label>
-          <ion-input [(ngModel)]="currentUser.gender"></ion-input>
         </ion-item>
 
         <ion-item *ngIf="!editMode">
