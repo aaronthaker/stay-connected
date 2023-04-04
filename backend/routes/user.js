@@ -7,24 +7,25 @@ const checkAuth = require('../middleware/check-auth');
 const profileController = require('../controllers/profile.controller');
 
 router.post("/signup", (req, res, next) => {
-    bcrypt.hash(req.body.password, 10).then(hash => {
-        const user = new User({
-            email: req.body.email,
-            password: hash,
-        });
-        user.save()
-            .then(result => {
-                res.status(201).json({
-                    message: 'User created',
-                    result: result
-                });
-            })
-            .catch(err => {
-                res.status(500).json({
-                    error: err
-                });
-            });
+  bcrypt.hash(req.body.password, 10).then(hash => {
+    const user = new User({
+      email: req.body.email,
+      password: hash,
+      profileImage: 'images/defaults/no-gender.jpg', // Set default profile image
     });
+    user.save()
+      .then(result => {
+        res.status(201).json({
+          message: 'User created',
+          result: result
+        });
+      })
+      .catch(err => {
+        res.status(500).json({
+          error: err
+        });
+      });
+  });
 });
 
 router.post("/login", (req, res, next) => {
@@ -36,8 +37,8 @@ router.post("/login", (req, res, next) => {
           message: "Auth failed"
         });
       } else {
-          fetchedUser = user;
-          return bcrypt.compare(req.body.password, user.password);
+        fetchedUser = user;
+        return bcrypt.compare(req.body.password, user.password);
       }
     })
     .then(result => {
