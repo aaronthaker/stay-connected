@@ -12,7 +12,8 @@
       <img
         src="https://www.instyle.com/thmb/jgkc4eR3_98s3nDLaAUSG5JO0xk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Kim-Kardashian-Bikini-Lead-fc136058b9c24342ae2d21d0623a8333.jpg"
         alt="Profile Picture" class="profile-picture">
-
+        <button mat-stroked-button type="button" (click)="filePicker.click()" *ngIf="editMode">Pick Image</button>
+        <input type="file" #filePicker>
       <h1 class="profile-name">{{ currentUser?.name }}</h1>
 
       <p class="profile-bio" *ngIf="!editMode">
@@ -75,18 +76,6 @@
             <ion-label>Location</ion-label>
             <ion-input formControlName="location"></ion-input>
           </ion-item>
-          <ion-item>
-            <ion-label>Interests</ion-label>
-            <mat-form-field appearance="outline" class="interest-input">
-              <input matInput placeholder="Add an interest" formControlName="interests" [formControl]="interestCtrl" [matAutocomplete]="auto">
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event.option.value)">
-                <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion">
-                  {{suggestion}}
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
-          </ion-item>
-
 
           <!-- Wrap the input field and chips in a div with *ngIf="editMode" -->
           <div *ngIf="editMode">

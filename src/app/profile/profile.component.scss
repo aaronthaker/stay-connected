@@ -33,3 +33,7 @@
 ion-content, ion-header {
   background-color: white;
 }
+
+input[type="file"] {
+  visibility: hidden;
+}
