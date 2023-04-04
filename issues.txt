@@ -3,7 +3,6 @@ Very Hard - Hard - Medium - Easy - Very Easy:
 VH - voice chatrooms
 
 H - Implement all settings pages
-H - Add image to user
 H - Audio message on bio
 H - Implement accessibility stuff
 H - Add filtering functionality
@@ -14,9 +13,8 @@ M - Add audio onboarding
 E - Implement location API
 E - Implement 'message now' button on user liked you too
 E - No message on incorrect sign in/log in
-E - signup creates user but doesn't redirect
-E - Events should be styled nicely and include image
-E - Style login / signup
+E - Style everything
+E - Events can be removed?
 
 VE - Fix it showing too much in api/users GET route + listing users in user-details
 

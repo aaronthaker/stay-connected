@@ -2,6 +2,7 @@
   <ion-grid class="login-container">
     <ion-row>
       <ion-col class="form-container">
+        <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
         <form (submit)="onLogin(loginForm)" #loginForm="ngForm" *ngIf="!isLoading">
           <h1 style="padding: 3%;text-align: center;font-weight: bold;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Login</h1>
           <ion-item class="input-container">
