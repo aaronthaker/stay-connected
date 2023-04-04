@@ -4,6 +4,11 @@ const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
+
+app.use(express.json({ limit: '50mb' }));
+
+// Increase payload size to 50mb
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 const eventsRoutes = require("./routes/events");

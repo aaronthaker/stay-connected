@@ -68,8 +68,38 @@ export class ProfileComponent implements OnInit {
 
       this.currentUser.interests = this.interests;
 
-      this.userService.updateUser(this.currentUser).subscribe(() => {});
+      this.userService.updateUser(this.currentUser).subscribe(() => { });
     }
     this.editMode = !this.editMode;
   }
+
+  onImageSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files![0];
+    const reader = new FileReader();
+    const maxSizeMB = 50; // Maximum sized image supported by payload limit in app.js (in MB)
+
+    if (this.isFileSizeValid(file, maxSizeMB)) {
+      reader.onload = () => {
+        this.currentUser.profileImageUrl = reader.result as string;
+        this.userService.updateUser(this.currentUser).subscribe(
+          (updatedUser) => {
+            console.log('User updated successfully:', updatedUser);
+          },
+          (error) => {
+            console.error('Error updating user:', error);
+          }
+        );
+      };
+      reader.readAsDataURL(file);
+    } else {
+      console.error('File size is too large, must be less than', maxSizeMB, 'MB');
+    }
+  }
+
+  isFileSizeValid(file: File, maxSizeMB: number): boolean {
+    const fileSizeInBytes = file.size;
+    const maxSizeInBytes = maxSizeMB * 1024 * 1024;
+    return fileSizeInBytes <= maxSizeInBytes;
+  }
+
 }

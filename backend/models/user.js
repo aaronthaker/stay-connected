@@ -12,6 +12,7 @@ const userSchema = mongoose.Schema({
   age: { type: Number, required: false},
   location: { type: String, required: false},
   bio: { type: String, required: false},
+  profileImageUrl: { type: String, required: false },
   likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   matchedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   dislikedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -21,4 +22,4 @@ const userSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('User', userSchema);
