@@ -84,11 +84,6 @@ export class ProfileComponent implements OnInit {
 
     if (this.isFileSizeValid(file, maxSizeMB)) {
       this.selectedImageFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.currentUser.profileImage = reader.result as string;
-      };
-      reader.readAsDataURL(file);
     } else {
       console.error('File size is too large, must be less than', maxSizeMB, 'MB');
     }
