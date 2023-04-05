@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Event } from '../event.model';
+import { Event as MyEvent } from '../event.model';
 import { EventsService } from '../events.service';
 
 @Component({
@@ -16,8 +16,10 @@ export class CreateEventComponent implements OnInit {
   enteredEventDescription = '';
   private editMode: boolean = false;
   private eventId: string | null;
-  event: Event;
+  event: MyEvent;
   isLoading = false;
+  imageFile: File;
+  @ViewChild('imagePicker', { static: false }) imagePickerRef: ElementRef;
 
   constructor(
     public eventService: EventsService,
@@ -49,6 +51,13 @@ export class CreateEventComponent implements OnInit {
     });
   }
 
+  onImagePicked(event: Event) {
+    const file = (event.target as HTMLInputElement).files![0];
+    if (file) {
+      this.imageFile = file;
+    }
+  }
+
   onSaveEvent(form: NgForm) {
     if (form.invalid) {
       return;
@@ -59,7 +68,8 @@ export class CreateEventComponent implements OnInit {
         form.value.title,
         form.value.description,
         form.value.date,
-        form.value.location
+        form.value.location,
+        this.imageFile
       );
     } else if (this.editMode) {
       this.eventService.updateEvent(
@@ -67,7 +77,8 @@ export class CreateEventComponent implements OnInit {
         form.value.title,
         form.value.description,
         form.value.location,
-        form.value.date
+        form.value.date,
+        this.imageFile
       );
     }
     form.resetForm();

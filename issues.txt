@@ -5,10 +5,11 @@ VH - voice chatrooms
 H - Implement accessibility stuff
 H - Implement all settings pages
 H - Add filtering functionality
-H - Audio message on bio
+H - Audio message on bio/audio onboarding
 
-M - Add audio onboarding
 M - Change password functionality
+M - ALL error handling
+M - Let users send images in messages
 
 E - Implement location API
 E - Implement 'message now' button on user liked you too

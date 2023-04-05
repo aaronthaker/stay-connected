@@ -4,5 +4,6 @@ export interface Event {
   description?: string;
   location?: string;
   date?: string;
+  imagePath?: string;
   creator?: string | null;
 }

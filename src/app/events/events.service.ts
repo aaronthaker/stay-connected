@@ -11,7 +11,7 @@ export class EventsService {
   private events: Event[] = [];
   private eventsUpdated = new Subject<Event[]>();
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   getEvents() {
     this.http
@@ -25,6 +25,7 @@ export class EventsService {
               location: any;
               date: any;
               _id: any;
+              imagePath: any;
               creator: any;
             }) => {
               return {
@@ -33,6 +34,7 @@ export class EventsService {
                 location: event.location,
                 date: event.date,
                 id: event._id,
+                imagePath: event.imagePath,
                 creator: event.creator
               };
             }
@@ -49,22 +51,31 @@ export class EventsService {
     return this.eventsUpdated.asObservable();
   }
 
-  addEvent(title: string, description: string, date: string, location: string) {
-    const event: Event = {
-      id: 'null',
-      title: title,
-      description: description,
-      date: date,
-      location: location,
-    };
+  addEvent(title: string, description: string, date: string, location: string, image: File) {
+    const eventData = new FormData();
+    eventData.append('title', title);
+    eventData.append('description', description);
+    eventData.append('date', date);
+    eventData.append('location', location);
+    eventData.append('image', image, title);
+
     this.http
-      .post<{ message: string; eventId: string }>(
+      .post<{ message: string; eventId: string; imagePath: string }>(
         'http://localhost:3000/api/events',
-        event
+        eventData
       )
+
       .subscribe((res) => {
         const id = res.eventId;
-        event.id = id;
+        const event: Event = {
+          id: id,
+          title: title,
+          description: description,
+          date: date,
+          location: location,
+          imagePath: res.imagePath,
+          creator: null
+        };
         this.events.push(event);
         this.eventsUpdated.next([...this.events]);
         this.router.navigate(['/']);
@@ -84,38 +95,55 @@ export class EventsService {
   }
 
   getEvent(id: string) {
-    // return {...this.events.find(e => e.id === id)};
     return this.http.get<{
       _id: string;
       title: string;
       description: string;
       location: string;
       date: string;
+      imagePath: string;
       creator: string;
     }>('http://localhost:3000/api/events/' + id);
   }
 
-  updateEvent(
-    id: string,
-    title: string,
-    description: string,
-    location: string,
-    date: string
-  ) {
-    const event: Event = {
-      id: id,
-      title: title,
-      description: description,
-      location: location,
-      date: date,
-      creator: null
-    };
+  updateEvent(id: string, title: string, description: string, location: string, date: string, image: File | string) {
+    let eventData: Event | FormData;
+
+    if (typeof image === 'object') {
+      eventData = new FormData();
+      eventData.append('id', id);
+      eventData.append('title', title);
+      eventData.append('description', description);
+      eventData.append('location', location);
+      eventData.append('date', date);
+      eventData.append('image', image, title);
+    } else {
+      eventData = {
+        id: id,
+        title: title,
+        description: description,
+        location: location,
+        date: date,
+        imagePath: image,
+        creator: null
+      };
+    }
+
     this.http
-      .put('http://localhost:3000/api/events/' + id, event)
+      .put<{ message: string; imagePath: string }>('http://localhost:3000/api/events/' + id, eventData)
       .subscribe((res) => {
         const updatedEvents = [...this.events];
-        const oldEventIndex = updatedEvents.findIndex((e) => e.id === event.id);
-        updatedEvents[oldEventIndex] = event;
+        const oldEventIndex = updatedEvents.findIndex((e) => e.id === id);
+        const updatedEvent: Event = {
+          id: id,
+          title: title,
+          description: description,
+          location: location,
+          date: date,
+          imagePath: res.imagePath,
+          creator: null
+        };
+        updatedEvents[oldEventIndex] = updatedEvent;
         this.events = updatedEvents;
         this.eventsUpdated.next([...this.events]);
         this.router.navigate(['/']);
