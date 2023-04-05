@@ -39,10 +39,14 @@ router.post('', checkAuth, multer({ storage: storage }).single('image'), (req, r
   event.save().then(createdEvent => {
     res.status(201).json({
       message: 'Event added successfully',
-      eventId: createdEvent._id
+      eventId: createdEvent._id,
+      event: {
+        ...createdEvent.toObject({ getters: true }),
+        creator: createdEvent.creator.toString()
+      }
     });
   });
-})
+});
 
 router.put('/:id', checkAuth, multer({ storage: storage }).single('image'), (req, res, next) => {
   let imagePath = req.body.imagePath;

@@ -51,35 +51,37 @@ export class EventsService {
     return this.eventsUpdated.asObservable();
   }
 
-  addEvent(title: string, description: string, date: string, location: string, image: File) {
+  addEvent(title: string, location: string, date: string, description: string, image: File) {
     const eventData = new FormData();
     eventData.append('title', title);
-    eventData.append('description', description);
-    eventData.append('date', date);
     eventData.append('location', location);
+    eventData.append('date', date);
+    eventData.append('description', description);
     eventData.append('image', image, title);
 
     this.http
-      .post<{ message: string; eventId: string; imagePath: string }>(
+      .post<{ message: string; eventId: string; event: Event }>(
         'http://localhost:3000/api/events',
         eventData
       )
-
-      .subscribe((res) => {
-        const id = res.eventId;
+      .subscribe(responseData => {
         const event: Event = {
-          id: id,
+          id: responseData.eventId,
           title: title,
-          description: description,
-          date: date,
           location: location,
-          imagePath: res.imagePath,
-          creator: null
+          date: date,
+          description: description,
+          imagePath: responseData.event.imagePath,
+          creator: responseData.event.creator
         };
-        this.events.push(event);
-        this.eventsUpdated.next([...this.events]);
+        this.addEventToList(event);
         this.router.navigate(['/events']);
       });
+  }
+
+  private addEventToList(event: Event) {
+    this.events.push(event);
+    this.eventsUpdated.next([...this.events]);
   }
 
   deleteEvent(eventId: string) {
