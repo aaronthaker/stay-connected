@@ -66,7 +66,6 @@ export class UserDetailsComponent implements OnInit {
     })
   }
 
-
   hasCommonInterests(user1: User, user2: User): boolean {
     return user1.interests!.some(interest => user2.interests?.includes(interest));
   }
