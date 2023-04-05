@@ -1,18 +1,15 @@
-Very Hard - Hard - Medium - Easy - Very Easy:
-
-VH - voice chatrooms
-
+BEFORE COMPILE:
 H - Implement accessibility stuff
-H - Implement all settings pages
+H - Implement some settings pages
 H - Add filtering functionality
-H - Audio message on bio/audio onboarding
-
+M - Style everything
 M - Change password functionality
 M - ALL error handling
-M - Let users send images in messages
 
+AFTER COMPILE:
+VH - voice chatrooms
+VH - Let users send images in messages
+H - Implement all settings pages
+H - Audio message on bio/audio onboarding
 E - Implement location API
-E - Implement 'message now' button on user liked you too
-E - Style everything
-
 VE - Fix it showing too much in api/users GET route + listing users in user-details
