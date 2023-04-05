@@ -1,9 +1,10 @@
 BEFORE COMPILE:
-H - Implement accessibility stuff
-H - Implement some settings pages
+M - Change password functionality
 H - Add filtering functionality
 M - Style everything
-M - Change password functionality
+
+H - Implement accessibility stuff
+H - Implement some settings pages
 M - ALL error handling
 
 AFTER COMPILE:
