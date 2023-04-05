@@ -78,7 +78,7 @@ export class EventsService {
         };
         this.events.push(event);
         this.eventsUpdated.next([...this.events]);
-        this.router.navigate(['/']);
+        this.router.navigate(['/events']);
       });
   }
 
