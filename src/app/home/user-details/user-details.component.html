@@ -1,15 +1,21 @@
 <ion-card>
-    <img [src]="'http://localhost:3000/' + displayedUser.profileImage"
-    width="300px" height="300px" *ngIf="displayedUser?.profileImage"/>
+  <img [src]="'http://localhost:3000/' + displayedUser.profileImage" width="300px" height="300px"
+    *ngIf="displayedUser?.profileImage" />
   <ion-card-header>
-    <ion-card-title>{{ displayedUser?.name }}<span *ngIf="displayedUser?.age">, {{ displayedUser?.age }}</span></ion-card-title>
+    <ion-card-title>{{ displayedUser?.name }}<span *ngIf="displayedUser?.age">, {{ displayedUser?.age
+        }}</span></ion-card-title>
   </ion-card-header>
   <ion-card-content>
     <p>{{displayedUser?.bio}}</p>
     <div *ngIf="commonInterests" class="common-interests">
       You have common interests with this person.
     </div>
-    <div *ngIf="showMatchMessage" class="match-message" [@fadeInOut]>{{displayedUser?.name}} also liked you!</div>
+    <div *ngIf="showMatchMessage" class="match-message" [@fadeInOut]>
+      {{displayedUser?.name}} also liked you!
+      <ion-button (click)="navigateToConversation(displayedUser?._id!)" color="primary">
+        Message {{displayedUser?.name}} now!
+      </ion-button>
+    </div>
   </ion-card-content>
   <ion-row class="justify-content-around" class="button-row">
     <ion-col>

@@ -1,5 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MessagesService } from 'src/app/messages/messages.service';
 import { User } from 'src/app/users/user.model';
@@ -38,6 +39,7 @@ export class UserDetailsComponent implements OnInit {
   constructor(
     private messagesService: MessagesService,
     private userService: UserService,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -102,5 +104,8 @@ export class UserDetailsComponent implements OnInit {
     });
   }
 
+  navigateToConversation(userId: string) {
+    this.router.navigate(['/conversation', userId]);
+  }
 
 }
