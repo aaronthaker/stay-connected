@@ -1,35 +1,36 @@
 <ion-content>
-    <mat-spinner *ngIf="isLoading"></mat-spinner>
-    <main *ngIf="events.length > 0 && !isLoading">
-        <button routerLink="create">Create Event</button>
-        <ion-card *ngFor="let event of events">
-            <ion-item>
-                <ion-icon name="pin" slot="start"></ion-icon>
-                <ion-label>{{ event.location }}</ion-label>
-            </ion-item>
-            <ion-card-content>
-                <ion-card-title>{{event.title}}</ion-card-title>
-                <ion-card-subtitle>{{event.date}}</ion-card-subtitle>
-                <p>{{event.description}}</p>
-            </ion-card-content>
-            <ion-row *ngIf="userIsAuthenticated && userId === event.creator">
-                <ion-col>
-                    <!-- <ion-button fill="outline" expand="block" color="primary">Edit</ion-button> -->
-                    <a mat-button color="primary" [routerLink]="['/events/edit', event.id]">EDIT</a>
-                </ion-col>
-                <ion-col>
-                    <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id!)">Delete</ion-button>
-                </ion-col>
-            </ion-row>
-        </ion-card>
-    </main>
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <main *ngIf="events.length > 0 && !isLoading">
+    <button routerLink="create">Create Event</button>
+    <ion-card *ngFor="let event of events">
+      <img *ngIf="event.imagePath" [src]="event.imagePath" alt="Event Image" class="event-image">
+      <ion-item>
+        <ion-icon name="pin" slot="start"></ion-icon>
+        <ion-label>{{ event.location }}</ion-label>
+      </ion-item>
+      <ion-card-content>
+        <ion-card-title>{{event.title}}</ion-card-title>
+        <ion-card-subtitle>{{event.date}}</ion-card-subtitle>
+        <p>{{event.description}}</p>
+      </ion-card-content>
+      <ion-row *ngIf="userIsAuthenticated && userId === event.creator">
+        <ion-col>
+          <!-- <ion-button fill="outline" expand="block" color="primary">Edit</ion-button> -->
+          <a mat-button color="primary" [routerLink]="['/events/edit', event.id]">EDIT</a>
+        </ion-col>
+        <ion-col>
+          <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id!)">Delete</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-card>
+  </main>
 
-    <main *ngIf="events.length === 0 && !isLoading">
-        <ion-card>
-          <button routerLink="create">Create Event</button>
-            <ion-card-content>
-                <p style="text-align: center;">No events yet</p>
-            </ion-card-content>
-        </ion-card>
-    </main>
+  <main *ngIf="events.length === 0 && !isLoading">
+    <ion-card>
+      <button routerLink="create">Create Event</button>
+      <ion-card-content>
+        <p style="text-align: center;">No events yet</p>
+      </ion-card-content>
+    </ion-card>
+  </main>
 </ion-content>
