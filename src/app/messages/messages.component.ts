@@ -104,6 +104,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
   }
 
+  unmatchUser(user: User) {
+    this.userService.unmatchUser(this.currentUserId, user._id).subscribe(response => {
+      this.matchedUsers = this.matchedUsers.filter(matchedUser => matchedUser._id !== user._id);
+    });
+  }
+
   get currentUserId() {
     return this.messagesService.currentUserId;
   }

@@ -5,6 +5,7 @@
     <ion-item *ngFor="let matchedUser of matchedUsers" (click)="onUserSelected(matchedUser)">
       <ion-label>{{ matchedUser.email }}</ion-label>
       <ion-badge *ngIf="getUnreadCount(matchedUser._id) > 0" slot="end">{{ getUnreadCount(matchedUser._id) }}</ion-badge>
+      <ion-button slot="end" (click)="unmatchUser(matchedUser); $event.stopPropagation()">Unmatch</ion-button>
     </ion-item>
   </ion-list>
 

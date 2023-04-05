@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require('../models/user');
 const profileController = require('../controllers/profile.controller');
 
-
 router.get('/', (req, res, next) => {
   User.find()
     // FIX BELOW MAJOR CYBERSEC ISSUE - Ask OpenAI how you'd diagnose against these kinds of errors
@@ -69,5 +68,46 @@ router.post(
   profileController.uploadProfilePicture
 );
 
+router.put('/:userId/unmatch', (req, res, next) => {
+  const userId = req.params.userId;
+  const unmatchedUserId = req.body.unmatchedUserId;
+
+  if (!unmatchedUserId) {
+    return res.status(400).json({
+      message: "Unmatched user ID is missing"
+    });
+  }
+
+  User.findById(userId)
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found"
+        });
+      }
+
+      user.matchedUsers = user.matchedUsers.filter(id => id.toString() !== unmatchedUserId);
+      user.likedUsers = user.likedUsers.filter(id => id.toString() !== unmatchedUserId);
+
+      user.save()
+        .then(updatedUser => {
+          res.status(200).json({
+            message: "User unmatched and unliked successfully",
+            user: updatedUser
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            error: err
+          });
+        });
+
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
+    });
+});
 
 module.exports = router;
