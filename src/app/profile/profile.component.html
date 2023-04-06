@@ -1,8 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
-      Profile
-    </ion-title>
+    <div style="display: flex;">
+      <ion-title>
+        Profile
+      </ion-title>
+      <ion-button (click)="toggleEditMode()" style="padding: 0px 20px">{{ editMode ? 'Save' : 'Edit' }}</ion-button>
+    </div>
   </ion-toolbar>
 </ion-header>
 
@@ -18,8 +21,8 @@
         class="profile-picture">
     </ng-template>
 
-    <input type="file" (change)="onImageSelected($event)" *ngIf="editMode" class="image-upload" accept="image/*">
-    <h1 class="profile-name">{{ currentUser?.name }}</h1>
+    <button mat-stroked-button type="button" (click)="filePicker.click()" *ngIf="editMode">Change Profile Picture</button>
+    <input type="file" (change)="onImageSelected($event)" #filePicker class="image-upload" accept="image/*">    <h1 class="profile-name">{{ currentUser?.name }}</h1>
     <p class="profile-bio" *ngIf="!editMode">
       {{currentUser?.bio}}
     </p>
@@ -28,10 +31,6 @@
     </p>
   </div>
   <ion-card class="profile-card">
-    <ion-card-header>
-      <ion-card-title>Profile Information</ion-card-title>
-      <ion-button (click)="toggleEditMode()">{{ editMode ? 'Save' : 'Edit' }}</ion-button>
-    </ion-card-header>
     <ion-card-content>
       <ion-list>
         <ion-item *ngIf="!editMode">

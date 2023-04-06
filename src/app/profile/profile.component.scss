@@ -27,7 +27,11 @@
 }
 
 .interest-input {
-  width: 100%;
+  width: 75%;
+}
+
+input[type="file"] {
+  visibility: hidden;
 }
 
 ion-content, ion-header {
