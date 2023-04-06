@@ -1,8 +1,13 @@
 <ion-content>
 
+  <!-- <ion-title *ngIf="matchedUsers.length > 0">Matched Users</ion-title>
+  <ion-list *ngIf="matchedUsers.length > 0"> -->
   <ion-title>Matched Users</ion-title>
   <ion-list>
-    <ion-item *ngFor="let matchedUser of matchedUsers" (click)="onUserSelected(matchedUser)">
+    <ion-item (click)="onUserSelected(matchedUser)" *ngFor="let matchedUser of matchedUsers" class="user-item">
+      <ion-avatar slot="start" (click)="onUserProfileSelected(matchedUser._id); $event.stopPropagation()">
+        <img [src]="'http://localhost:3000/' + matchedUser.profileImage" class="users-profile-picture"/>
+      </ion-avatar>
       <ion-label>{{ matchedUser.email }}</ion-label>
       <ion-badge *ngIf="getUnreadCount(matchedUser._id) > 0" slot="end">{{ getUnreadCount(matchedUser._id) }}</ion-badge>
       <ion-button slot="end" (click)="unmatchUser(matchedUser); $event.stopPropagation()">Unmatch</ion-button>
