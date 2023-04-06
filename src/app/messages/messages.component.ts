@@ -35,7 +35,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.userSub = this.userService.getUsers().subscribe(users => {
-      this.users = users;
+      this.users = users.filter(user => user._id !== this.currentUserId);
       this.getMatchedUsers();
       this.messagesService.listenForNewMessages();
     });
