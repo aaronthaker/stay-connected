@@ -6,6 +6,7 @@ M - Style everything
 H - Implement accessibility stuff
 H - Implement some settings pages
 M - ALL error handling
+M - Clicking on profile should load other user's profile
 
 AFTER COMPILE:
 VH - voice chatrooms

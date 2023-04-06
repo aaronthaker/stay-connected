@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Other Profile
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="profile-header">
+    <img [src]="'http://localhost:3000/' + otherUser?.profileImage" alt="Profile Picture"
+      class="profile-picture">
+    <h1 class="profile-name">{{ otherUser?.name }}</h1>
+    <p class="profile-bio">
+      {{otherUser?.bio}}
+    </p>
+  </div>
+  <ion-card class="profile-card">
+    <ion-card-header>
+      <ion-card-title>Profile Information</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label>Name</ion-label>
+          <ion-text>{{ otherUser?.name }}</ion-text>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Age</ion-label>
+          <ion-text>{{ otherUser?.age }}</ion-text>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Gender</ion-label>
+          <ion-text>{{ otherUser?.gender }}</ion-text>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Location</ion-label>
+          <ion-text>{{ otherUser?.location }}</ion-text>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Interests</ion-label>
+          <ion-text>{{ otherUser?.interests?.join(', ') }}</ion-text>
+        </ion-item>
+
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

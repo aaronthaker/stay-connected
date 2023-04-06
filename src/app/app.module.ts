@@ -33,6 +33,7 @@ import { PrivacyComponent } from './settings/privacy/privacy.component';
 import { SocketIoModule } from 'ngx-socket-io';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
+import { OtherProfileComponent } from './other-profile/other-profile.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { MatChipsModule } from '@angular/material/chips';
     LanguageComponent,
     NotificationsComponent,
     PreferencesComponent,
-    PrivacyComponent
+    PrivacyComponent,
+    OtherProfileComponent
   ],
   imports: [
     IonicModule,

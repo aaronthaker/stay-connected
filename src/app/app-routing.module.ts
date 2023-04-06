@@ -16,6 +16,7 @@ import { NotificationsComponent } from './settings/notifications/notifications.c
 import { PreferencesComponent } from './settings/preferences/preferences.component';
 import { PrivacyComponent } from './settings/privacy/privacy.component';
 import { SettingsComponent } from './settings/settings.component';
+import { OtherProfileComponent } from './other-profile/other-profile.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -94,6 +95,10 @@ const routes: Routes = [
     path: 'settings/privacy',
     component: PrivacyComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'other-profile/:id',
+    component: OtherProfileComponent
   },
 ];
 

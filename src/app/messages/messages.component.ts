@@ -110,6 +110,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  onUserProfileSelected(userId: string) {
+    this.router.navigate(['/other-profile', userId]);
+  }
+
   get currentUserId() {
     return this.messagesService.currentUserId;
   }
