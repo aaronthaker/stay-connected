@@ -8,7 +8,7 @@
             <div class="profile-container">
               <a routerDirection="root" id="profile-a" [routerLink]="['/profile']" lines="none" detail="false"
                 routerLinkActive="selected" class="profile-button">
-                <ion-icon style="font-size:28px" slot="start" ios="person-outline" md="person-sharp"></ion-icon>
+                <ion-icon slot="start" ios="person-outline" md="person-sharp"></ion-icon>
               </a>
               <div>
                 <ion-title class="ion-text-center">Stay Connected</ion-title>
@@ -19,7 +19,7 @@
 
               <a routerDirection="root" id="profile-a" [routerLink]="['/settings']" lines="none" detail="false"
                 routerLinkActive="selected" class="settings-button">
-                <ion-icon style="font-size:28px" slot="start" ios="settings-outline" md="settings-sharp"></ion-icon>
+                <ion-icon slot="start" ios="settings-outline" md="settings-sharp"></ion-icon>
               </a>
             </div>
           </ion-list>
@@ -29,19 +29,19 @@
               <ng-container *ngIf="userIsAuthenticated">
                 <ion-item *ngIf="p.title !== 'Messages'" routerDirection="root" [routerLink]="[p.url]" lines="none"
                   detail="false" routerLinkActive="selected" class="sidenav-items" [@fadeInOut]>
-                  <ion-item style="margin-left: 10px; width: 100%;">
-                    <ion-icon style="font-size:28px" aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
+                  <ion-item id="sidenav-ion-item">
+                    <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
                       [md]="p.icon + '-outline'"></ion-icon>
-                    <ion-label style="font-size: smaller">{{ p.title }}</ion-label>
+                    <ion-label>{{ p.title }}</ion-label>
                   </ion-item>
                 </ion-item>
 
                 <ion-item *ngIf="p.title === 'Messages'" routerDirection="root" [routerLink]="[p.url]" lines="none"
                   detail="false" routerLinkActive="selected" class="sidenav-items" [@fadeInOut]>
-                  <ion-item style="margin-left: 10px; width: 100%;">
-                    <ion-icon style="font-size:28px" aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
+                  <ion-item id="sidenav-ion-item">
+                    <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
                       [md]="p.icon + '-outline'"></ion-icon>
-                    <ion-label style="font-size: smaller">{{ p.title }}</ion-label>
+                    <ion-label>{{ p.title }}</ion-label>
                     <ion-badge *ngIf="unreadMessagesCount > 0" slot="end">{{ unreadMessagesCount }}</ion-badge>
                   </ion-item>
                 </ion-item>
@@ -51,28 +51,26 @@
             <div class="bottom-buttons">
               <ng-container *ngIf="!userIsAuthenticated">
                 <ion-item lines="none" detail="false" class="sidenav-items" [@fadeInOut]>
-                  <ion-item style="margin-left: 10px;width: 100%;" routerLink="/login">
-                    <ion-icon style="font-size:28px" name="log-in-outline" slot="start"></ion-icon>
-                    <ion-label style="font-size: smaller">Log In</ion-label>
+                  <ion-item id="sidenav-ion-item" routerLink="/login">
+                    <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                    <ion-label>Log In</ion-label>
                   </ion-item>
                 </ion-item>
               </ng-container>
               <ng-container *ngIf="!userIsAuthenticated">
                 <ion-item lines="none" detail="false" class="sidenav-items" [@fadeInOut]>
-                  <ion-item style="margin-left: 10px;width: 100%;" routerLink="/signup">
-                    <ion-icon style="font-size:28px" name="person-add-outline" slot="start"></ion-icon>
-                    <ion-label style="font-size: smaller">Sign Up</ion-label>
+                  <ion-item id="sidenav-ion-item" routerLink="/signup">
+                    <ion-icon name="person-add-outline" slot="start"></ion-icon>
+                    <ion-label>Sign Up</ion-label>
                   </ion-item>
                 </ion-item>
               </ng-container>
-              <ng-container *ngIf="userIsAuthenticated">
-                <ion-item lines="none" detail="false" class="sidenav-items" id="logOutButton" [@fadeInOut] style="user-select: cursor;">
-                  <ion-item style="margin-left: 10px;width: 100%;" (click)="onLogout()">
-                    <ion-icon style="font-size:28px" name="log-in-outline" slot="start"></ion-icon>
-                    <ion-label style="font-size: smaller">Log Out</ion-label>
+                <ion-item lines="none" detail="false" class="sidenav-items" id="logOutButton" [@fadeInOut]>
+                  <ion-item id="sidenav-ion-item" (click)="onLogout()">
+                    <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                    <ion-label>Log Out</ion-label>
                   </ion-item>
                 </ion-item>
-              </ng-container>
             </div>
           </div>
         </ion-list>
