@@ -97,7 +97,6 @@
           <ion-input [(ngModel)]="currentUser.location"></ion-input>
         </ion-item>
 
-        <!-- Wrap the input field and chips in a div with *ngIf="editMode" -->
         <div *ngIf="editMode">
           <ion-item>
             <ion-label>Interests</ion-label>
@@ -125,6 +124,30 @@
           </ion-item>
         </div>
 
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="editMode">
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngIf="editMode">
+          <ion-label>Current Password</ion-label>
+          <ion-input type="password" [(ngModel)]="currentPassword"></ion-input>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>New Password</ion-label>
+          <ion-input type="password" [(ngModel)]="newPassword"></ion-input>
+        </ion-item>
+
+        <ion-item *ngIf="editMode">
+          <ion-label>Confirm New Password</ion-label>
+          <ion-input type="password" [(ngModel)]="confirmNewPassword"></ion-input>
+        </ion-item>
+
+        <p class="password-error-message">{{ passwordErrorMessage }}</p>
+        <p class="password-successful-message">{{ passwordChangeSuccessfulMessage }}</p>
+        <ion-button (click)="changePassword()">Change Password</ion-button>
       </ion-list>
     </ion-card-content>
   </ion-card>

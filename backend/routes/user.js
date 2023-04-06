@@ -67,8 +67,6 @@ router.post("/login", (req, res, next) => {
     });
 });
 
-
-// Update likedUsers array
 router.put('/:userId/like', checkAuth, (req, res, next) => {
   const { userId } = req.params;
   const { likedUserId } = req.body;
@@ -112,7 +110,6 @@ router.put('/:userId/like', checkAuth, (req, res, next) => {
     .catch((error) => res.status(500).json({ message: 'An error occurred while checking for a match', error }));
 });
 
-// Update dislikedUsers array
 router.put('/:userId/dislike', checkAuth, (req, res, next) => {
   const { userId } = req.params;
   const { dislikedUserId } = req.body;
@@ -126,7 +123,6 @@ router.put('/:userId/dislike', checkAuth, (req, res, next) => {
     .catch((error) => res.status(500).json({ message: 'An error occurred while disliking the user', error }));
 });
 
-// Update matchedUsers arrays for both users
 router.put('/match', checkAuth, (req, res, next) => {
   const { userId1, userId2 } = req.body;
 
@@ -142,7 +138,6 @@ router.put('/match', checkAuth, (req, res, next) => {
     .catch((error) => res.status(500).json({ message: 'An error occurred while matching the users', error }));
 });
 
-// Get matched users for the current user
 router.get('/:userId/matches', checkAuth, (req, res, next) => {
   const { userId } = req.params;
 
@@ -163,7 +158,6 @@ router.get('/:userId/matches', checkAuth, (req, res, next) => {
     .catch((error) => res.status(500).json({ message: 'An error occurred while fetching the user', error }));
 });
 
-// Get user by ID
 router.get("/:userId", checkAuth, (req, res, next) => {
   const { userId } = req.params;
 
@@ -179,5 +173,33 @@ router.get("/:userId", checkAuth, (req, res, next) => {
     );
 });
 
+router.post("/change-password", checkAuth, (req, res, next) => {
+  const { userId, currentPassword, newPassword } = req.body;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      bcrypt.compare(currentPassword, user.password)
+        .then((result) => {
+          if (!result) {
+            return res.status(401).json({ message: "Current password is incorrect" });
+          }
+
+          bcrypt.hash(newPassword, 10)
+            .then((hash) => {
+              user.password = hash;
+              user.save()
+                .then(() => res.status(200).json({ message: "Password changed successfully" }))
+                .catch((error) => res.status(500).json({ message: "An error occurred while saving the new password", error }));
+            })
+            .catch((error) => res.status(500).json({ message: "An error occurred while hashing the new password", error }));
+        })
+        .catch((error) => res.status(500).json({ message: "An error occurred while checking the current password", error }));
+    })
+    .catch((error) => res.status(500).json({ message: "An error occurred while fetching the user", error }));
+});
 
 module.exports = router;

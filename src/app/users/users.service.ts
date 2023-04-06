@@ -83,5 +83,11 @@ export class UserService {
     return this.http.put(`http://localhost:3000/api/user/match`, { userId1, userId2 });
   }
 
+  changePassword(userId: string, currentPassword: string, newPassword: string): Observable<any> {
+    const apiUrl = 'http://localhost:3000/api/user/change-password';
+
+    return this.http.post<any>(apiUrl, { userId, currentPassword, newPassword });
+  }
+
 
 }

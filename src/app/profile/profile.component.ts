@@ -120,4 +120,44 @@ export class ProfileComponent implements OnInit {
     return fileSizeInBytes <= maxSizeInBytes;
   }
 
+  // Add these properties to your class
+  currentPassword = '';
+  newPassword = '';
+  confirmNewPassword = '';
+  passwordErrorMessage = '';
+  passwordChangeSuccessfulMessage = '';
+
+  changePassword() {
+    this.passwordErrorMessage = '';
+    this.passwordChangeSuccessfulMessage = '';
+
+    if (this.newPassword !== this.confirmNewPassword) {
+      this.passwordErrorMessage = 'New passwords do not match';
+      return;
+    }
+
+    if (!this.currentPassword || !this.newPassword) {
+      this.passwordErrorMessage = 'Please fill in all fields';
+      return;
+    }
+
+    this.userService.changePassword(this.currentUserId, this.currentPassword, this.newPassword)
+      .subscribe(
+        (response) => {
+          // this.passwordErrorMessage = 'Password changed successfully';
+          this.passwordChangeSuccessfulMessage = 'Password changed successfully';
+          this.currentPassword = '';
+          this.newPassword = '';
+          this.confirmNewPassword = '';
+        },
+        (error) => {
+          console.error('Error changing password:', error);
+          this.passwordErrorMessage = 'Failed to change password';
+          this.currentPassword = '';
+          this.newPassword = '';
+          this.confirmNewPassword = '';
+        }
+      );
+  }
+
 }
