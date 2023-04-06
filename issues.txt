@@ -1,6 +1,4 @@
 BEFORE COMPILE:
-Change password functionality
-Add filtering functionality
 Style everything
 ALL error handling
 Implement accessibility stuff
