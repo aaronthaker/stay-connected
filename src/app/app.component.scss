@@ -1,6 +1,7 @@
 /* Add a small white strip to the left side of the selected item but not profile */
 .selected:not(#profile-a) {
   border-left: 3px solid #fff;
+  background-color: rgba(0, 0, 0, 0.25);
 }
 
 #profile-a:hover ion-icon {
