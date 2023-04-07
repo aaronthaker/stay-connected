@@ -6,10 +6,11 @@
   <ion-list>
     <ion-item (click)="onUserSelected(matchedUser)" *ngFor="let matchedUser of matchedUsers" class="user-item">
       <ion-avatar slot="start" (click)="onUserProfileSelected(matchedUser._id); $event.stopPropagation()">
-        <img [src]="'http://localhost:3000/' + matchedUser.profileImage" class="users-profile-picture"/>
+        <img [src]="'http://localhost:3000/' + matchedUser.profileImage" class="users-profile-picture" />
       </ion-avatar>
       <ion-label>{{ matchedUser.email }}</ion-label>
-      <ion-badge *ngIf="getUnreadCount(matchedUser._id) > 0" slot="end">{{ getUnreadCount(matchedUser._id) }}</ion-badge>
+      <ion-badge *ngIf="getUnreadCount(matchedUser._id) > 0" slot="end">{{ getUnreadCount(matchedUser._id)
+        }}</ion-badge>
       <ion-button slot="end" (click)="unmatchUser(matchedUser); $event.stopPropagation()">Unmatch</ion-button>
     </ion-item>
   </ion-list>
@@ -18,7 +19,7 @@
   <ion-list>
     <ion-item (click)="onUserSelected(user)" *ngFor="let user of users" class="user-item">
       <ion-avatar slot="start" (click)="onUserProfileSelected(user._id); $event.stopPropagation()">
-        <img [src]="'http://localhost:3000/' + user.profileImage" class="users-profile-picture"/>
+        <img [src]="'http://localhost:3000/' + user.profileImage" class="users-profile-picture" />
       </ion-avatar>
       <ion-label>{{ user.email }}</ion-label>
       <ion-badge *ngIf="getUnreadCount(user._id) > 0" slot="end">{{ getUnreadCount(user._id) }}</ion-badge>
