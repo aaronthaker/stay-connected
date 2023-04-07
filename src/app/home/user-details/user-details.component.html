@@ -1,19 +1,27 @@
 <ion-card>
-  <p id="location"><ion-icon id="location-icon" name="location"></ion-icon><span id="location-span">{{displayedUser?.location}}</span></p>
+  <p id="location"><ion-icon id="location-icon" name="location"></ion-icon><span
+      id="location-span">{{displayedUser?.location}}</span></p>
 
   <img [src]="'http://localhost:3000/' + displayedUser.profileImage" width="300px" height="300px"
     *ngIf="displayedUser?.profileImage" />
 
   <ion-card-header>
     <ion-card-title id="name">{{displayedUser?.name}}<span *ngIf="displayedUser?.age">, {{ displayedUser?.age }}</span>
-      </ion-card-title>
+    </ion-card-title>
   </ion-card-header>
 
   <ion-card-content>
-    <p id="bio">{{displayedUser?.bio}}</p>
+    <p id="bio">{{displayedUser?.bio}}
+      <ion-button (click)="speakText(displayedUser?.bio!)">
+        <ion-icon name="volume-high-outline"></ion-icon>
+      </ion-button>
+    </p>
     <div class="match-message" [@fadeInOut]>
       <div *ngIf="commonInterests" class="common-interests">
         You have common interests with this person!
+        <ion-button (click)="speakText('You have common interests with this person!')">
+          <ion-icon name="volume-high-outline"></ion-icon>
+        </ion-button>
       </div>
     </div>
     <div *ngIf="showMatchMessage" class="match-message" [@fadeInOut]>
