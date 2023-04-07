@@ -35,6 +35,7 @@ body {
 }
 
 // Below is to set the sidemenu to transparent, god knows why it works on page element as well
+// Below is what lets hover work for some reason.
 ion-app {
   --ion-background-color: transparent;
 }
