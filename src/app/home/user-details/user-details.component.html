@@ -11,8 +11,10 @@
 
   <ion-card-content>
     <p id="bio">{{displayedUser?.bio}}</p>
-    <div *ngIf="commonInterests" class="common-interests">
-      You have common interests with this person.
+    <div class="match-message" [@fadeInOut]>
+      <div *ngIf="commonInterests" class="common-interests">
+        You have common interests with this person!
+      </div>
     </div>
     <div *ngIf="showMatchMessage" class="match-message" [@fadeInOut]>
       <p>{{displayedUser?.name}} also liked you!</p>

@@ -1,6 +1,7 @@
-ion-content {
+ion-content, ion-header, ion-toolbar {
   background-color: white;
 }
+
 .message-list {
   display: flex;
   flex-direction: column;
@@ -55,4 +56,8 @@ ion-content {
     border-top: 10px solid #4caf50;
     border-right: 10px solid transparent;
   }
+}
+
+.message-input {
+  display: flex;
 }

@@ -34,22 +34,22 @@
     <ion-card-content>
       <ion-list>
         <ion-item *ngIf="!editMode">
-          <ion-label>Name</ion-label>
+          <ion-label>Name:</ion-label>
           <ion-text>{{ currentUser?.name }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Name</ion-label>
-          <ion-input [(ngModel)]="currentUser.name"></ion-input>
+          <ion-label>Name:</ion-label>
+          <ion-input [(ngModel)]="currentUser.name" slot="end" style="text-align: right;"></ion-input>
         </ion-item>
 
         <ion-item *ngIf="!editMode">
-          <ion-label>Email</ion-label>
+          <ion-label>Email:</ion-label>
           <ion-text>{{ currentUser?.email }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Email</ion-label>
+          <ion-label>Email:</ion-label>
           <ion-text>{{ currentUser?.email }}</ion-text>
         </ion-item>
 
@@ -64,17 +64,17 @@
         </ion-item> -->
 
         <ion-item *ngIf="!editMode">
-          <ion-label>Age</ion-label>
+          <ion-label>Age:</ion-label>
           <ion-text>{{ currentUser?.age }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Age</ion-label>
-          <ion-input type="number" [(ngModel)]="currentUser.age"></ion-input>
+          <ion-label>Age:</ion-label>
+          <ion-input type="number" [(ngModel)]="currentUser.age" slot="end" style="text-align: right;"></ion-input>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Gender</ion-label>
+          <ion-label>Gender:</ion-label>
           <ion-select [(ngModel)]="currentUser.gender">
             <ion-select-option value="male">Male</ion-select-option>
             <ion-select-option value="female">Female</ion-select-option>
@@ -82,24 +82,24 @@
           </ion-select>
         </ion-item>
         <ion-item *ngIf="!editMode">
-          <ion-label>Gender</ion-label>
+          <ion-label>Gender:</ion-label>
           <ion-text>{{ currentUser?.gender }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="!editMode">
-          <ion-label>Location</ion-label>
+          <ion-label>Location:</ion-label>
           <ion-text>{{ currentUser?.location }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Location</ion-label>
-          <ion-input [(ngModel)]="currentUser.location"></ion-input>
+          <ion-label>Location:</ion-label>
+          <ion-input [(ngModel)]="currentUser.location" slot="end" style="text-align: right;"></ion-input>
         </ion-item>
 
         <div *ngIf="editMode">
           <ion-item>
-            <ion-label>Interests</ion-label>
-            <mat-form-field appearance="outline" class="interest-input">
+            <ion-label>Interests:</ion-label>
+            <mat-form-field appearance="outline" class="interest-input" style="padding-top: 1.25rem;">
               <input matInput placeholder="Add an interest" [formControl]="interestCtrl" [matAutocomplete]="auto">
               <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event.option.value)">
                 <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion">
@@ -118,8 +118,8 @@
         <!-- Display interests as plain text when not in editMode -->
         <div *ngIf="!editMode">
           <ion-item>
-            <ion-label>Interests</ion-label>
-            <ion-text>{{ interests.join(', ') }}</ion-text>
+            <ion-label>Interests:</ion-label>
+            <ion-input readonly="true">{{ interests.join(', ') }}</ion-input>
           </ion-item>
         </div>
 
@@ -129,7 +129,7 @@
   <ion-card *ngIf="editMode">
     <ion-card-content>
       <ion-list>
-        <ion-item *ngIf="editMode">
+        <ion-item>
           <ion-label>Current Password</ion-label>
           <ion-input type="password" [(ngModel)]="currentPassword"></ion-input>
         </ion-item>
