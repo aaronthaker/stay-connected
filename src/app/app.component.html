@@ -1,8 +1,8 @@
 <ion-app>
   <!-- Remove ng-container to show sidenav when not logged in -->
   <ng-container *ngIf="userIsAuthenticated">
-    <ion-split-pane contentId="main-content">
-      <ion-menu class="sidemenu" contentId="main-content" type="overlay">
+    <ion-split-pane contentId="main-content" when="md">
+      <ion-menu class="sidemenu" id="top-level-menu" contentId="main-content" type="overlay">
         <ion-list lines="full" id="meet-list">
           <ion-list padding class="ion-text-center" id="welcome">
             <div class="profile-container">

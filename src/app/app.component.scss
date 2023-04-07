@@ -4,11 +4,11 @@
 }
 
 #profile-a:hover ion-icon {
-  color: black;
+  opacity: 0.4;
 }
 
 .sidenav-container {
-  background: #df1c6b;
+  // background: #df1c6b;
   height: 100%;
 }
 
@@ -59,10 +59,6 @@ ion-icon {
   color: white;
 }
 
-ion-menu {
-  background: transparent;
-}
-
 ion-list {
   font-family: 'Proxima Nova', sans-serif;
 }
@@ -71,16 +67,27 @@ ion-list {
   padding: 10% 0%;
   border-bottom: 1px solid white;
   border-radius: 0px;
-  background: #ca1b62;
-}
-
-ion-menu::part(backdrop) {
-  background-color: rgba(255, 0, 255, 0.5);
 }
 
 ion-menu::part(container) {
   border-radius: 0 20px 20px 0;
   box-shadow: 4px 0px 16px rgba(255, 0, 255, 0.18);
+}
+
+#top-level-menu {
+  // background: #df1c6b;
+  background: transparent;
+}
+
+:host {
+  --border: 1px solid transparent !important;
+}
+
+@media only screen and (max-width: 768px) {
+  /* styles for mobile and tablets */
+  #top-level-menu {
+    background: transparent;
+  }
 }
 
 #meet-list {
@@ -89,6 +96,7 @@ ion-menu::part(container) {
   width: 100%;
   height: 100%;
   position: relative;
+  background: #df1c6b;
 }
 
 #logOutButton {
@@ -159,11 +167,6 @@ ion-menu.md ion-item {
   border-radius: 4px;
 }
 
-ion-menu.md ion-item.selected {
-  // --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
-  background: #a0184f;
-}
-
 ion-menu.md ion-item ion-icon {
   color: white;
 }
@@ -205,8 +208,4 @@ ion-menu.ios ion-note {
 
 ion-menu.ios ion-note {
   margin-bottom: 8px;
-}
-
-ion-app {
-  background: radial-gradient(#ff3434, transparent);
 }

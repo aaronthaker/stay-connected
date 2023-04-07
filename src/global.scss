@@ -34,6 +34,10 @@ body {
   font-family: 'Proxima Nova', sans-serif;
 }
 
+app-confirm-logout-modal {
+  background: white;
+}
+
 // Below is to set the sidemenu to transparent, god knows why it works on page element as well
 // Below is what lets hover work for some reason.
 ion-app {
@@ -49,10 +53,6 @@ app-home {
   background: radial-gradient(#ff3434, transparent)
 }
 
-app-confirm-logout-modal {
-  background-color: white;
-}
-
-.alert-wrapper {
-  --background: #ffffff;
+ion-menu {
+  --border: 1px solid transparent;
 }
