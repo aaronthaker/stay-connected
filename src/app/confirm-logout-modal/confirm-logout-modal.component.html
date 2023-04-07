@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Confirm Logout
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>
+        Are you sure you want to log out?
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-button (click)="dismiss(false)" color="primary" expand="block">
+          Cancel
+        </ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button (click)="dismiss(true)" color="danger" expand="block">
+          Log Out
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

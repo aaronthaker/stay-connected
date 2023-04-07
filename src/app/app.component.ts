@@ -5,6 +5,8 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { Router } from '@angular/router';
 import { MessagesService } from './messages/messages.service';
 import { SharedService } from './shared.service';
+import { ModalController } from '@ionic/angular';
+import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logout-modal.component';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +29,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private messagesService: MessagesService,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private modalController: ModalController
   ) { }
 
   public appPages = [
@@ -73,7 +76,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onLogout() {
-    this.authService.logout();
+    this.presentConfirmLogoutModal();
   }
 
   goToLogin() {
@@ -83,5 +86,21 @@ export class AppComponent implements OnInit, OnDestroy {
   goToSignup() {
     this.router.navigate(['/signup']);
   }
+
+  async presentConfirmLogoutModal() {
+    const modal = await this.modalController.create({
+      component: ConfirmLogoutModalComponent,
+      cssClass: 'my-custom-class'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data && data.confirm) {
+      this.authService.logout();
+    }
+}
+
 
 }
