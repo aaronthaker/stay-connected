@@ -1,38 +1,62 @@
-ion-card img {
+ion-content {
+  display: flex;
+  justify-content: center;
+  --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  flex: 1;
+}
+
+.text {
+  color: white;
+}
+
+.profile-image {
+  display: flex;
+  justify-content: center;
+}
+
+ion-content img {
   display: block;
+  margin: auto;
+  border-radius: 5%;
+  width: 90%;
+  height: auto;
+  max-width: 300px;
+}
+
+#bio-interests-div {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0px;
+}
+
+ion-content ion-card-title {
+  text-align: center;
+  font-weight: 100;
+}
+
+.card-header {
+  padding: 0.5rem 0;
   margin-left: auto;
   margin-right: auto;
-  // margin-top: 35px;
-  border-radius: 5%;
-}
-
-ion-card ion-card-title {
-  text-align: center;
-}
-
-ion-card-header {
-  padding: 0.5rem 0;
-}
-
-ion-card {
-  --background: -webkit-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
-  --background: -o-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
-  --background: -ms-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
-  --background: -moz-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
-  --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+  width: 90%;
 }
 
 .button-row {
   background-color: white;
-}
-
-ion-card-content,
-ion-card-title {
-  color: white;
-}
-
-ion-card-title {
-  font-weight: 100;
 }
 
 .match-message {
@@ -42,11 +66,12 @@ ion-card-title {
   border-radius: 5px;
   font-weight: bold;
   margin-top: 1rem;
+  margin-bottom: 1rem;
   text-align: center;
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
-  box-shadow: 0px 0px 26px black
+  box-shadow: 0px 0px 26px black;
 }
 
 #location-icon {
@@ -60,6 +85,7 @@ ion-card-title {
   display: flex;
   justify-content: center;
   align-items: center;
+  font-weight: 400;
 }
 
 #name ion-button {
@@ -68,10 +94,7 @@ ion-card-title {
 
 #bio {
   font-size: 16px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  max-width: 650px;
 }
 
 #location {
@@ -131,15 +154,15 @@ ion-card-title {
 
 #buttons-div {
   width: 100%;
-  background:white;
+  background: white;
   display: flex;
   justify-content: center;
   height: 70px;
+  margin-top: auto;
 }
 
 .common-interests {
   text-align: center;
-  color: white;
   font-weight: normal;
   display: flex;
   justify-content: center;
@@ -151,8 +174,17 @@ ion-card-title {
   padding: 0.2rem 0.5rem;
 }
 
-@media only screen and (max-width: 768px) {
-  .common-interests, #bio {
-    flex-direction: column;
+@media only screen and (max-width: 576px) {
+  ion-content img {
+    max-width: 90%;
+  }
+
+  .card-header {
+    padding: 0px;
+  }
+
+  #tick-button ion-icon,
+  #cross-button ion-icon {
+    font-size: 30px;
   }
 }

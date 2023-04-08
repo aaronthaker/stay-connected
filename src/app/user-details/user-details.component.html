@@ -1,0 +1,70 @@
+<ion-content>
+  <div class="container">
+    <div class="content">
+      <p id="location">
+        <span>
+          <ion-icon id="location-icon" name="location"></ion-icon>
+          <span id="location-span">{{displayedUser?.location}}</span>
+        </span>
+        <ion-button (click)="speakText(displayedUser?.location!)" size="small">
+          <ion-icon name="volume-high-outline"></ion-icon>
+        </ion-button>
+      </p>
+
+      <div class="profile-image">
+        <ng-container *ngIf="displayedUser?.profileImage">
+          <img [src]="'http://localhost:3000/' + displayedUser.profileImage" width="300px" height="300px"
+            class="profile-img" (click)="openImage('http://localhost:3000/' + displayedUser.profileImage)" />
+        </ng-container>
+      </div>
+
+      <div class="card-header">
+        <ion-card-title id="name" class="text"><span>{{displayedUser?.name}}<span *ngIf="displayedUser?.age">, {{
+              displayedUser?.age }}</span></span>
+          <ion-button (click)="speakText(displayedUser?.name! + ', ' + displayedUser?.age!)" size="small">
+            <ion-icon name="volume-high-outline"></ion-icon>
+          </ion-button>
+        </ion-card-title>
+        <div class="text" id="bio-interests-div">
+          <div id="bio">{{displayedUser?.bio}}</div>
+          <ion-button (click)="speakText(displayedUser?.bio!)" size="small">
+            <ion-icon name="volume-high-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <ng-container *ngIf="commonInterests || showMatchMessage">
+        <div class="match-message" [@fadeInOut]>
+          <div *ngIf="commonInterests" class="common-interests">
+            You have common interests with this person!
+            <ion-button (click)="speakText('You have common interests with this person!')" size="small"
+              id="match-message-speaker-button">
+              <ion-icon name="volume-high-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <div *ngIf="showMatchMessage">
+            <p>{{displayedUser?.name}} also liked you!</p>
+            <ion-button (click)="navigateToConversation(displayedUser?._id!)" color="primary" size="small">
+              Message {{displayedUser?.name}} now!
+            </ion-button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-item>
+      <div id="buttons-div">
+        <ion-button (click)="onCrossClick(displayedUser)" fill="clear" color="danger" id="cross-button" size="large">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onTickClick(displayedUser)" fill="clear" color="success" id="tick-button" size="large">
+          <ion-icon name="heart-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

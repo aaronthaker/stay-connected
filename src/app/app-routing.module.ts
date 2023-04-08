@@ -5,7 +5,6 @@ import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
 import { EventsListComponent } from './events/events-list/events-list.component';
-import { HomeComponent } from './home/home.component';
 import { ConversationComponent } from './messages/conversation/conversation.component';
 import { MessagesComponent } from './messages/messages.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -17,12 +16,13 @@ import { PreferencesComponent } from './settings/preferences/preferences.compone
 import { PrivacyComponent } from './settings/privacy/privacy.component';
 import { SettingsComponent } from './settings/settings.component';
 import { OtherProfileComponent } from './other-profile/other-profile.component';
+import { UserDetailsComponent } from './user-details/user-details.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'home',
-    component: HomeComponent,
+    component: UserDetailsComponent,
     canActivate: [AuthGuard]
   },
   {

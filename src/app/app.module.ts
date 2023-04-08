@@ -13,7 +13,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventsListComponent } from './events/events-list/events-list.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
-import { UserDetailsComponent } from './home/user-details/user-details.component';
+import { UserDetailsComponent } from './user-details/user-details.component';
 import { HomeComponent } from './home/home.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
@@ -35,7 +35,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
 import { OtherProfileComponent } from './other-profile/other-profile.component';
 import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logout-modal.component';
-import { ImageViewerComponent } from './home/user-details/image-viewer/image-viewer.component';
+import { ImageViewerComponent } from './user-details/image-viewer/image-viewer.component';
 
 @NgModule({
   declarations: [
