@@ -1,7 +1,10 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/messages"></ion-back-button>
+    </ion-buttons>
     <ion-title>
-      Other Profile
+      {{otherUser?.name}}
     </ion-title>
   </ion-toolbar>
 </ion-header>

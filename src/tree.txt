@@ -12,6 +12,7 @@
 ¦   ¦   app.component.scss
 ¦   ¦   app.component.ts
 ¦   ¦   app.module.ts
+¦   ¦   shared.service.ts
 ¦   ¦   
 ¦   +---auth
 ¦   ¦   ¦   auth-data.model.ts
@@ -29,6 +30,11 @@
 ¦   ¦           signup.component.scss
 ¦   ¦           signup.component.ts
 ¦   ¦           
+¦   +---confirm-logout-modal
+¦   ¦       confirm-logout-modal.component.html
+¦   ¦       confirm-logout-modal.component.scss
+¦   ¦       confirm-logout-modal.component.ts
+¦   ¦       
 ¦   +---events
 ¦   ¦   ¦   event.model.ts
 ¦   ¦   ¦   events.service.ts
@@ -66,11 +72,54 @@
 ¦   ¦           conversation.component.ts
 ¦   ¦           conversation.module.ts
 ¦   ¦           
+¦   +---other-profile
+¦   ¦       other-profile.component.html
+¦   ¦       other-profile.component.scss
+¦   ¦       other-profile.component.ts
+¦   ¦       
 ¦   +---profile
 ¦   ¦       profile.component.html
 ¦   ¦       profile.component.scss
 ¦   ¦       profile.component.ts
 ¦   ¦       
+¦   +---settings
+¦   ¦   ¦   settings.component.html
+¦   ¦   ¦   settings.component.scss
+¦   ¦   ¦   settings.component.ts
+¦   ¦   ¦   
+¦   ¦   +---accessibility
+¦   ¦   ¦       accessibility.component.html
+¦   ¦   ¦       accessibility.component.scss
+¦   ¦   ¦       accessibility.component.ts
+¦   ¦   ¦       
+¦   ¦   +---account-settings
+¦   ¦   ¦       account-settings.component.html
+¦   ¦   ¦       
+¦   ¦   +---help
+¦   ¦   ¦       help.component.html
+¦   ¦   ¦       help.component.scss
+¦   ¦   ¦       help.component.ts
+¦   ¦   ¦       
+¦   ¦   +---language
+¦   ¦   ¦       language.component.html
+¦   ¦   ¦       language.component.scss
+¦   ¦   ¦       language.component.ts
+¦   ¦   ¦       
+¦   ¦   +---notifications
+¦   ¦   ¦       notifications.component.html
+¦   ¦   ¦       notifications.component.scss
+¦   ¦   ¦       notifications.component.ts
+¦   ¦   ¦       
+¦   ¦   +---preferences
+¦   ¦   ¦       preferences.component.html
+¦   ¦   ¦       preferences.component.scss
+¦   ¦   ¦       preferences.component.ts
+¦   ¦   ¦       
+¦   ¦   +---privacy
+¦   ¦           privacy.component.html
+¦   ¦           privacy.component.scss
+¦   ¦           privacy.component.ts
+¦   ¦           
 ¦   +---users
 ¦           user.model.ts
 ¦           users.service.ts
