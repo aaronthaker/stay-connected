@@ -35,6 +35,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
 import { OtherProfileComponent } from './other-profile/other-profile.component';
 import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logout-modal.component';
+import { ImageViewerComponent } from './home/user-details/image-viewer/image-viewer.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logo
     PreferencesComponent,
     PrivacyComponent,
     OtherProfileComponent,
-    ConfirmLogoutModalComponent
+    ConfirmLogoutModalComponent,
+    ImageViewerComponent
   ],
   imports: [
     IonicModule,

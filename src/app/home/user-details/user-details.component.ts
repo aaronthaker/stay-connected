@@ -1,10 +1,12 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { MessagesService } from 'src/app/messages/messages.service';
 import { User } from 'src/app/users/user.model';
 import { UserService } from 'src/app/users/users.service';
+import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 
 @Component({
   selector: 'app-user-details',
@@ -40,6 +42,7 @@ export class UserDetailsComponent implements OnInit {
     private messagesService: MessagesService,
     private userService: UserService,
     private router: Router,
+    private modalController: ModalController,
   ) { }
 
   ngOnInit() {
@@ -66,6 +69,16 @@ export class UserDetailsComponent implements OnInit {
         this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
       });
     })
+  }
+
+  async openImage(imageUrl: string) {
+    const modal = await this.modalController.create({
+      component: ImageViewerComponent,
+      componentProps: {
+        imageUrl: imageUrl,
+      },
+    });
+    return await modal.present();
   }
 
   speakText(textToSpeak: string) {

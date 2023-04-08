@@ -10,6 +10,10 @@ ion-card ion-card-title {
   text-align: center;
 }
 
+ion-card-header {
+  padding: 0.5rem 0;
+}
+
 ion-card {
   --background: -webkit-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
   --background: -o-linear-gradient(bottom, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
@@ -148,7 +152,7 @@ ion-card-title {
 }
 
 @media only screen and (max-width: 768px) {
-  .common-interests, #name, #bio, #location {
+  .common-interests, #bio {
     flex-direction: column;
   }
 }

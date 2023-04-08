@@ -10,7 +10,7 @@
   </p>
 
   <ng-container *ngIf="displayedUser?.profileImage">
-    <img [src]="'http://localhost:3000/' + displayedUser.profileImage" width="300px" height="300px" class="profile-img"/>
+    <img [src]="'http://localhost:3000/' + displayedUser.profileImage" width="300px" height="300px" class="profile-img" (click)="openImage('http://localhost:3000/' + displayedUser.profileImage)" />
   </ng-container>
 
   <ion-card-header>
