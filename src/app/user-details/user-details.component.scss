@@ -80,7 +80,11 @@ ion-content ion-card-title {
   margin-bottom: 3px;
 }
 
-#name {
+#location-span, #name, #bio, #match-message, #tick-button, #cross-button {
+  cursor: help;
+}
+
+#nameCard {
   font-size: 28px;
   display: flex;
   justify-content: center;
@@ -88,7 +92,7 @@ ion-content ion-card-title {
   font-weight: 400;
 }
 
-#name ion-button {
+#nameCard ion-button {
   margin-left: 10px;
 }
 

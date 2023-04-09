@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessagesService } from '../messages.service';
 import { UserService } from '../../users/users.service';
@@ -17,6 +17,8 @@ export class ConversationComponent implements OnInit, OnDestroy {
   public messages: any[] = [];
   public newMessage: string;
   newMessageSub: Subscription;
+  touchDevice: boolean;
+
   @ViewChild('content', { static: false }) content: IonContent;
 
   constructor(
@@ -24,7 +26,9 @@ export class ConversationComponent implements OnInit, OnDestroy {
     public messagesService: MessagesService,
     private userService: UserService,
     private animationCtrl: AnimationController
-  ) { }
+  ) {
+    this.touchDevice = this.isTouchDevice();
+  }
 
   ngOnInit() {
     const otherUserId = this.route.snapshot.params['id'];
@@ -43,6 +47,40 @@ export class ConversationComponent implements OnInit, OnDestroy {
         this.scrollToBottom();
       }
     });
+  }
+
+  onMouseEnter(target: EventTarget | null) {
+    if (!this.touchDevice && target instanceof HTMLElement) {
+      const indexStr = target.getAttribute('data-index');
+      if (indexStr !== null) {
+        const index = parseInt(indexStr, 10);
+        const message = this.messages[index];
+        if (message) {
+          this.speakText(message.content);
+        }
+      }
+    }
+  }
+
+  onMouseLeave() {
+    if (!this.touchDevice && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+
+  isTouchDevice(): boolean {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  }
+
+  speakText(textToSpeak: string) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.error('Speech synthesis is not supported in this browser.');
+    }
   }
 
   ngOnDestroy() {

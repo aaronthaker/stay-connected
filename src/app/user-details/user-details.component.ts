@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
@@ -34,9 +34,12 @@ export class UserDetailsComponent implements OnInit {
   currentUserLikes: string[] | undefined;
   showMatchMessage: boolean;
   commonInterests: boolean = false;
+  touchDevice: boolean;
 
   userSub: Subscription;
   currentIndex = 0;
+
+  hoverTimeout: any;
 
   constructor(
     private messagesService: MessagesService,
@@ -68,7 +71,12 @@ export class UserDetailsComponent implements OnInit {
         this.displayedUser = this.displayedUsers[this.currentIndex];
         this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
       });
-    })
+    });
+    this.touchDevice = this.isTouchDevice();
+  }
+
+  isTouchDevice(): boolean {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
   async openImage(imageUrl: string) {
@@ -130,6 +138,56 @@ export class UserDetailsComponent implements OnInit {
 
   navigateToConversation(userId: string) {
     this.router.navigate(['/conversation', userId]);
+  }
+
+  @HostListener('mouseenter', ['$event.target'])
+  onMouseEnter(target: EventTarget | null) {
+    if (!this.touchDevice && target instanceof HTMLElement) {
+      const elementId = target.getAttribute('id');
+      if (elementId) {
+        clearTimeout(this.hoverTimeout);
+        this.hoverTimeout = setTimeout(() => {
+          this.speakElementText(elementId);
+          console.log(elementId)
+        }, 1500);
+      }
+    }
+  }
+
+  @HostListener('mouseleave', ['$event.target'])
+  onMouseLeave(target: EventTarget | null) {
+    if (!this.touchDevice && target instanceof HTMLElement) {
+      clearTimeout(this.hoverTimeout);
+    }
+  }
+
+  speakElementText(elementId: string) {
+    let textToSpeak = '';
+    switch (elementId) {
+      case 'location-span':
+        textToSpeak = this.displayedUser?.location!;
+        break;
+      case 'name':
+        textToSpeak = `${this.displayedUser?.name!}, ${this.displayedUser?.age!}`;
+        break;
+      case 'bio':
+        textToSpeak = this.displayedUser?.bio!;
+        break;
+      case 'match-message':
+        textToSpeak = 'You have common interests with this person!';
+        break;
+      case 'tick-button':
+        textToSpeak = 'Like';
+        break;
+      case 'cross-button':
+        textToSpeak = 'Dislike';
+        break;
+      default:
+        break;
+    }
+    if (textToSpeak) {
+      this.speakText(textToSpeak);
+    }
   }
 
 }
