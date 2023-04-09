@@ -1,32 +1,46 @@
-<ion-card>
-  <mat-spinner *ngIf="isLoading"></mat-spinner>
-  <form (submit)="onSaveEvent(eventForm)" #eventForm="ngForm" *ngIf="!isLoading">
+<ion-content>
 
-    <ion-item>
-      <ion-label>Event Title:</ion-label>
-      <ion-input matInput [ngModel]="event?.title" name="title"></ion-input>
-    </ion-item>
+  <ion-header>
+    <ion-toolbar>
+      <div style="display: flex;">
+        <ion-back-button defaultHref="/events"></ion-back-button>
+        <ion-title>
+          Create Event
+        </ion-title>
+      </div>
+    </ion-toolbar>
+  </ion-header>
 
-    <ion-item>
-      <ion-label>Event Location:</ion-label>
-      <ion-input matInput [ngModel]="event?.location" name="location"></ion-input>
-    </ion-item>
+  <ion-card>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+    <form (submit)="onSaveEvent(eventForm)" #eventForm="ngForm" *ngIf="!isLoading">
 
-    <ion-item>
-      <ion-label>Event Date:</ion-label>
-      <ion-input matInput [ngModel]="event?.date" name="date"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label>Event Title:</ion-label>
+        <ion-input matInput [ngModel]="event?.title" name="title"></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Event Description:</ion-label>
-      <ion-input matInput [ngModel]="event?.description" name="description"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label>Event Location:</ion-label>
+        <ion-input matInput [ngModel]="event?.location" name="location"></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Event Image:</ion-label>
-      <input type="file" (change)="onImagePicked($event)" #imagePicker>
-    </ion-item>
+      <ion-item>
+        <ion-label>Event Date:</ion-label>
+        <ion-input matInput [ngModel]="event?.date" name="date"></ion-input>
+      </ion-item>
 
-    <ion-button type="submit" (click)="onSubmitClick()">Submit</ion-button>
-  </form>
-</ion-card>
+      <ion-item>
+        <ion-label>Event Description:</ion-label>
+        <ion-input matInput [ngModel]="event?.description" name="description"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Event Image:</ion-label>
+        <input type="file" (change)="onImagePicked($event)" #imagePicker>
+      </ion-item>
+
+      <ion-button type="submit" (click)="onSubmitClick()">Submit</ion-button>
+    </form>
+  </ion-card>
+</ion-content>

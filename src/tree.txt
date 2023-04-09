@@ -49,16 +49,6 @@
 ¦   ¦           events-list.component.scss
 ¦   ¦           events-list.component.ts
 ¦   ¦           
-¦   +---home
-¦   ¦   ¦   home.component.html
-¦   ¦   ¦   home.component.scss
-¦   ¦   ¦   home.component.ts
-¦   ¦   ¦   
-¦   ¦   +---user-details
-¦   ¦           user-details.component.html
-¦   ¦           user-details.component.scss
-¦   ¦           user-details.component.ts
-¦   ¦           
 ¦   +---messages
 ¦   ¦   ¦   message.model.ts
 ¦   ¦   ¦   messages.component.html
@@ -119,6 +109,16 @@
 ¦   ¦           privacy.component.html
 ¦   ¦           privacy.component.scss
 ¦   ¦           privacy.component.ts
+¦   ¦           
+¦   +---user-details
+¦   ¦   ¦   user-details.component.html
+¦   ¦   ¦   user-details.component.scss
+¦   ¦   ¦   user-details.component.ts
+¦   ¦   ¦   
+¦   ¦   +---image-viewer
+¦   ¦           image-viewer.component.html
+¦   ¦           image-viewer.component.scss
+¦   ¦           image-viewer.component.ts
 ¦   ¦           
 ¦   +---users
 ¦           user.model.ts

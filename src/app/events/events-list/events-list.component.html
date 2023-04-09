@@ -1,3 +1,14 @@
+<ion-header>
+  <ion-toolbar>
+    <div style="display: flex;">
+      <ion-title>
+        Events
+      </ion-title>
+      <ion-button routerLink="create" style="padding: 0px 20px">Create Event</ion-button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content>
   <mat-spinner *ngIf="isLoading"></mat-spinner>
   <main *ngIf="events.length > 0 && !isLoading">
@@ -27,7 +38,6 @@
 
   <main *ngIf="events.length === 0 && !isLoading">
     <ion-card>
-      <button routerLink="create">Create Event</button>
       <ion-card-content>
         <p style="text-align: center;">No events yet</p>
       </ion-card-content>
