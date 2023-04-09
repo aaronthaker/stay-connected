@@ -100,7 +100,7 @@ ion-menu::part(container) {
   background: #df1c6b;
 }
 
-#page-logout {
+#page-log-out {
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -112,9 +112,13 @@ ion-menu::part(container) {
   color: white;
 }
 
-#page-logout:hover {
+#page-log-out:hover {
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.25);
+}
+
+#page-log-out, #page-profile, #page-settings, .page-title, #page-welcome, #page-stay-connected {
+  cursor: help !important;
 }
 
 ion-list-header {

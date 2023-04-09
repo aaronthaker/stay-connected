@@ -65,7 +65,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
         clearTimeout(this.hoverTimeout);
         this.hoverTimeout = setTimeout(() => {
           this.speakElementText(elementId);
-          console.log(elementId)
         }, 1500);
       }
     }

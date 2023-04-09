@@ -148,7 +148,6 @@ export class UserDetailsComponent implements OnInit {
         clearTimeout(this.hoverTimeout);
         this.hoverTimeout = setTimeout(() => {
           this.speakElementText(elementId);
-          console.log(elementId)
         }, 1500);
       }
     }
