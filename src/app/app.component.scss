@@ -1,10 +1,10 @@
 /* Add a small white strip to the left side of the selected item but not profile */
-.selected:not(#profile-a) {
+.selected:not(#page-profile, #page-settings) {
   border-left: 3px solid #fff;
   background-color: rgba(0, 0, 0, 0.25);
 }
 
-#profile-a:hover ion-icon {
+#page-profile:hover ion-icon, #page-settings:hover ion-icon {
   opacity: 0.4;
 }
 
@@ -100,7 +100,7 @@ ion-menu::part(container) {
   background: #df1c6b;
 }
 
-#logOutButton {
+#page-logout {
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -112,7 +112,7 @@ ion-menu::part(container) {
   color: white;
 }
 
-#logOutButton:hover {
+#page-logout:hover {
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.25);
 }

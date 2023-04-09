@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
@@ -25,6 +25,9 @@ export class AppComponent implements OnInit, OnDestroy {
   userName: string | null;
   unreadMessagesCount = 0;
   interval: any;
+
+  touchDevice: boolean;
+  hoverTimeout: any;
 
   constructor(
     private authService: AuthService,
@@ -64,6 +67,57 @@ export class AppComponent implements OnInit, OnDestroy {
         this.userName = this.authService.getUserName();
       });
     this.updateUnreadMessagesCount();
+    this.touchDevice = this.isTouchDevice();
+  }
+
+  isTouchDevice(): boolean {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  }
+
+  @HostListener('mouseenter', ['$event.target'])
+  onMouseEnter(target: EventTarget | null) {
+    if (!this.touchDevice && target instanceof HTMLElement) {
+      const elementId = target.getAttribute('id');
+      if (elementId) {
+        clearTimeout(this.hoverTimeout);
+        this.hoverTimeout = setTimeout(() => {
+          this.speakElementText(elementId);
+        }, 1500);
+      }
+    }
+  }
+
+  @HostListener('mouseleave', ['$event.target'])
+  onMouseLeave(target: EventTarget | null) {
+    if (!this.touchDevice && target instanceof HTMLElement) {
+      clearTimeout(this.hoverTimeout);
+    }
+  }
+
+  speakElementText(elementId: string) {
+    let textToSpeak = '';
+    const pagePrefix = 'page-';
+    if (elementId.startsWith(pagePrefix)) {
+      if (elementId) {
+        textToSpeak = elementId.substring(5);
+      }
+    }
+
+    if (textToSpeak) {
+      this.speakText(textToSpeak);
+    }
+  }
+
+
+  speakText(textToSpeak: string) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      // Handle the case where the browser doesn't support speech synthesis
+      console.error('Speech synthesis is not supported in this browser.');
+    }
   }
 
   updateUnreadMessagesCount() {
@@ -103,7 +157,6 @@ export class AppComponent implements OnInit, OnDestroy {
     if (data && data.confirm) {
       this.authService.logout();
     }
-}
-
+  }
 
 }
