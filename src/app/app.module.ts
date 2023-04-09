@@ -14,7 +14,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventsListComponent } from './events/events-list/events-list.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
 import { UserDetailsComponent } from './user-details/user-details.component';
-import { HomeComponent } from './home/home.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
 import { LoginComponent } from './auth/login/login.component';
@@ -43,7 +42,6 @@ import { ImageViewerComponent } from './user-details/image-viewer/image-viewer.c
     EventsListComponent,
     CreateEventComponent,
     UserDetailsComponent,
-    HomeComponent,
     LoginComponent,
     SignupComponent,
     MessagesComponent,

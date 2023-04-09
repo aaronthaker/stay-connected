@@ -22,6 +22,7 @@ import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logo
 export class AppComponent implements OnInit, OnDestroy {
 
   userEmail: string | null;
+  userName: string | null;
   unreadMessagesCount = 0;
   interval: any;
 
@@ -54,11 +55,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.userEmail = localStorage.getItem('userEmail');
+    this.userName = localStorage.getItem('userName');
     this.authListenerSubs = this.authService
       .getAuthStatusListener()
       .subscribe(isAuthenticated => {
         this.userIsAuthenticated = isAuthenticated;
         this.userEmail = this.authService.getUserEmail();
+        this.userName = this.authService.getUserName();
       });
     this.updateUnreadMessagesCount();
   }

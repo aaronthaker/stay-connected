@@ -112,7 +112,7 @@ ion-content ion-card-title {
   margin-left: 10px;
 }
 
-#cross-button {
+#cross-button, #tick-button {
   border-radius: 10%;
 }
 
@@ -120,20 +120,12 @@ ion-content ion-card-title {
   background-color: red;
 }
 
-#cross-button:hover ion-icon {
+#cross-button:hover ion-icon, #tick-button:hover ion-icon {
   color: white;
-}
-
-#tick-button {
-  border-radius: 10%;
 }
 
 #tick-button:hover {
   background-color: green;
-}
-
-#tick-button:hover ion-icon {
-  color: white;
 }
 
 #tick-button,
@@ -159,6 +151,11 @@ ion-content ion-card-title {
   justify-content: center;
   height: 70px;
   margin-top: auto;
+}
+
+ion-footer ion-item {
+  --padding-end: 0px;
+  --inner-padding-end: 0px;
 }
 
 .common-interests {

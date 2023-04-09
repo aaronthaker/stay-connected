@@ -14,6 +14,7 @@ export class AuthService {
   private tokenTimer: NodeJS.Timer;
   private userId: string | null;
   private userEmail: string | null;
+  private userName: string | null;
 
   getToken() {
     return this.token;
@@ -45,13 +46,18 @@ export class AuthService {
     return this.userEmail;
   }
 
+  getUserName() {
+    return this.userName;
+  }
+
   login(email: string, password: string, errorCallback: (errorMessage: string) => void) {
     const authData: AuthData = { email: email, password: password };
-    this.http.post<{ token: string, expiresIn: number, userId: string, email: string }>("http://localhost:3000/api/user/login", authData)
+    this.http.post<{ token: string, expiresIn: number, userId: string, email: string, name: string }>("http://localhost:3000/api/user/login", authData)
       .subscribe(response => {
         const token = response.token;
         this.token = token;
         this.userEmail = response.email;
+        this.userName = response.name;
         if (token) {
           const expiresInDuration = response.expiresIn;
           this.setAuthTimer(expiresInDuration);
@@ -62,6 +68,7 @@ export class AuthService {
           const expirationDate = new Date(now.getTime() + (expiresInDuration * 1000));
           this.saveAuthData(token, expirationDate, this.userId);
           localStorage.setItem('userEmail', response.email);
+          localStorage.setItem('userName', response.name);
           this.router.navigate(['/home']);
         }
       }, error => {
@@ -91,6 +98,7 @@ export class AuthService {
         this.setAuthTimer(expiresIn / 1000);
         this.authStatusListener.next(true);
         this.userEmail = localStorage.getItem('userEmail');
+        this.userName = localStorage.getItem('userName');
       }
     }
   }
@@ -115,6 +123,7 @@ export class AuthService {
     this.authStatusListener.next(false);
     this.userId = null;
     this.userEmail = null;
+    this.userName = null;
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
     this.router.navigate(['/login']);
@@ -128,6 +137,7 @@ export class AuthService {
 
   private clearAuthData() {
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
     localStorage.removeItem('token');
     localStorage.removeItem('expiration');
     localStorage.removeItem("userId");

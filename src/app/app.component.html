@@ -12,9 +12,9 @@
               </a>
               <div>
                 <ion-title class="ion-text-center">Stay Connected</ion-title>
-                <ion-label class="ion-text-center" *ngIf="userIsAuthenticated">{{
-                  userEmail
-                  }}</ion-label>
+                <ion-label class="ion-text-center" *ngIf="userIsAuthenticated">Welcome, {{
+                  userName && userName.indexOf(' ') !== -1 ? userName.split(' ')[0] : userName
+                }}!</ion-label>
               </div>
 
               <a routerDirection="root" id="profile-a" [routerLink]="['/settings']" lines="none" detail="false"
