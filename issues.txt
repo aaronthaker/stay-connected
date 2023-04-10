@@ -1,11 +1,10 @@
 BEFORE COMPILE:
-Style login/signup
 All error handling
 Implement accessibility stuff:
 - add voice input for users AND HELP PAGE THAT TALKS - ALT TEXT - TEXT WHEN HOVER
 - High contrast mode - voice command (button on every screen to talk to?)
 - Noise every time a letter is input in messaging (OR BUTTON IS CLICKED)
-Implement some settings pages
+Implement accessibility settings pages
 
 check login/sigup button screen
 check how often signup button color comes up

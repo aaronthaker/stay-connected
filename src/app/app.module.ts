@@ -36,6 +36,8 @@ import { OtherProfileComponent } from './other-profile/other-profile.component';
 import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logout-modal.component';
 import { ImageViewerComponent } from './user-details/image-viewer/image-viewer.component';
 import { DatePipe } from '@angular/common';
+import { A11yModule } from '@angular/cdk/a11y';
+import { VoiceNavigationButtonComponent } from './components/voice-navigation-button/voice-navigation-button.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,8 @@ import { DatePipe } from '@angular/common';
     PrivacyComponent,
     OtherProfileComponent,
     ConfirmLogoutModalComponent,
-    ImageViewerComponent
+    ImageViewerComponent,
+    VoiceNavigationButtonComponent
   ],
   imports: [
     IonicModule,
@@ -74,6 +77,7 @@ import { DatePipe } from '@angular/common';
     HttpClientModule,
     MatProgressSpinnerModule,
     MatAutocompleteModule,
+    A11yModule,
     SocketIoModule.forRoot({
       url: 'http://localhost:3000',
       options: {}

@@ -1,0 +1,55 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+
+@Component({
+  selector: 'app-voice-navigation-button',
+  templateUrl: './voice-navigation-button.component.html',
+  styleUrls: ['./voice-navigation-button.component.scss'],
+})
+
+export class VoiceNavigationButtonComponent implements OnInit, OnDestroy {
+  private recognition: any;
+
+  constructor(private router: Router, private liveAnnouncer: LiveAnnouncer) {
+    this.recognition = new (window as any).webkitSpeechRecognition();
+    this.recognition.lang = 'en-US';
+    this.recognition.interimResults = false;
+    this.recognition.maxAlternatives = 1;
+  }
+
+  ngOnInit(): void {
+    this.recognition.onresult = (event: any) => {
+      const last = event.results.length - 1;
+      const command = event.results[last][0].transcript.trim().toLowerCase();
+      this.handleVoiceCommand(command);
+    };
+  }
+
+  ngOnDestroy(): void {
+    this.recognition.stop();
+  }
+
+  startRecognition(): void {
+    this.recognition.start();
+    console.log("in start")
+    this.liveAnnouncer.announce('Listening for voice command');
+  }
+
+  handleVoiceCommand(command: string): void {
+    console.log(command)
+    switch (command) {
+      case 'events.':
+        this.router.navigate(['/events/events-list']);
+        break;
+      case 'messages.':
+        this.router.navigate(['/messages']);
+        break;
+      case 'profile.':
+        this.router.navigate(['/profile']);
+        break;
+      default:
+        this.liveAnnouncer.announce('Invalid voice command. Please try again');
+    }
+  }
+}
