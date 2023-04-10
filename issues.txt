@@ -1,7 +1,6 @@
 BEFORE COMPILE:
 Style sidemenu fonts on iOS
-implement images in events
-Style login/signup/events/messages (Style everything)
+Style login/signup/messages (Style everything)
 All error handling
 Implement accessibility stuff:
 - add voice input for users AND HELP PAGE THAT TALKS - ALT TEXT - TEXT WHEN HOVER

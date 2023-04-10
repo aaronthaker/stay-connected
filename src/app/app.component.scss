@@ -89,6 +89,13 @@ ion-menu::part(container) {
   #top-level-menu {
     background: transparent;
   }
+  .profile-container{
+    justify-content: space-around;
+  }
+
+  #page-welcome {
+    display: none;
+  }
 }
 
 #meet-list {
@@ -98,6 +105,10 @@ ion-menu::part(container) {
   height: 100%;
   position: relative;
   background: #df1c6b;
+}
+
+.item.sc-ion-label-ios-h, .item .sc-ion-label-ios-h {
+  color: white;
 }
 
 #page-log-out {
