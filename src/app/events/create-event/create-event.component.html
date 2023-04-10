@@ -10,12 +10,12 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-card>
+  <ion-card class="event-card">
     <mat-spinner *ngIf="isLoading"></mat-spinner>
     <form (submit)="onSaveEvent(eventForm)" #eventForm="ngForm" *ngIf="!isLoading">
 
       <ion-item>
-        <ion-label>Event Title:</ion-label>
+        <ion-label position="floating">Event Title:</ion-label>
         <ion-input matInput [ngModel]="event?.title" name="title" required #title="ngModel"></ion-input>
       </ion-item>
       <p *ngIf="title.invalid && (title.dirty || title.touched)" class="error-message">
@@ -23,7 +23,7 @@
       </p>
 
       <ion-item>
-        <ion-label>Event Location:</ion-label>
+        <ion-label position="floating">Event Location:</ion-label>
         <ion-input matInput [ngModel]="event?.location" name="location" required #location="ngModel"></ion-input>
       </ion-item>
       <p *ngIf="location.invalid && (location.dirty || location.touched)" class="error-message">
@@ -31,15 +31,16 @@
       </p>
 
       <ion-item>
-        <ion-label>Event Date:</ion-label>
-        <ion-input type="datetime-local" matInput [ngModel]="event?.date" name="date" required #date="ngModel"></ion-input>
+        <ion-label position="floating">Event Date:</ion-label>
+        <ion-input type="datetime-local" matInput [ngModel]="event?.date" name="date" required
+          #date="ngModel"></ion-input>
       </ion-item>
       <p *ngIf="date.invalid && (date.dirty || date.touched)" class="error-message">
         Event date is required.
       </p>
 
       <ion-item>
-        <ion-label>Event Description:</ion-label>
+        <ion-label position="floating">Event Description:</ion-label>
         <ion-input matInput [ngModel]="event?.description" name="description" required
           #description="ngModel"></ion-input>
       </ion-item>
@@ -58,7 +59,8 @@
         <ion-button fill="outline" color="danger" (click)="removeImage()">Remove Image</ion-button>
       </ion-item>
 
-      <ion-button type="submit" [disabled]="eventForm.invalid" (click)="onSubmitClick()">Submit</ion-button>
+      <ion-button class="submit-button" type="submit" [disabled]="eventForm.invalid"
+        (click)="onSubmitClick()">Submit</ion-button>
     </form>
   </ion-card>
 </ion-content>

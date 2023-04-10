@@ -1,18 +1,35 @@
+ion-content {
+  --ion-background-color: #f9f9f9;
+}
+
+.event-card {
+  width: 100%;
+  margin: 1em 0;
+  --ion-padding-start: 1em;
+  --ion-padding-end: 1em;
+  --ion-padding-top: 1em;
+  --ion-padding-bottom: 1.5em;
+}
+
 mat-spinner {
-    margin: auto;
-}
-
-#image-upload {
-    display: none;
-}
-
-img {
-  width: 200px;
-  height: auto;
+  margin: auto;
 }
 
 .error-message {
   color: red;
   font-size: 0.9em;
   margin-left: 15px;
+}
+
+.submit-button {
+  display: block;
+  margin: 1em auto;
+  width: 100%;
+}
+
+img {
+  width: 200px;
+  height: auto;
+  display: block;
+  margin: 0.5em auto;
 }
