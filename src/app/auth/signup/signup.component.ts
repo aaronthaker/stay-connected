@@ -12,6 +12,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   isLoading = false;
   private authStatusSub: Subscription;
   private hoverTimeout: any;
+  onboardingMessage = "Welcome to the Stay Connected signup screen. To create an account, please enter your email and password in the provided fields. If you need assistance, you can hover over any part of the form and have the information red aloud to you. To enable this feature, simply hover over the input fields, buttons, or links for 2 seconds, and a description will be spoken. Once you have filled in your details, click the 'Sign Up' button to complete the registration process. If you already have an account, click the 'Login' link at the bottom of the form to return to the login screen.";
 
   constructor(private authService: AuthService) { }
 
@@ -56,6 +57,10 @@ export class SignupComponent implements OnInit, OnDestroy {
       utterance.text = 'Sign Up';
     } else if (field === 'login-message') {
       utterance.text = 'Already have an account? Click here to log in.';
+    } else if (field === 'hover-onboarding') {
+      utterance.text = 'Click here to play the onboarding message.';
+    } else if (field === 'onboardingMessage') {
+      utterance.text = this.onboardingMessage;
     }
     synth.speak(utterance);
   }

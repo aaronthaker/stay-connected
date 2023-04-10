@@ -187,13 +187,19 @@ export class UserDetailsComponent implements OnInit {
         textToSpeak = 'You have common interests with this person!';
         break;
       case 'profileButton':
-        textToSpeak = 'See this user\'s full profile.';
+        textToSpeak = `See ${this.displayedUser?.name!}'s full profile.`;
+        break;
+      case 'listenToProfileButton':
+        textToSpeak = `Listen to ${this.displayedUser?.name!}'s profile.`;
         break;
       case 'tick-button':
         textToSpeak = 'Like';
         break;
       case 'cross-button':
         textToSpeak = 'Dislike';
+        break;
+      case 'user-image':
+        textToSpeak = `An image of ${this.displayedUser?.name!}`;
         break;
       default:
         break;

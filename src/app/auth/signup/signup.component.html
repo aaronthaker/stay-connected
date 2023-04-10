@@ -3,7 +3,9 @@
     <ion-row id="form-row">
       <ion-col class="form-container">
         <form (submit)="onSignup(signupForm)" #signupForm="ngForm" *ngIf="!isLoading">
-          <h1 class="signup-header">Sign Up</h1>
+          <h1 class="signup-header" id="stay-connected">Stay Connected</h1>
+          <ion-button class="login-button" (mouseenter)="startHover('hover-onboarding')" (mouseleave)="stopHover()" (click)="speak('onboardingMessage')" style="width:100%;">Play Onboarding Message</ion-button>
+          <h1 class="signup-header" id="sign-up-text">Sign Up</h1>
           <ion-item class="input-container" (mouseenter)="startHover('email')" (mouseleave)="stopHover()">
             <ion-label position="floating">Email</ion-label>
             <ion-input type="email" name="email" ngModel #emailInput="ngModel" required email

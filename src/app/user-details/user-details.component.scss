@@ -94,9 +94,11 @@ ion-content ion-card-title {
 #bio,
 #match-message,
 #profileButton,
+#listenToProfileButton,
 #tick-button,
-#cross-button {
-  cursor: help;
+#cross-button,
+#user-image {
+  cursor: help !important;
 }
 
 #nameCard {

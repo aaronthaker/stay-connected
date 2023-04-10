@@ -4,9 +4,9 @@
       <ion-col class="form-container">
         <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
         <form (submit)="onLogin(loginForm)" #loginForm="ngForm" *ngIf="!isLoading">
-          <!-- <div style="display: flex; flex-direction: column;"> -->
-            <h1 class="login-header">Login</h1>
-            <ion-button (mouseenter)="startHover('hover-onboarding')" (mouseleave)="stopHover()" (click)="speak('onboardingMessage')" style="width:100%">Play Onboarding Message</ion-button>
+            <h1 class="login-header" id="stay-connected">Stay Connected</h1>
+            <ion-button class="login-button" (mouseenter)="startHover('hover-onboarding')" (mouseleave)="stopHover()" (click)="speak('onboardingMessage')" style="width:100%;">Play Onboarding Message</ion-button>
+            <h1 class="login-header" id="login-text">Login</h1>
           <!-- </div> -->
           <ion-item class="input-container" (mouseenter)="startHover('email')" (mouseleave)="stopHover()">
             <ion-label position="floating">Email</ion-label>
