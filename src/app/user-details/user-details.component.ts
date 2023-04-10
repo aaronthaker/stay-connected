@@ -160,6 +160,17 @@ export class UserDetailsComponent implements OnInit {
     }
   }
 
+  onListenToProfileClick() {
+    if (this.displayedUser) {
+      const profileText = `
+        Name: ${this.displayedUser.name}, ${this.displayedUser.age}.
+        Location: ${this.displayedUser.location}.
+        Bio: ${this.displayedUser.bio}.
+      `;
+      this.speakText(profileText);
+    }
+  }
+
   speakElementText(elementId: string) {
     let textToSpeak = '';
     switch (elementId) {

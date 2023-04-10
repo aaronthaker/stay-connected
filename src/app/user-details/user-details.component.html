@@ -50,12 +50,18 @@
         </div>
       </div>
 
-      <ng-container id="see-full-profile">
+      <div id="see-full-profile">
         <ion-button id="profileButton" (click)="onUserProfileSelected(displayedUser?._id!); $event.stopPropagation()" (mouseenter)="onMouseEnter($event.target)"
         (mouseleave)="onMouseLeave($event.target)">
           See full profile
         </ion-button>
-      </ng-container>
+        <ng-container id="listen-to-profile">
+          <ion-button id="listenToProfileButton" (click)="onListenToProfileClick()" (mouseenter)="onMouseEnter($event.target)"
+            (mouseleave)="onMouseLeave($event.target)">
+            Listen to {{displayedUser?.name}}'s Profile
+          </ion-button>
+        </ng-container>
+      </div>
 
       <ng-container *ngIf="commonInterests || likedYouToo">
         <div class="match-message" id="match-message" [@fadeInOut] (mouseenter)="onMouseEnter($event.target)"
