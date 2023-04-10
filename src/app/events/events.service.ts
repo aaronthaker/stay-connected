@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { map, Subject } from 'rxjs';
 import { Event } from './event.model';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,7 @@ export class EventsService {
   private events: Event[] = [];
   private eventsUpdated = new Subject<Event[]>();
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private authService: AuthService) { }
 
   getEvents() {
     this.http
@@ -140,7 +141,7 @@ export class EventsService {
         location: location,
         date: date,
         imagePath: imagePath,
-        creator: null,
+        creator: this.authService.getUserId(),
       };
     }
 
@@ -156,7 +157,7 @@ export class EventsService {
           location: location,
           date: date,
           imagePath: res.imagePath,
-          creator: null
+          creator: this.authService.getUserId()
         };
         updatedEvents[oldEventIndex] = updatedEvent;
         this.events = updatedEvents;

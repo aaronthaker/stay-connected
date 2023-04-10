@@ -73,7 +73,7 @@ router.put('/:id', checkAuth, multer({ storage: storage }).single('image'), (req
   })
   Event.updateOne({ _id: req.params.id, creator: req.userData.userId }, event).then(result => {
     if (result.matchedCount > 0) {
-      res.status(200).json({ message: "Update successful!" });
+      res.status(200).json({ message: "Update successful!", imagePath: imagePath });
     } else {
       res.status(401).json({ message: "Not authorized." })
     }
