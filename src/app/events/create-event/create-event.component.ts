@@ -18,14 +18,15 @@ export class CreateEventComponent implements OnInit {
   private eventId: string | null;
   event: MyEvent;
   isLoading = false;
-  imageFile: File;
+  imagePath: string | null = null;
+  imageFile: File | null = null;
   @ViewChild('imagePicker', { static: false }) imagePickerRef: ElementRef;
 
   constructor(
     public eventService: EventsService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
@@ -34,6 +35,7 @@ export class CreateEventComponent implements OnInit {
         this.eventId = paramMap.get('eventId')!;
         this.isLoading = true;
         this.eventService.getEvent(this.eventId).subscribe((eventData) => {
+          this.imagePath = eventData.imagePath;
           this.isLoading = false;
           this.event = {
             id: eventData._id,
@@ -55,6 +57,15 @@ export class CreateEventComponent implements OnInit {
     const file = (event.target as HTMLInputElement).files![0];
     if (file) {
       this.imageFile = file;
+    } else {
+      this.imageFile = null;
+    }
+  }
+
+  removeImage() {
+    this.imageFile = null;
+    if (this.event) {
+      this.event.imagePath = null;
     }
   }
 
@@ -69,7 +80,7 @@ export class CreateEventComponent implements OnInit {
         form.value.description,
         form.value.date,
         form.value.location,
-        this.imageFile
+        this.imageFile!
       );
     } else if (this.editMode) {
       this.eventService.updateEvent(
@@ -78,7 +89,8 @@ export class CreateEventComponent implements OnInit {
         form.value.description,
         form.value.location,
         form.value.date,
-        this.imageFile
+        this.imageFile,
+        this.imagePath
       );
     }
     form.resetForm();

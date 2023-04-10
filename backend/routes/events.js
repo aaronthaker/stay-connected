@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     if (isValid) {
       error = null;
     }
-    cb(error, 'backend/images');
+    cb(error, 'backend/images/events');
   },
   filename: (req, file, cb) => {
     const name = file.originalname.toLowerCase().split(' ').join('-');
@@ -28,12 +28,16 @@ const storage = multer.diskStorage({
 
 router.post('', checkAuth, multer({ storage: storage }).single('image'), (req, res, next) => {
   const url = req.protocol + '://' + req.get('host');
+  let imagePath = null;
+  if (req.file) {
+    imagePath = url + '/images/events/' + req.file.filename;
+  }
   const event = new Event({
     title: req.body.title,
     location: req.body.location,
     date: req.body.date,
     description: req.body.description,
-    imagePath: url + '/images/' + req.file.filename,
+    imagePath: imagePath,
     creator: req.userData.userId
   });
   event.save().then(createdEvent => {
@@ -50,9 +54,13 @@ router.post('', checkAuth, multer({ storage: storage }).single('image'), (req, r
 
 router.put('/:id', checkAuth, multer({ storage: storage }).single('image'), (req, res, next) => {
   let imagePath = req.body.imagePath;
+  const removeImage = req.body.removeImage === 'true';
+
   if (req.file) {
     const url = req.protocol + '://' + req.get('host');
-    imagePath = url + '/images/' + req.file.filename;
+    imagePath = url + '/images/events/' + req.file.filename;
+  } else if (removeImage) {
+    imagePath = '';
   }
   const event = new Event({
     _id: req.body.id,

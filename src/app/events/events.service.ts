@@ -51,13 +51,16 @@ export class EventsService {
     return this.eventsUpdated.asObservable();
   }
 
-  addEvent(title: string, location: string, date: string, description: string, image: File) {
+  addEvent(title: string, location: string, date: string, description: string, image: File | null) {
     const eventData = new FormData();
     eventData.append('title', title);
     eventData.append('location', location);
     eventData.append('date', date);
     eventData.append('description', description);
-    eventData.append('image', image, title);
+
+    if (image) { // Check if the image is provided before appending it to FormData
+      eventData.append('image', image, title);
+    }
 
     this.http
       .post<{ message: string; eventId: string; event: Event }>(
@@ -108,17 +111,27 @@ export class EventsService {
     }>('http://localhost:3000/api/events/' + id);
   }
 
-  updateEvent(id: string, title: string, description: string, location: string, date: string, image: File | string) {
-    let eventData: Event | FormData;
+  updateEvent(
+    id: string,
+    title: string,
+    description: string,
+    location: string,
+    date: string,
+    image: File | null,
+    imagePath: string | null
+  ) {
+    let eventData: any;
 
-    if (typeof image === 'object') {
+    if (image) {
       eventData = new FormData();
-      eventData.append('id', id);
-      eventData.append('title', title);
-      eventData.append('description', description);
-      eventData.append('location', location);
-      eventData.append('date', date);
-      eventData.append('image', image, title);
+      eventData.append("id", id);
+      eventData.append("title", title);
+      eventData.append("description", description);
+      eventData.append("location", location);
+      eventData.append("date", date);
+      if (image) {
+        eventData.append("image", image, title);
+      }
     } else {
       eventData = {
         id: id,
@@ -126,8 +139,8 @@ export class EventsService {
         description: description,
         location: location,
         date: date,
-        imagePath: image,
-        creator: null
+        imagePath: imagePath,
+        creator: null,
       };
     }
 
@@ -148,7 +161,7 @@ export class EventsService {
         updatedEvents[oldEventIndex] = updatedEvent;
         this.events = updatedEvents;
         this.eventsUpdated.next([...this.events]);
-        this.router.navigate(['/']);
+        this.router.navigate(['/events']);
       });
   }
 }

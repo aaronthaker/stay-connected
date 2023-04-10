@@ -40,6 +40,12 @@
         <input type="file" (change)="onImagePicked($event)" #imagePicker>
       </ion-item>
 
+      <ion-item *ngIf="imagePath || imageFile">
+        <ion-label>Current Image:</ion-label>
+        <img *ngIf="imagePath && !imageFile" [src]="imagePath" alt="Event Image" class="event-image">
+        <ion-button fill="outline" color="danger" (click)="removeImage()">Remove Image</ion-button>
+      </ion-item>
+
       <ion-button type="submit" (click)="onSubmitClick()">Submit</ion-button>
     </form>
   </ion-card>

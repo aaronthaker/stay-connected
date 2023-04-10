@@ -12,7 +12,6 @@
 <ion-content>
   <mat-spinner *ngIf="isLoading"></mat-spinner>
   <main *ngIf="events.length > 0 && !isLoading">
-    <button routerLink="create">Create Event</button>
     <ion-card *ngFor="let event of events">
       <img *ngIf="event.imagePath" [src]="event.imagePath" alt="Event Image" class="event-image">
       <ion-item>
@@ -26,8 +25,7 @@
       </ion-card-content>
       <ion-row *ngIf="userIsAuthenticated && userId === event.creator">
         <ion-col>
-          <!-- <ion-button fill="outline" expand="block" color="primary">Edit</ion-button> -->
-          <a mat-button color="primary" [routerLink]="['/events/edit', event.id]">EDIT</a>
+          <ion-button fill="outline" [routerLink]="['/events/edit', event.id]" expand="block" color="primary">Edit</ion-button>
         </ion-col>
         <ion-col>
           <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id!)">Delete</ion-button>
