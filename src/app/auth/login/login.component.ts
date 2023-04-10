@@ -15,10 +15,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   private authStatusSub: Subscription;
   successMessage = '';
   private hoverTimeout: any;
+  onboardingMessage = 'Welcome to Stay Connected. Please login using your email and password below.';
 
   constructor(
     private authService: AuthService,
-    private router: Router,
     private route: ActivatedRoute
   ) { }
 
@@ -67,6 +67,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       utterance.text = 'Email input field';
     } else if (field === 'password') {
       utterance.text = 'Password input field';
+    } else if (field === 'onboardingMessage') {
+      utterance.text = this.onboardingMessage;
+    } else if (field === 'login-button') {
+      utterance.text = 'Login';
+    } else if (field === 'signup-message') {
+      utterance.text = 'Do you not have an account? Click here to sign up.';
+    } else if (field === 'hover-onboarding') {
+      utterance.text = 'Click here to play the onboarding message.';
     }
     synth.speak(utterance);
   }

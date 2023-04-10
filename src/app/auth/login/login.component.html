@@ -1,10 +1,13 @@
 <ion-content>
   <ion-grid class="login-container">
-    <ion-row>
+    <ion-row id="form-row">
       <ion-col class="form-container">
         <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
         <form (submit)="onLogin(loginForm)" #loginForm="ngForm" *ngIf="!isLoading">
-          <h1 class="login-header">Login</h1>
+          <!-- <div style="display: flex; flex-direction: column;"> -->
+            <h1 class="login-header">Login</h1>
+            <ion-button (mouseenter)="startHover('hover-onboarding')" (mouseleave)="stopHover()" (click)="speak('onboardingMessage')" style="width:100%">Play Onboarding Message</ion-button>
+          <!-- </div> -->
           <ion-item class="input-container" (mouseenter)="startHover('email')" (mouseleave)="stopHover()">
             <ion-label position="floating">Email</ion-label>
             <ion-input type="email" name="email" ngModel #emailInput="ngModel" required email
@@ -20,9 +23,9 @@
 
           <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-          <ion-button type="submit" class="login-button" expand="block">Login</ion-button>
+          <ion-button type="submit" class="login-button" expand="block" (mouseenter)="startHover('login-button')" (mouseleave)="stopHover()">Login</ion-button>
 
-          <div class="signup-link-container">
+          <div class="signup-link-container" (mouseenter)="startHover('signup-message')" (mouseleave)="stopHover()">
             Don't have an account? <a routerLink="/signup" class="signup-link">Sign up</a>
           </div>
         </form>

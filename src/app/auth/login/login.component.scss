@@ -4,6 +4,27 @@
   justify-content: center;
   align-items: center;
   background-color: #ededed;
+  flex-direction: column;
+  padding: 5% 0;
+}
+
+.input-container:focus-within {
+  transform: scale(1.05);
+}
+
+form {
+  width: 100%;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-container {
@@ -15,10 +36,16 @@
   flex-direction: column;
   align-items: center;
   background-color: #ffffff;
+  animation: fadeInDown 1s ease-in-out;
+}
+
+#form-row{
+  max-width: 100%;
+  width: 50rem;
 }
 
 .login-header {
-  padding: 3%;
+  padding-top: 3%;
   text-align: center;
   font-weight: bold;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -32,6 +59,7 @@
   margin-bottom: 16px;
   --box-shadow: none;
   --padding-start: 0;
+  transition: transform 0.3s;
 }
 
 .input-icon {
