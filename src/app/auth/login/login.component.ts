@@ -14,6 +14,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   errorMessage: string;
   private authStatusSub: Subscription;
   successMessage = '';
+  private hoverTimeout: any;
 
   constructor(
     private authService: AuthService,
@@ -34,6 +35,16 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
+  startHover(field: string) {
+    this.hoverTimeout = setTimeout(() => {
+      this.speak(field);
+    }, 2000);
+  }
+
+  stopHover() {
+    clearTimeout(this.hoverTimeout);
+  }
+
   ngOnDestroy() {
     this.authStatusSub.unsubscribe();
   }
@@ -47,5 +58,16 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.isLoading = false;
       this.errorMessage = errorMessage;
     });
+  }
+
+  speak(field: string) {
+    const synth = window.speechSynthesis;
+    const utterance = new SpeechSynthesisUtterance();
+    if (field === 'email') {
+      utterance.text = 'Email input field';
+    } else if (field === 'password') {
+      utterance.text = 'Password input field';
+    }
+    synth.speak(utterance);
   }
 }
