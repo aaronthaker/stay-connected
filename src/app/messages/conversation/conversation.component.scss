@@ -61,3 +61,13 @@
 .message-input {
   display: flex;
 }
+
+#toolbar {
+  display: flex;
+}
+
+@media only screen and (max-width: 768px) {
+  #toolbar {
+    flex-direction: row-reverse;
+  }
+}

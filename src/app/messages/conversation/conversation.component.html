@@ -2,8 +2,18 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/messages"></ion-back-button>
+        <ion-menu-toggle>
+          <ion-button>
+            <ion-icon slot="icon-only" name="menu"></ion-icon>
+          </ion-button>
+        </ion-menu-toggle>
     </ion-buttons>
-    <ion-title>{{ user?.name }}</ion-title>
+    <div id="toolbar">
+      <ion-title>
+        {{ user?.name }}
+      </ion-title>
+      <ion-button slot="end" style="padding: 0px 20px" (click)="sayLastTenMessages()" [disabled]="messages.length === 0">Say last 10 messages</ion-button>
+    </div>
   </ion-toolbar>
 </ion-header>
 

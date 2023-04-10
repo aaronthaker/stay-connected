@@ -62,6 +62,16 @@ export class ConversationComponent implements OnInit, OnDestroy {
     }
   }
 
+  sayLastTenMessages() {
+    const startIndex = Math.max(this.messages.length - 10, 0);
+    const lastTenMessages = this.messages.slice(startIndex);
+    for (const message of lastTenMessages) {
+      const senderName = message.senderId === this.messagesService.currentUserId ? 'You' : this.user.name;
+      const textToSpeak = `${senderName}: ${message.content}`;
+      this.speakText(textToSpeak);
+    }
+  }
+
   onMouseLeave() {
     if (!this.touchDevice && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
