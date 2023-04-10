@@ -20,7 +20,7 @@
       </ion-item>
       <ion-card-content>
         <ion-card-title>{{event.title}}</ion-card-title>
-        <ion-card-subtitle>{{event.date}}</ion-card-subtitle>
+        <ion-card-subtitle>{{ event.date | date:'medium' }}</ion-card-subtitle>
         <p>{{event.description}}</p>
       </ion-card-content>
       <ion-row *ngIf="userIsAuthenticated && userId === event.creator">

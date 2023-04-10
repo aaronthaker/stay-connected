@@ -56,7 +56,7 @@ export class EventsService {
     const eventData = new FormData();
     eventData.append('title', title);
     eventData.append('location', location);
-    eventData.append('date', date);
+    eventData.append('date', new Date(date).toISOString());
     eventData.append('description', description);
 
     if (image) { // Check if the image is provided before appending it to FormData
@@ -129,7 +129,7 @@ export class EventsService {
       eventData.append("title", title);
       eventData.append("description", description);
       eventData.append("location", location);
-      eventData.append("date", date);
+      eventData.append("date", new Date(date).toISOString());
       if (image) {
         eventData.append("image", image, title);
       }
@@ -139,7 +139,7 @@ export class EventsService {
         title: title,
         description: description,
         location: location,
-        date: date,
+        date: new Date(date).toISOString(),
         imagePath: imagePath,
         creator: this.authService.getUserId(),
       };
