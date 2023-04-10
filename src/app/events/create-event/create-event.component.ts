@@ -54,6 +54,11 @@ export class CreateEventComponent implements OnInit {
     const file = (event.target as HTMLInputElement).files![0];
     if (file) {
       this.imageFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePath = reader.result as string;
+      };
+      reader.readAsDataURL(file);
     } else {
       this.imageFile = null;
     }
@@ -61,9 +66,7 @@ export class CreateEventComponent implements OnInit {
 
   removeImage() {
     this.imageFile = null;
-    if (this.event) {
-      this.imagePath = null;
-    }
+    this.imagePath = null;
   }
 
   onSaveEvent(form: NgForm) {

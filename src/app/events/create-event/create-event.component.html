@@ -42,7 +42,7 @@
 
       <ion-item *ngIf="imagePath || imageFile">
         <ion-label>Current Image:</ion-label>
-        <img *ngIf="imagePath && !imageFile" [src]="imagePath" alt="Event Image" class="event-image">
+        <img *ngIf="imagePath" [src]="imagePath" alt="Event Image" class="event-image">
         <ion-button fill="outline" color="danger" (click)="removeImage()">Remove Image</ion-button>
       </ion-item>
 
