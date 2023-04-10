@@ -32,9 +32,9 @@ export class UserDetailsComponent implements OnInit {
   currentUser: User;
   currentUserDislikes: string[] | undefined;
   currentUserLikes: string[] | undefined;
-  showMatchMessage: boolean;
   commonInterests: boolean = false;
   touchDevice: boolean;
+  likedYouToo: boolean = false;
 
   userSub: Subscription;
   currentIndex = 0;
@@ -114,30 +114,30 @@ export class UserDetailsComponent implements OnInit {
 
   onTickClick(displayedUser: User) {
     this.userService.updateLikedUsers(this.currentUserId, displayedUser._id).subscribe((response) => {
-      // Check if the displayed user has liked the current user
       if (response.matched) {
-        // Update the matchedUsers arrays for both users
         this.userService.updateMatchedUsers(this.currentUserId, displayedUser._id).subscribe();
-        this.showMatchMessage = true;
-        // Set a delay before showing the next user and hiding the match message
+        this.likedYouToo = true;
         setTimeout(() => {
           this.currentIndex++;
           this.displayedUser = this.displayedUsers[this.currentIndex];
-          this.showMatchMessage = false;
+          this.likedYouToo = false;
           this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
         }, 5000);
       } else {
         this.currentIndex++;
         this.displayedUser = this.displayedUsers[this.currentIndex];
-        this.showMatchMessage = false;
+        this.likedYouToo = false;
         this.commonInterests = this.hasCommonInterests(this.currentUser, this.displayedUser);
       }
-
     });
   }
 
   navigateToConversation(userId: string) {
     this.router.navigate(['/conversation', userId]);
+  }
+
+  onUserProfileSelected(userId: string) {
+    this.router.navigate(['/other-profile', userId]);
   }
 
   @HostListener('mouseenter', ['$event.target'])
@@ -174,6 +174,9 @@ export class UserDetailsComponent implements OnInit {
         break;
       case 'match-message':
         textToSpeak = 'You have common interests with this person!';
+        break;
+      case 'profileButton':
+        textToSpeak = 'See this user\'s full profile.';
         break;
       case 'tick-button':
         textToSpeak = 'Like';

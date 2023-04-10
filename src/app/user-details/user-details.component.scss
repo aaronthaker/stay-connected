@@ -59,6 +59,21 @@ ion-content ion-card-title {
   background-color: white;
 }
 
+#profileButton {
+  display: block;
+  margin: 0 auto;
+  width: 40%;
+}
+
+#see-full-profile {
+  font-weight: bold;
+  text-align: center;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0px 0px 26px black;
+}
+
 .match-message {
   background-color: rgb(70 133 73);
   color: white;
@@ -74,13 +89,23 @@ ion-content ion-card-title {
   box-shadow: 0px 0px 26px black;
 }
 
+.signup-link-container {
+  text-align: center;
+}
+
 #location-icon {
   font-size: 25px;
   vertical-align: middle;
   margin-bottom: 3px;
 }
 
-#location-span, #name, #bio, #match-message, #tick-button, #cross-button {
+#location-span,
+#name,
+#bio,
+#match-message,
+#profileButton,
+#tick-button,
+#cross-button {
   cursor: help;
 }
 
@@ -116,7 +141,8 @@ ion-content ion-card-title {
   margin-left: 10px;
 }
 
-#cross-button, #tick-button {
+#cross-button,
+#tick-button {
   border-radius: 10%;
 }
 
@@ -124,7 +150,8 @@ ion-content ion-card-title {
   background-color: red;
 }
 
-#cross-button:hover ion-icon, #tick-button:hover ion-icon {
+#cross-button:hover ion-icon,
+#tick-button:hover ion-icon {
   color: white;
 }
 
