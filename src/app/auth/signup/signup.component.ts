@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 export class SignupComponent implements OnInit, OnDestroy {
   isLoading = false;
   private authStatusSub: Subscription;
+  private hoverTimeout: any;
 
   constructor(private authService: AuthService) { }
 
@@ -20,6 +21,16 @@ export class SignupComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     );
+  }
+
+  startHover(field: string) {
+    this.hoverTimeout = setTimeout(() => {
+      this.speak(field);
+    }, 2000);
+  }
+
+  stopHover() {
+    clearTimeout(this.hoverTimeout);
   }
 
   onSignup(form: NgForm) {
@@ -34,4 +45,18 @@ export class SignupComponent implements OnInit, OnDestroy {
     this.authStatusSub.unsubscribe();
   }
 
+  speak(field: string) {
+    const synth = window.speechSynthesis;
+    const utterance = new SpeechSynthesisUtterance();
+    if (field === 'email') {
+      utterance.text = 'Email input field';
+    } else if (field === 'password') {
+      utterance.text = 'Password input field';
+    } else if (field === 'signup-button') {
+      utterance.text = 'Sign Up';
+    } else if (field === 'login-message') {
+      utterance.text = 'Already have an account? Click here to log in.';
+    }
+    synth.speak(utterance);
+  }
 }

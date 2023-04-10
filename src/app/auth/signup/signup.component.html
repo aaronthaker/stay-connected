@@ -1,26 +1,28 @@
 <ion-content>
   <ion-grid class="signup-container">
-    <ion-row>
+    <ion-row id="form-row">
       <ion-col class="form-container">
         <form (submit)="onSignup(signupForm)" #signupForm="ngForm" *ngIf="!isLoading">
-          <h1 style="padding: 3%;text-align: center;font-weight: bold;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Sign Up</h1>
-          <ion-item class="input-container">
-            <ion-input type="email" name="email" ngModel placeholder="Email" #emailInput="ngModel" required email
+          <h1 class="signup-header">Sign Up</h1>
+          <ion-item class="input-container" (mouseenter)="startHover('email')" (mouseleave)="stopHover()">
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" name="email" ngModel #emailInput="ngModel" required email
               clearInput="true"></ion-input>
             <ion-icon slot="start" name="mail-outline" class="input-icon"></ion-icon>
           </ion-item>
 
-          <ion-item class="input-container">
-            <ion-input type="password" name="password" ngModel placeholder="Password"
-              #passwordInput="ngModel"></ion-input>
+          <ion-item class="input-container" (mouseenter)="startHover('password')" (mouseleave)="stopHover()">
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password" name="password" ngModel #passwordInput="ngModel"></ion-input>
             <ion-icon slot="start" name="lock-closed-outline" class="input-icon"></ion-icon>
           </ion-item>
 
           <!-- <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div> -->
 
-          <ion-button type="submit" class="signup-button" expand="block">Sign Up</ion-button>
+          <ion-button type="submit" class="signup-button" expand="block" (mouseenter)="startHover('signup-button')"
+            (mouseleave)="stopHover()">Sign Up</ion-button>
 
-          <div class="signup-link-container">
+          <div class="signup-link-container" (mouseenter)="startHover('login-message')" (mouseleave)="stopHover()">
             Already have an account? <a routerLink="/login" class="signup-link">Login</a>
           </div>
         </form>

@@ -6,11 +6,16 @@ mat-spinner {
   margin: auto;
 }
 
+#event-card{
+  background: white;
+  padding: 0.4rem;
+}
+
 .event-image {
-max-width: 150px;
-max-height: 150px;
-width: auto;
-height: auto;
+  max-width: 150px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
 }
 
 #card-stuff {
@@ -28,13 +33,17 @@ ion-card-content {
   display: flex;
 }
 
+#date-text, #description-text, #location-label {
+  font-size: 18px;
+  color: black;
+}
+
 .read-event-info-button {
   margin: 0.3rem;
   position: absolute;
   top: 0;
   right: 0;
 }
-
 
 #toolbar {
   display: flex;

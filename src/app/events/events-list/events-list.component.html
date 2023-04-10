@@ -19,7 +19,7 @@
 <ion-content style="background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%)">
   <mat-spinner *ngIf="isLoading"></mat-spinner>
   <main *ngIf="events.length > 0 && !isLoading">
-    <ion-card *ngFor="let event of events" style="background: white;">
+    <ion-card *ngFor="let event of events" id="event-card">
       <ion-item>
         <ion-card-title>{{event.title}}</ion-card-title>
         <ion-button fill="outline" (click)="readEventInfo(event)" slot="end" class="read-event-info-button">Read Event Info</ion-button>
@@ -27,11 +27,11 @@
       <ion-card-content>
         <img *ngIf="event.imagePath" [src]="event.imagePath" alt="Event Image" class="event-image">
         <div id="card-stuff">
-          <ion-card-subtitle>{{ event.date | date:'medium' }}</ion-card-subtitle>
-          <p>{{event.description}}</p>
+          <ion-card-subtitle id="date-text">{{ event.date | date:'medium' }}</ion-card-subtitle>
+          <p id="description-text">{{event.description}}</p>
         </div>
       </ion-card-content>
-      <ion-label id="location-label"><ion-icon name="pin" slot="end"></ion-icon><i>{{ event.location }}</i></ion-label>
+      <ion-label id="location-label"><ion-icon name="pin" slot="end"></ion-icon>{{ event.location }}</ion-label>
       <ion-row *ngIf="userIsAuthenticated && userId === event.creator">
         <ion-col>
           <ion-button fill="outline" [routerLink]="['/events/edit', event.id]" expand="block"
