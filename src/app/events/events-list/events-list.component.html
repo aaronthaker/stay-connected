@@ -22,6 +22,7 @@
     <ion-card *ngFor="let event of events" style="background: white;">
       <ion-item>
         <ion-card-title>{{event.title}}</ion-card-title>
+        <ion-button fill="outline" (click)="readEventInfo(event)" slot="end" class="read-event-info-button">Read Event Info</ion-button>
       </ion-item>
       <ion-card-content>
         <img *ngIf="event.imagePath" [src]="event.imagePath" alt="Event Image" class="event-image">

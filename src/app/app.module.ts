@@ -35,6 +35,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { OtherProfileComponent } from './other-profile/other-profile.component';
 import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logout-modal.component';
 import { ImageViewerComponent } from './user-details/image-viewer/image-viewer.component';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -81,7 +82,8 @@ import { ImageViewerComponent } from './user-details/image-viewer/image-viewer.c
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    AnimationController
+    AnimationController,
+    DatePipe
   ],
   bootstrap: [AppComponent],
 })

@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
 import { Event } from '../event.model';
 import { EventsService } from '../events.service';
+import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-events-list',
   templateUrl: './events-list.component.html',
@@ -17,7 +18,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
   public userIsAuthenticated = false;
   userId: string | null;
 
-  constructor(public eventService: EventsService, private authService: AuthService) {}
+  constructor(public eventService: EventsService, private authService: AuthService, private datePipe: DatePipe) {}
 
   ngOnInit() {
     this.isLoading = true;
@@ -32,6 +33,24 @@ export class EventsListComponent implements OnInit, OnDestroy {
       this.userIsAuthenticated = isAuthenticated;
       this.userId = this.authService.getUserId();
     });
+  }
+
+  readEventInfo(event: Event) {
+    const eventTitle = `Title: ${event.title}`;
+    const formattedDate = this.datePipe.transform(event.date, 'medium');
+    const eventDate = `Date: ${formattedDate}`;
+    const eventLocation = `Location: ${event.location}`;
+    const eventDescription = `Description: ${event.description}`;
+
+    const eventInfo = [eventTitle, eventDate, eventLocation, eventDescription].join('. ');
+
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(eventInfo);
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.error('Speech synthesis is not supported in this browser.');
+    }
   }
 
   onDelete(eventId: string) {
