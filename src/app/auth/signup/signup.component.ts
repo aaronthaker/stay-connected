@@ -44,6 +44,10 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.authStatusSub.unsubscribe();
+    // Stop any ongoing speech synthesis when the component is destroyed
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }
 
   speak(field: string) {

@@ -97,6 +97,10 @@ export class ConversationComponent implements OnInit, OnDestroy {
     if (this.newMessageSub) {
       this.newMessageSub.unsubscribe();
     }
+    // Stop any ongoing speech synthesis when the component is destroyed
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }
 
   scrollToBottom() {

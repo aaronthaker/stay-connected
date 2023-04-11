@@ -130,6 +130,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.authListenerSubs.unsubscribe();
+    // Stop any ongoing speech synthesis when the component is destroyed
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }
 
   onLogout() {

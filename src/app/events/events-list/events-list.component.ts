@@ -18,7 +18,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
   public userIsAuthenticated = false;
   userId: string | null;
 
-  constructor(public eventService: EventsService, private authService: AuthService, private datePipe: DatePipe) {}
+  constructor(public eventService: EventsService, private authService: AuthService, private datePipe: DatePipe) { }
 
   ngOnInit() {
     this.isLoading = true;
@@ -60,6 +60,11 @@ export class EventsListComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.eventsSub.unsubscribe();
     this.authStatusSub.unsubscribe();
+
+    // Stop any ongoing speech synthesis when the component is destroyed
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }
 
 }

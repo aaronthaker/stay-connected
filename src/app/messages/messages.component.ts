@@ -131,6 +131,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
     if (this.messageSub) {
       this.messageSub.unsubscribe();
     }
+    // Stop any ongoing speech synthesis when the component is destroyed
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }
 
   onUserSelected(user: User) {

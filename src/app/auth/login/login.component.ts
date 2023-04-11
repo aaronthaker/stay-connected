@@ -46,6 +46,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.authStatusSub.unsubscribe();
+    // Stop any ongoing speech synthesis when the component is destroyed
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }
 
   onLogin(form: NgForm) {
@@ -77,4 +81,5 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
     synth.speak(utterance);
   }
+
 }

@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
@@ -24,7 +24,7 @@ import { ImageViewerComponent } from './image-viewer/image-viewer.component';
     ]),
   ],
 })
-export class UserDetailsComponent implements OnInit {
+export class UserDetailsComponent implements OnInit, OnDestroy {
 
   displayedUsers: User[] = [];
   currentUserId: string | null;
@@ -73,6 +73,13 @@ export class UserDetailsComponent implements OnInit {
       });
     });
     this.touchDevice = this.isTouchDevice();
+  }
+
+  ngOnDestroy() {
+    // Stop any ongoing speech synthesis when the component is destroyed
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }
 
   isTouchDevice(): boolean {
