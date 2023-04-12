@@ -108,7 +108,6 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-
   speakText(textToSpeak: string) {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(textToSpeak);

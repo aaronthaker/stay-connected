@@ -38,6 +38,7 @@ import { ImageViewerComponent } from './user-details/image-viewer/image-viewer.c
 import { DatePipe } from '@angular/common';
 import { A11yModule } from '@angular/cdk/a11y';
 import { VoiceNavigationButtonComponent } from './components/voice-navigation-button/voice-navigation-button.component';
+import { SpeakOnHoverDirective } from './speak-on-hover.directive';
 
 @NgModule({
   declarations: [
@@ -60,7 +61,8 @@ import { VoiceNavigationButtonComponent } from './components/voice-navigation-bu
     OtherProfileComponent,
     ConfirmLogoutModalComponent,
     ImageViewerComponent,
-    VoiceNavigationButtonComponent
+    VoiceNavigationButtonComponent,
+    SpeakOnHoverDirective
   ],
   imports: [
     IonicModule,

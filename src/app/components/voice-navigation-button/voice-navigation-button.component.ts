@@ -32,24 +32,25 @@ export class VoiceNavigationButtonComponent implements OnInit, OnDestroy {
 
   startRecognition(): void {
     this.recognition.start();
-    console.log("in start")
     this.liveAnnouncer.announce('Listening for voice command');
   }
 
   handleVoiceCommand(command: string): void {
     console.log(command)
-    switch (command) {
-      case 'events.':
-        this.router.navigate(['/events/events-list']);
-        break;
-      case 'messages.':
-        this.router.navigate(['/messages']);
-        break;
-      case 'profile.':
-        this.router.navigate(['/profile']);
-        break;
-      default:
-        this.liveAnnouncer.announce('Invalid voice command. Please try again');
+    if (command.includes('events')) {
+      this.router.navigate(['/events']);
+    } else if (command.includes('messages')) {
+      this.router.navigate(['/messages']);
+    } else if (command.includes('profile' || 'account')) {
+      this.router.navigate(['/profile']);
+    } else if (command.includes('settings')) {
+      this.router.navigate(['/settings']);
+    } else if (command.includes('home')) {
+      this.router.navigate(['/home']);
+    } else if (command.includes('main')) {
+      this.router.navigate(['/settings']);
+    } else if (command.includes('log out' || 'logout' || 'log-out')) {
+      this.router.navigate(['/settings']);
     }
   }
 }
