@@ -28,7 +28,7 @@ export class MessagesComponent implements OnInit, ViewWillEnter {
   unreadCounts: { [userId: string]: number } = {};
   touchDevice: boolean;
 
-  constructor(public messagesService: MessagesService, public userService: UserService,) {}
+  constructor(public messagesService: MessagesService, public userService: UserService,) { }
 
   ngOnInit(): void {
     this.userSub = this.userService.getUsers().subscribe(users => {
@@ -41,7 +41,22 @@ export class MessagesComponent implements OnInit, ViewWillEnter {
     this.messagesService.listenForNewMessages().subscribe(message => {
       this.unreadMessages.push(message);
       this.updateUnreadCounts();
+
+      // Update the last message of the corresponding conversation
+      const conversation = this.conversations.find(conv => conv.contact._id === message.senderId);
+      if (conversation) {
+        conversation.lastMessage = message;
+      } else {
+        // If the conversation doesn't exist yet, create it
+        this.userService.getUser(message.senderId!).subscribe(user => {
+          this.conversations.push({
+            contact: user,
+            lastMessage: message
+          });
+        });
+      }
     });
+
     this.unreadMessagesSub = this.messagesService
       .listenForUnreadMessages()
       .subscribe((message: Message) => {
