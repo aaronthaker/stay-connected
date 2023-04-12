@@ -56,3 +56,18 @@ app-home {
 ion-menu {
   --border: 1px solid transparent;
 }
+
+#toolbar {
+  display: flex;
+  // justify-content: space-between;
+  // align-items: center;
+  // width: 100%;
+
+  // @media (max-width: 767px) {
+  //   flex-direction: column;
+  //   ion-title {
+  //     font-size: 1.2rem;
+  //     margin-bottom: 4px;
+  //   }
+  // }
+}

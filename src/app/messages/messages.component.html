@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header *ngIf="!touchDevice">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-toggle>
@@ -7,10 +7,30 @@
         </ion-button>
       </ion-menu-toggle>
     </ion-buttons>
-    <ion-title id="matched-users-title" speakOnHover [textToSpeak]="'Matched Users'">Matched Users</ion-title>
+    <div style="display: flex;">
+      <ion-title speakOnHover [textToSpeak]="'Matched Users'">
+        Matched Users
+      </ion-title>
+      <app-voice-navigation-button speakOnHover
+        [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
+    </div>
   </ion-toolbar>
 </ion-header>
 
+<ion-header *ngIf="touchDevice">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title speakOnHover [textToSpeak]="'Matched Users'">
+      Matched Users
+    </ion-title>
+    <ion-buttons slot="end">
+      <app-voice-navigation-button speakOnHover
+        [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
 <ion-content class="ion-padding">
   <!-- <ion-button *ngIf="touchDevice" (click)="speakText('Matched Users')" size="small"></ion-button> -->

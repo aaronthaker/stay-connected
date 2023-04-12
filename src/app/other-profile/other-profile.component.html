@@ -3,15 +3,18 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/messages"></ion-back-button>
     </ion-buttons>
-    <ion-title>
-      {{otherUser?.name}}
-    </ion-title>
+    <div id="toolbar">
+      <ion-title>
+        {{otherUser?.name}}
+      </ion-title>
+      <app-voice-navigation-button speakOnHover
+        [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
+    </div>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
   <div class="profile-header">
-    <img [src]="'http://localhost:3000/' + otherUser?.profileImage" alt="Profile Picture"
-      class="profile-picture">
+    <img [src]="'http://localhost:3000/' + otherUser?.profileImage" alt="Profile Picture" class="profile-picture">
     <h1 class="profile-name">{{ otherUser?.name }}</h1>
     <p class="profile-bio">
       {{otherUser?.bio}}

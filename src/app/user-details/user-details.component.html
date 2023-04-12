@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header *ngIf="!touchDevice">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-toggle>
@@ -7,7 +7,26 @@
         </ion-button>
       </ion-menu-toggle>
     </ion-buttons>
-    <ion-title speakOnHover [textToSpeak]="'Meet People'">Meet People</ion-title>
+    <div id="toolbar">
+      <ion-title speakOnHover [textToSpeak]="'Meet People'">Meet People</ion-title>
+      <app-voice-navigation-button speakOnHover
+        [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-header *ngIf="touchDevice">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title speakOnHover [textToSpeak]="'Events'">
+      Meet People
+    </ion-title>
+    <ion-buttons slot="end">
+      <app-voice-navigation-button speakOnHover
+        [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -74,13 +93,11 @@
     <ion-item class="ion-no-padding">
       <div id="buttons-div">
         <ion-button (click)="onCrossClick(displayedUser)" fill="clear" color="danger" id="cross-button" size="large"
-        speakOnHover [textToSpeak]="'Dislike'"
-        >
+          speakOnHover [textToSpeak]="'Dislike'">
           <ion-icon name="close-circle-outline"></ion-icon>
         </ion-button>
         <ion-button (click)="onTickClick(displayedUser)" fill="clear" color="success" id="tick-button" size="large"
-        speakOnHover [textToSpeak]="'Like'"
-        >
+          speakOnHover [textToSpeak]="'Like'">
           <ion-icon name="heart-outline"></ion-icon>
         </ion-button>
       </div>

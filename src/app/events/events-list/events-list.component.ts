@@ -17,6 +17,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
   private authStatusSub: Subscription;
   public userIsAuthenticated = false;
   userId: string | null;
+  touchDevice: boolean;
 
   constructor(public eventService: EventsService, private authService: AuthService, public datePipe: DatePipe) { }
 
@@ -33,6 +34,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
       this.userIsAuthenticated = isAuthenticated;
       this.userId = this.authService.getUserId();
     });
+    this.touchDevice = this.isTouchDevice();
   }
 
   readEventInfo(event: Event) {
@@ -65,6 +67,10 @@ export class EventsListComponent implements OnInit, OnDestroy {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
+  }
+
+  isTouchDevice(): boolean {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
 }

@@ -53,8 +53,29 @@ ion-card-content {
   display: flex;
 }
 
+#readEventInfo {
+  background-color: white;
+}
+
+ion-item {
+  --inner-padding-top: 20px;
+  --inner-padding-bottom: 20px;
+}
+
 @media only screen and (max-width: 768px) {
+  ion-item {
+    --inner-padding-top: 16px;
+    --inner-padding-bottom: 16px;
+  }
+
   #toolbar {
     flex-direction: row-reverse;
+  }
+
+  ion-item .item-native {
+    min-height: 70px;
+  }
+  ion-item .item-inner {
+    min-height: 70px;
   }
 }
