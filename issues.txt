@@ -1,19 +1,7 @@
 BEFORE COMPILE:
-All error handling
+Get demo ready
+
 Implement accessibility stuff:
-- add voice input for users AND HELP PAGE THAT TALKS - ALT TEXT - TEXT WHEN HOVER
 - High contrast mode - voice command (button on every screen to talk to?)
 - Noise every time a letter is input in messaging (OR BUTTON IS CLICKED)
-Implement accessibility settings pages
-
-check login/sigup button screen
-check how often signup button color comes up
-change user-item to opacity
-
-AFTER COMPILE:
-VH - voice chatrooms
-VH - Let users send images in messages
-H - Implement all settings pages
-H - Audio message on bio/audio onboarding
-E - Implement location API
-VE - Fix it showing too much in api/users GET route + listing users in user-details
+- Implement accessibility settings pages
