@@ -6,14 +6,15 @@
           <h1 class="signup-header" id="stay-connected">Stay Connected</h1>
           <ion-button class="login-button" speakOnHover [textToSpeak]="'Click here to play the on-boarding message'" (click)="speak('onboardingMessage')" style="width:100%;">Play Onboarding Message</ion-button>
           <h1 class="signup-header" id="sign-up-text" speakOnHover [textToSpeak]="'Sign up'">Sign Up</h1>
-          <ion-item class="input-container" speakOnHover [textToSpeak]="'Please input an email address for your Stay Connected account.'">
+
+          <ion-item style="display: flex;align-items: center;" class="input-container" speakOnHover [textToSpeak]="'Please input an email address for your Stay Connected account.'">
             <ion-label position="floating">Email</ion-label>
             <ion-input type="email" name="email" ngModel #emailInput="ngModel" required email
               clearInput="true"></ion-input>
             <ion-icon slot="start" name="mail-outline" class="input-icon"></ion-icon>
           </ion-item>
 
-          <ion-item class="input-container" speakOnHover [textToSpeak]="'Please input a password for your Stay Connected account.'">
+          <ion-item style="display: flex;align-items: center;" class="input-container" speakOnHover [textToSpeak]="'Please input a password for your Stay Connected account.'">
             <ion-label position="floating">Password</ion-label>
             <ion-input type="password" name="password" ngModel #passwordInput="ngModel"></ion-input>
             <ion-icon slot="start" name="lock-closed-outline" class="input-icon"></ion-icon>

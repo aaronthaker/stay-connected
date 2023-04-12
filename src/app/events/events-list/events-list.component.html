@@ -7,7 +7,7 @@
         </ion-button>
       </ion-menu-toggle>
     </ion-buttons>
-    <div style="display: flex;">
+    <div style="display: flex;margin-right: 1rem;">
       <ion-title speakOnHover [textToSpeak]="'Events'">
         Events
       </ion-title>
@@ -42,11 +42,15 @@
   <mat-spinner *ngIf="isLoading"></mat-spinner>
   <main *ngIf="events.length > 0 && !isLoading">
     <ion-card *ngFor="let event of events" id="event-card">
-      <ion-item>
-        <ion-card-title speakOnHover [textToSpeak]="event.title">{{event.title}}</ion-card-title>
-        <ion-button fill="outline" (click)="readEventInfo(event)" size="large" slot="end" class="read-event-info-button"
-          speakOnHover [textToSpeak]="'Click here to have the event details read aloud'" id="readEventInfo"><ion-icon
-            name="volume-high"></ion-icon></ion-button>
+      <ion-item id="card-title">
+        <div class="title-button-container">
+          <ion-card-title speakOnHover [textToSpeak]="event.title">{{event.title}}</ion-card-title>
+          <ion-button fill="outline" (click)="readEventInfo(event)" size="large" slot="end"
+            class="read-event-info-button" speakOnHover
+            [textToSpeak]="'Click here to have the event details read aloud'" id="readEventInfo">
+            <ion-icon name="volume-high"></ion-icon>
+          </ion-button>
+        </div>
       </ion-item>
       <ion-card-content>
         <img *ngIf="event.imagePath" speakOnHover [textToSpeak]="'Image of ' + event.title" [src]="event.imagePath"

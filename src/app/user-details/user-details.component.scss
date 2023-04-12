@@ -4,6 +4,10 @@ ion-content {
   --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
 }
 
+#toolbar {
+  margin-right: 1rem;
+}
+
 .location,
 img,
 .name,
@@ -31,7 +35,6 @@ span {
 .location {
   display: flex;
   align-items: center;
-  margin-top: 1rem;
   font-size: 1.2rem;
 
   ion-icon {

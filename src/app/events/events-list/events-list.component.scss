@@ -1,4 +1,11 @@
-ion-title, ion-card-title, #create-button, img, ion-card-subtitle, #description-text, ion-label, #no-events {
+ion-title,
+ion-card-title,
+#create-button,
+img,
+ion-card-subtitle,
+#description-text,
+ion-label,
+#no-events {
   cursor: help;
 }
 
@@ -10,9 +17,15 @@ mat-spinner {
   margin: auto;
 }
 
-#event-card{
+img {
+  border-radius: 12px;
+  border: 2px grey solid;
+}
+
+#event-card {
   background: white;
   padding: 0.4rem;
+  padding-bottom: 1rem;
 }
 
 .event-image {
@@ -25,7 +38,7 @@ mat-spinner {
 #card-stuff {
   display: flex;
   flex-direction: column;
-  padding: 0.3rem;
+  padding: 0.5rem;
 }
 
 #location-label {
@@ -33,11 +46,17 @@ mat-spinner {
   margin: 0.3rem;
 }
 
+ion-card {
+  box-shadow: 0px 0px 15px black;
+}
+
 ion-card-content {
   display: flex;
 }
 
-#date-text, #description-text, #location-label {
+#date-text,
+#description-text,
+#location-label {
   font-size: 18px;
   color: black;
 }
@@ -63,6 +82,10 @@ ion-item {
 }
 
 @media only screen and (max-width: 768px) {
+  ion-card-title {
+    width: 70%;
+  }
+
   ion-item {
     --inner-padding-top: 16px;
     --inner-padding-bottom: 16px;
@@ -75,7 +98,23 @@ ion-item {
   ion-item .item-native {
     min-height: 70px;
   }
+
   ion-item .item-inner {
     min-height: 70px;
   }
+
+  .title-button-container {
+    flex-direction: column;
+  }
+
+  .read-event-info-button {
+    margin-top: 0.5rem;
+  }
+
+  .title-button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
 }
