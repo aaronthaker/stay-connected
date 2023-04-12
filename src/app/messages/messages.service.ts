@@ -12,6 +12,9 @@ import { MessagesComponent } from './messages.component';
   providedIn: 'root',
 })
 export class MessagesService {
+
+  private messageRead = new Subject<void>();
+
   constructor(
     private authService: AuthService,
     private http: HttpClient,
@@ -76,6 +79,15 @@ export class MessagesService {
       })
     );
   }
+
+  broadcastMessageRead(): void {
+    this.messageRead.next();
+  }
+
+  listenForMessageRead(): Observable<void> {
+    return this.messageRead.asObservable();
+  }
+
 
   getMatchedUsers(userId: string | null): Observable<User[]> {
     return this.http.get<User[]>(`http://localhost:3000/api/user/${userId}/matches`);

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessagesService } from '../messages.service';
 import { UserService } from '../../users/users.service';
@@ -98,7 +98,9 @@ export class ConversationComponent implements OnInit, OnDestroy {
           delete message._id;
         }
         messageIds.push(message.id);
-        this.messagesService.markMessageAsRead(message.id).subscribe();
+        this.messagesService.markMessageAsRead(message.id).subscribe(() => {
+          this.messagesService.broadcastMessageRead(); // Add this line
+        });
       }
     });
     if (messageIds.length > 0) {

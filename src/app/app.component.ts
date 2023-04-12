@@ -55,6 +55,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.messagesService.listenForNewMessages().subscribe(message => {
       this.updateUnreadMessagesCount();
     });
+    this.messagesService.listenForMessageRead().subscribe(() => {
+      this.updateUnreadMessagesCount();
+    });
     this.authService.autoAuthUser();
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.userEmail = localStorage.getItem('userEmail');
