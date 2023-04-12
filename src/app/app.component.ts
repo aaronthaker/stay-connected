@@ -67,6 +67,9 @@ export class AppComponent implements OnInit, OnDestroy {
         this.userName = this.authService.getUserName();
       });
     this.updateUnreadMessagesCount();
+    this.messagesService.listenForUnreadMessages().subscribe(() => {
+      this.updateUnreadMessagesCount();
+    });
     this.touchDevice = this.isTouchDevice();
   }
 

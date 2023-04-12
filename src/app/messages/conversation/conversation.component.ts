@@ -90,15 +90,20 @@ export class ConversationComponent implements OnInit, OnDestroy {
   }
 
   markMessagesAsRead() {
+    const messageIds: string[] = [];
     this.messages.forEach(message => {
       if (message.unread && message.receiverId === this.messagesService.currentUserId) {
         if (message._id) {
           message.id = message._id;
           delete message._id;
         }
+        messageIds.push(message.id);
         this.messagesService.markMessageAsRead(message.id).subscribe();
       }
     });
+    if (messageIds.length > 0) {
+      this.messagesService.updateUnreadMessagesCount(messageIds);
+    }
   }
 
   sendMessage() {

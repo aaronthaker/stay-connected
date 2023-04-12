@@ -3,42 +3,74 @@ import { MessagesService } from './messages.service';
 import { Message } from './message.model';
 import { Subscription } from 'rxjs';
 import { User } from '../users/user.model';
-import { map } from 'rxjs/operators';
+import { UserService } from '../users/users.service';
+import { ViewWillEnter } from '@ionic/angular';
 
 @Component({
   selector: 'app-messages',
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss'],
 })
-export class MessagesComponent implements OnInit {
+export class MessagesComponent implements OnInit, ViewWillEnter {
   contacts$ = this.messagesService.getMatchedUsers(this.messagesService.currentUserId);
   unreadMessages: Message[] = [];
   unreadMessagesSub: Subscription;
+  conversations: any[] = [];
+
+  users: User[] = [];
+  messages: Message[] = [];
+  selectedUser: User;
+  messageContent: string;
+  userSub: Subscription;
+  messageSub: Subscription;
+  matchedUsers: User[] = [];
+  interval: any;
+  unreadCounts: { [userId: string]: number } = {};
   touchDevice: boolean;
 
-  constructor(private messagesService: MessagesService) { }
+  constructor(public messagesService: MessagesService, public userService: UserService,) {}
 
   ngOnInit(): void {
+    this.userSub = this.userService.getUsers().subscribe(users => {
+      this.users = users.filter(user => user._id !== this.currentUserId);
+      this.messagesService.listenForNewMessages();
+    });
     this.messagesService.getUnreadMessages().subscribe((unreadMessages) => {
       this.unreadMessages = unreadMessages;
     });
-
+    this.messagesService.listenForNewMessages().subscribe(message => {
+      this.unreadMessages.push(message);
+      this.updateUnreadCounts();
+    });
     this.unreadMessagesSub = this.messagesService
       .listenForUnreadMessages()
       .subscribe((message: Message) => {
         this.unreadMessages.push(message);
       });
-    this.touchDevice = this.isTouchDevice();
+
+    this.contacts$.subscribe((contacts) => {
+      this.conversations = contacts.map((contact) => {
+        return {
+          contact: contact,
+          lastMessage: null,
+        };
+      });
+
+      this.updateLastMessages();
+    });
+    this.initializeData();
   }
 
   ngOnDestroy(): void {
     if (this.unreadMessagesSub) {
       this.unreadMessagesSub.unsubscribe();
     }
-  }
-
-  isTouchDevice(): boolean {
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (this.userSub) {
+      this.userSub.unsubscribe();
+    }
+    if (this.messageSub) {
+      this.messageSub.unsubscribe();
+    }
   }
 
   getUnreadMessageCount(contact: User): number {
@@ -47,4 +79,65 @@ export class MessagesComponent implements OnInit {
         message.senderId === contact._id && message.receiverId === this.messagesService.currentUserId
     ).length;
   }
+
+  updateLastMessages(): void {
+    this.conversations.forEach((conversation, index) => {
+      this.messagesService
+        .getConversation(conversation.contact._id)
+        .subscribe((messages) => {
+          if (messages.length > 0) {
+            conversation.lastMessage = messages[messages.length - 1];
+          } else {
+            this.conversations.splice(index, 1);
+          }
+        });
+    });
+  }
+
+  initializeData(): void {
+    this.contacts$.subscribe((contacts) => {
+      this.conversations = contacts.map((contact) => {
+        return {
+          contact: contact,
+          lastMessage: null,
+        };
+      });
+
+      this.updateLastMessages();
+    });
+
+    this.messagesService.getUnreadMessages().subscribe((unreadMessages) => {
+      this.unreadMessages = unreadMessages;
+      this.updateUnreadCounts();
+    });
+
+  }
+
+  ionViewWillEnter(): void {
+    this.initializeData();
+  }
+
+
+  getUnreadCount(userId: string): number {
+    if (this.unreadCounts[userId]) {
+      return this.unreadCounts[userId];
+    } else {
+      return 0;
+    }
+  }
+
+  updateUnreadCounts() {
+    this.unreadCounts = {};
+    for (const message of this.unreadMessages) {
+      if (!this.unreadCounts[message.senderId!]) {
+        this.unreadCounts[message.senderId!] = 0;
+      }
+      this.unreadCounts[message.senderId!]++;
+    }
+  }
+
+  get currentUserId() {
+    return this.messagesService.currentUserId;
+  }
+
 }

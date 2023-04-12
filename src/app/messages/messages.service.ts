@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 import { Message } from './message.model';
@@ -91,6 +91,21 @@ export class MessagesService {
 
   listenForUnreadMessages(): Observable<Message> {
     return this.socket.fromEvent<Message>('newUnreadMessage');
+  }
+
+  private unreadMessagesUpdate = new Subject<void>();
+
+  listenForUnreadMessagesUpdate(): Observable<void> {
+    return this.unreadMessagesUpdate.asObservable();
+  }
+
+  unreadMessages: Message[] = [];
+
+  updateUnreadMessagesCount(messageIds: string[]): void {
+    this.getUnreadMessages().subscribe((messages) => {
+      this.unreadMessages = messages.filter((message) => !messageIds.includes(message.id!));
+    });
+    this.unreadMessagesUpdate.next();
   }
 
 }

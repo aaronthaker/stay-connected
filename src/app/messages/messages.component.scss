@@ -14,3 +14,30 @@
   margin: 0px;
   font-size: 18px;
 }
+
+.conversation-item {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f2f2f2;
+  }
+}
+
+.conversation-item ion-avatar {
+  --border-radius: 50%;
+  --border: 2px solid var(--ion-color-primary);
+}
+
+.users-profile-picture {
+  cursor: pointer;
+}
+
+#unmatchBtn {
+  margin: 0px;
+  font-size: 18px;
+}
+
+.incoming {
+  color: var(--ion-color-primary);
+  font-weight: bold;
+}

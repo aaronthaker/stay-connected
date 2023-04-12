@@ -32,7 +32,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content *ngIf="displayedUser">
   <ion-grid>
     <ion-row class="ion-justify-content-center ion-align-items-center">
 
@@ -95,6 +95,10 @@
 
     </ion-row>
   </ion-grid>
+</ion-content>
+
+<ion-content *ngIf="!displayedUser">
+  No users left! Check back soon!
 </ion-content>
 <ion-footer>
   <ion-toolbar>
