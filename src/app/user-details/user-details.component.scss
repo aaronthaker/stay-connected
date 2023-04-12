@@ -1,67 +1,77 @@
+@import "~@ionic/angular/css/core.css";
+
 ion-content {
-  display: flex;
-  justify-content: center;
   --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 100%;
-  height: 100%;
+ion-grid {
+  padding: 0px;
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  flex: 1;
-}
-
-.text {
+span {
+  line-height: initial;
   color: white;
 }
 
-.profile-image {
+.image-col {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
-ion-content img {
-  display: block;
-  margin: auto;
-  border-radius: 5%;
-  width: 90%;
+.location {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+
+  ion-icon {
+    margin-right: 0.5rem;
+  }
+}
+
+.image-container {
+  margin-top: 1rem;
+  width: 100%;
   height: auto;
-  max-width: 300px;
-}
-
-#bio-interests-div {
   display: flex;
   justify-content: center;
-  padding: 10px 0px;
+  align-items: center;
 }
 
-ion-content ion-card-title {
-  text-align: center;
-  font-weight: 100;
+.profile-img {
+  max-width: 90%;
+  height: auto;
+  border-radius: 1rem;
+  object-fit: cover;
 }
 
-.card-header {
-  padding: 0.5rem 0;
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-}
-
-.button-row {
-  background-color: white;
-}
-
-#see-full-profile {
+.info-col {
   display: flex;
-  margin: auto;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+ion-footer ion-item {
+  --padding-end: 0px;
+  --inner-padding-end: 0px;
+}
+
+.name {
+  font-size: 2.2rem;
+  font-weight: 550;
+  margin-top: 1rem;
+}
+
+.bio {
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  text-align: justify;
+}
+
+ion-button {
+  margin-top: 1rem;
 }
 
 .match-message {
@@ -70,7 +80,7 @@ ion-content ion-card-title {
   padding: 0.5rem 1rem;
   border-radius: 5px;
   font-weight: bold;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
   text-align: center;
   width: fit-content;
@@ -79,92 +89,22 @@ ion-content ion-card-title {
   box-shadow: 0px 0px 26px black;
 }
 
-.signup-link-container {
+#match-message-speaker-button {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.common-interests {
   text-align: center;
-}
-
-#location-icon {
-  font-size: 25px;
-  vertical-align: middle;
-  margin-bottom: 3px;
-}
-
-#location-span,
-#name,
-#bio,
-#match-message,
-#profileButton,
-#listenToProfileButton,
-#tick-button,
-#cross-button,
-#user-image {
-  cursor: help !important;
-}
-
-#nameCard {
-  font-size: 28px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 400;
-}
-
-#nameCard ion-button {
-  margin-left: 10px;
-}
-
-#bio {
-  font-size: 16px;
-  max-width: 650px;
-}
-
-#location {
-  font-size: 20px;
-  padding-top: 5px;
-  margin: 0px;
-  text-align: center;
-  color: white;
+  font-weight: normal;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#location ion-button {
-  margin-left: 10px;
-}
-
-#cross-button,
-#tick-button {
-  border-radius: 10%;
-}
-
-#cross-button:hover {
-  background-color: red;
-}
-
-#cross-button:hover ion-icon,
-#tick-button:hover ion-icon {
-  color: white;
-}
-
-#tick-button:hover {
-  background-color: green;
-}
-
-#tick-button,
-#cross-button {
-  width: 50%;
-  height: 100%;
+#profile-buttons {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0px;
-  border-radius: 0px;
-}
-
-#tick-button ion-icon,
-#cross-button ion-icon {
-  font-size: 35px;
+  margin-top: 1rem;
 }
 
 #buttons-div {
@@ -176,32 +116,56 @@ ion-content ion-card-title {
   margin-top: auto;
 }
 
-ion-footer ion-item {
-  --padding-end: 0px;
-  --inner-padding-end: 0px;
+img {
+  max-height: 400px;
+  max-width: 100%;
 }
 
-.common-interests {
-  text-align: center;
-  font-weight: normal;
+ion-grid {
+  height: 100%;
+
+  ion-row {
+    height: 100%;
+  }
+}
+
+#cross-button,
+#tick-button {
+  border-radius: 10%;
+}
+
+#cross-button:hover {
+  background-color: red;
+
+  ion-icon {
+    color: white;
+  }
+}
+
+#tick-button:hover {
+  background-color: green;
+
+  ion-icon {
+    color: white;
+  }
+}
+
+#tick-button,
+#cross-button {
+  width: 50%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-}
+  margin: 0px;
+  border-radius: 0px;
 
-#match-message-speaker-button {
-  font-size: 0.8rem;
-  padding: 0.2rem 0.5rem;
+  ion-icon {
+    font-size: 35px;
+  }
 }
 
 @media only screen and (max-width: 576px) {
-  ion-content img {
-    max-width: 90%;
-  }
-
-  .card-header {
-    padding: 0px;
-  }
 
   #tick-button ion-icon,
   #cross-button ion-icon {

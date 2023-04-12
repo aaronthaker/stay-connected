@@ -30,6 +30,12 @@
 ¦   ¦           signup.component.scss
 ¦   ¦           signup.component.ts
 ¦   ¦           
+¦   +---components
+¦   ¦   +---voice-navigation-button
+¦   ¦           voice-navigation-button.component.html
+¦   ¦           voice-navigation-button.component.scss
+¦   ¦           voice-navigation-button.component.ts
+¦   ¦           
 ¦   +---confirm-logout-modal
 ¦   ¦       confirm-logout-modal.component.html
 ¦   ¦       confirm-logout-modal.component.scss
@@ -141,5 +147,6 @@
 ¦       environment.ts
 ¦       
 +---theme
-        variables.scss
-        
+¦       variables.scss
+¦       
++---typings

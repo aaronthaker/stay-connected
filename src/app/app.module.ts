@@ -34,7 +34,6 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
 import { OtherProfileComponent } from './other-profile/other-profile.component';
 import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logout-modal.component';
-import { ImageViewerComponent } from './user-details/image-viewer/image-viewer.component';
 import { DatePipe } from '@angular/common';
 import { A11yModule } from '@angular/cdk/a11y';
 import { VoiceNavigationButtonComponent } from './components/voice-navigation-button/voice-navigation-button.component';
@@ -60,7 +59,6 @@ import { SpeakOnHoverDirective } from './speak-on-hover.directive';
     PrivacyComponent,
     OtherProfileComponent,
     ConfirmLogoutModalComponent,
-    ImageViewerComponent,
     VoiceNavigationButtonComponent,
     SpeakOnHoverDirective
   ],

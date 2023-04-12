@@ -1,4 +1,4 @@
-<ion-header *ngIf="touchDevice">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-toggle>
@@ -12,81 +12,63 @@
 </ion-header>
 
 <ion-content>
-  <div class="container">
-    <div class="content">
-      <p id="location">
-        <span>
-          <ion-icon id="location-icon" name="location"></ion-icon>
-          <span id="location-span" (mouseenter)="onMouseEnter($event.target)"
-            (mouseleave)="onMouseLeave($event.target)">{{displayedUser?.location}}</span>
-        </span>
-        <ion-button *ngIf="touchDevice" (click)="speakText(displayedUser?.location!)" size="small">
-          <ion-icon name="volume-high-outline"></ion-icon>
-        </ion-button>
-      </p>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-align-items-center">
 
-      <div class="profile-image">
-        <ng-container *ngIf="displayedUser?.profileImage">
-          <img [src]="'http://localhost:3000/' + displayedUser.profileImage" width="300px" height="300px"
-            class="profile-img" id="user-image" (mouseenter)="onMouseEnter($event.target)"
-            (mouseleave)="onMouseLeave($event.target)" (click)="openImage('http://localhost:3000/' + displayedUser.profileImage)" />
-        </ng-container>
-      </div>
+      <ion-col size="12" size-md="6" class="image-col">
+        <div class="location">
+          <ion-icon name="location" style="color: white;"></ion-icon>
+          <span speakOnHover [textToSpeak]="displayedUser?.location">{{displayedUser?.location}}</span>
+        </div>
+        <div class="image-container">
+          <img *ngIf="displayedUser?.profileImage" speakOnHover [textToSpeak]="'An image of ' + displayedUser?.name"
+            [src]="'http://localhost:3000/' + displayedUser.profileImage" class="profile-img" />
+        </div>
+      </ion-col>
 
-      <div class="card-header">
-        <ion-card-title id="nameCard" class="text"><span id="name" (mouseenter)="onMouseEnter($event.target)"
-            (mouseleave)="onMouseLeave($event.target)">{{displayedUser?.name}}<span *ngIf="displayedUser?.age">, {{
-              displayedUser?.age }}</span></span>
-          <ion-button *ngIf="touchDevice" (click)="speakText(displayedUser?.name! + ', ' + displayedUser?.age!)"
-            size="small">
-            <ion-icon name="volume-high-outline"></ion-icon>
+      <ion-col size="12" size-md="6" class="info-col">
+        <span class="name" speakOnHover [textToSpeak]="displayedUser?.name + ', ' + displayedUser?.age">
+          {{displayedUser?.name}},
+          {{ displayedUser?.age }}</span>
+        <span class="bio" speakOnHover [textToSpeak]="displayedUser?.bio">
+          {{displayedUser?.bio}}</span>
+
+        <div id="profile-buttons">
+          <ion-button id="profileButton" (click)="onUserProfileSelected(displayedUser?._id!); $event.stopPropagation()"
+            speakOnHover [textToSpeak]="'Click here to see' + displayedUser?.name + '\'s full profile'">
+            See full profile
           </ion-button>
-        </ion-card-title>
-        <div class="text" id="bio-interests-div">
-          <div id="bio" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)">
-            {{displayedUser?.bio}}</div>
-          <ion-button *ngIf="touchDevice" (click)="speakText(displayedUser?.bio!)" size="small">
-            <ion-icon name="volume-high-outline"></ion-icon>
+          <ion-button id="listenToProfileButton" (click)="onListenToProfileClick()" speakOnHover
+            [textToSpeak]="'Click here to listen to '  + displayedUser?.name + '\'s full profile'">
+            Listen to Profile <ion-icon name="volume-high" style="margin-left: 5px;"></ion-icon>
           </ion-button>
         </div>
-      </div>
 
-      <div id="see-full-profile">
-        <ion-button id="profileButton" (click)="onUserProfileSelected(displayedUser?._id!); $event.stopPropagation()" (mouseenter)="onMouseEnter($event.target)"
-        (mouseleave)="onMouseLeave($event.target)">
-          See full profile
-        </ion-button>
-        <ng-container id="listen-to-profile">
-          <ion-button id="listenToProfileButton" (click)="onListenToProfileClick()" (mouseenter)="onMouseEnter($event.target)"
-            (mouseleave)="onMouseLeave($event.target)">
-            Listen to Profile
-          </ion-button>
+        <ng-container *ngIf="commonInterests || likedYouToo">
+          <div class="match-message" id="match-message" [@fadeInOut]>
+            <div *ngIf="commonInterests && !likedYouToo" class="common-interests" speakOnHover
+              [textToSpeak]="'You have common interests with this person!'">
+              You have common interests with this person!
+              <ion-button *ngIf="touchDevice" (click)="speakText('You have common interests with this person!')"
+                size="small" id="match-message-speaker-button">
+                <ion-icon name="volume-high-outline"></ion-icon>
+              </ion-button>
+            </div>
+            <div *ngIf="likedYouToo" speakOnHover
+              [textToSpeak]="displayedUser?.name + ' also liked you! Message her now!'">
+              <p class="common-interests">{{displayedUser?.name}} also liked you!</p>
+              <ion-button (click)="navigateToConversation(displayedUser?._id!)" color="primary" size="small">
+                Message {{displayedUser?.name}} now!
+              </ion-button>
+            </div>
+          </div>
         </ng-container>
-      </div>
 
-      <ng-container *ngIf="commonInterests || likedYouToo">
-        <div class="match-message" id="match-message" [@fadeInOut] (mouseenter)="onMouseEnter($event.target)"
-          (mouseleave)="onMouseLeave($event.target)">
-          <div *ngIf="commonInterests && !likedYouToo" class="common-interests">
-            You have common interests with this person!
-            <ion-button *ngIf="touchDevice" (click)="speakText('You have common interests with this person!')"
-              size="small" id="match-message-speaker-button">
-              <ion-icon name="volume-high-outline"></ion-icon>
-            </ion-button>
-          </div>
-          <div *ngIf="likedYouToo">
-            <p>{{displayedUser?.name}} also liked you!</p>
-            <ion-button (click)="navigateToConversation(displayedUser?._id!)" color="primary" size="small">
-              Message {{displayedUser?.name}} now!
-            </ion-button>
-          </div>
-        </div>
-      </ng-container>
+      </ion-col>
 
-    </div>
-  </div>
+    </ion-row>
+  </ion-grid>
 </ion-content>
-
 <ion-footer>
   <ion-toolbar>
     <ion-item class="ion-no-padding">

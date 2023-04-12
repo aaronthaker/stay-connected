@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 import { MessagesService } from 'src/app/messages/messages.service';
 import { User } from 'src/app/users/user.model';
 import { UserService } from 'src/app/users/users.service';
-import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 
 @Component({
   selector: 'app-user-details',
@@ -84,16 +83,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   isTouchDevice(): boolean {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  }
-
-  async openImage(imageUrl: string) {
-    const modal = await this.modalController.create({
-      component: ImageViewerComponent,
-      componentProps: {
-        imageUrl: imageUrl,
-      },
-    });
-    return await modal.present();
   }
 
   speakText(textToSpeak: string) {
