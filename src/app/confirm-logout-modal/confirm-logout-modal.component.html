@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
+    <ion-title speakOnHover [textToSpeak]="'Confirm log out'">
       Confirm Logout
     </ion-title>
   </ion-toolbar>
@@ -8,7 +8,7 @@
 <ion-content>
   <ion-list>
     <ion-item>
-      <ion-label>
+      <ion-label speakOnHover [textToSpeak]="'Are you shore you want to log out?'">
         Are you sure you want to log out?
       </ion-label>
     </ion-item>
@@ -16,12 +16,12 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <ion-button (click)="dismiss(false)" color="primary" expand="block">
+        <ion-button (click)="dismiss(false)" color="primary" expand="block" speakOnHover [textToSpeak]="'Cancel'">
           Cancel
         </ion-button>
       </ion-col>
       <ion-col>
-        <ion-button (click)="dismiss(true)" color="danger" expand="block">
+        <ion-button (click)="dismiss(true)" color="danger" expand="block" speakOnHover [textToSpeak]="'Log Out'">
           Log Out
         </ion-button>
       </ion-col>

@@ -8,10 +8,10 @@
       </ion-menu-toggle>
     </ion-buttons>
     <div style="display: flex;">
-      <ion-title>
+      <ion-title speakOnHover [textToSpeak]="'Profile'">
         Profile
       </ion-title>
-      <ion-button (click)="toggleEditMode()" style="padding: 0px 20px">{{ editMode ? 'Save' : 'Edit' }}</ion-button>
+      <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode()" style="padding: 0px 20px">{{ editMode ? 'Save' : 'Edit Profile' }}</ion-button>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -21,19 +21,19 @@
 
     <img *ngIf="currentUser?.profileImage && !selectedImageFile; else previewImage"
       [src]="'http://localhost:3000/' + currentUser?.profileImage + '?t=' + timestamp" alt="Profile Picture"
-      class="profile-picture">
+      class="profile-picture" speakOnHover [textToSpeak]="'Your current profile picture'">
 
     <ng-template #previewImage>
       <img *ngIf="selectedImageFile" [src]="currentUser?.profileImage" alt="Profile Picture Preview"
-        class="profile-picture">
+        class="profile-picture" speakOnHover [textToSpeak]="'Your new profile picture'">
     </ng-template>
 
-    <button mat-stroked-button type="button" (click)="filePicker.click()" *ngIf="editMode">Change Profile Picture</button>
-    <input type="file" (change)="onImageSelected($event)" #filePicker class="image-upload" accept="image/*">    <h1 class="profile-name">{{ currentUser?.name }}</h1>
-    <p class="profile-bio" *ngIf="!editMode">
+    <button mat-stroked-button type="button" (click)="filePicker.click()" *ngIf="editMode" speakOnHover [textToSpeak]="'Change Profile Picture'">Change Profile Picture</button>
+    <input type="file" (change)="onImageSelected($event)" #filePicker class="image-upload" accept="image/*">    <h1 class="profile-name" speakOnHover [textToSpeak]="currentUser?.name">{{ currentUser?.name }}</h1>
+    <p class="profile-bio" *ngIf="!editMode" speakOnHover [textToSpeak]="currentUser?.bio">
       {{currentUser?.bio}}
     </p>
-    <p class="profile-bio" *ngIf="editMode">
+    <p class="profile-bio" *ngIf="editMode" speakOnHover [textToSpeak]="currentUser?.bio">
       <ion-input [(ngModel)]="currentUser.bio"></ion-input>
     </p>
   </div>
@@ -41,75 +41,66 @@
     <ion-card-content>
       <ion-list>
         <ion-item *ngIf="!editMode">
-          <ion-label>Name:</ion-label>
-          <ion-text>{{ currentUser?.name }}</ion-text>
+          <ion-label speakOnHover [textToSpeak]="'Name'">Name:</ion-label>
+          <ion-text speakOnHover [textToSpeak]="currentUser?.name">{{ currentUser?.name }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Name:</ion-label>
-          <ion-input [(ngModel)]="currentUser.name" slot="end" style="text-align: right;"></ion-input>
+          <ion-label speakOnHover [textToSpeak]="'Name'">Name:</ion-label>
+          <ion-input speakOnHover [textToSpeak]="currentUser.name" [(ngModel)]="currentUser.name" slot="end" style="text-align: right;"></ion-input>
         </ion-item>
 
         <ion-item *ngIf="!editMode">
-          <ion-label>Email:</ion-label>
-          <ion-text>{{ currentUser?.email }}</ion-text>
+          <ion-label speakOnHover [textToSpeak]="'Email'">Email:</ion-label>
+          <ion-text speakOnHover [textToSpeak]="currentUser?.email">{{ currentUser?.email }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Email:</ion-label>
-          <ion-text>{{ currentUser?.email }}</ion-text>
+          <ion-label speakOnHover [textToSpeak]="'Email'">Email:</ion-label>
+          <ion-text speakOnHover [textToSpeak]="currentUser?.email">{{ currentUser?.email }}</ion-text>
         </ion-item>
-
-        <!-- <ion-item *ngIf="!editMode">
-          <ion-label>Phone Number</ion-label>
-          <ion-text>{{ currentUser?.phoneNumber }}</ion-text>
-        </ion-item>
-
-        <ion-item *ngIf="editMode">
-          <ion-label>Phone Number</ion-label>
-          <ion-input [(ngModel)]="currentUser.phoneNumber"></ion-input>
-        </ion-item> -->
 
         <ion-item *ngIf="!editMode">
-          <ion-label>Age:</ion-label>
-          <ion-text>{{ currentUser?.age }}</ion-text>
+          <ion-label speakOnHover [textToSpeak]="'Age'">Age:</ion-label>
+          <ion-text speakOnHover [textToSpeak]="currentUser?.age">{{ currentUser?.age }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Age:</ion-label>
-          <ion-input type="number" [(ngModel)]="currentUser.age" slot="end" style="text-align: right;"></ion-input>
+          <ion-label speakOnHover [textToSpeak]="'Age'">Age:</ion-label>
+          <ion-input speakOnHover [textToSpeak]="currentUser?.age" type="number" [(ngModel)]="currentUser.age" slot="end" style="text-align: right;"></ion-input>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Gender:</ion-label>
-          <ion-select [(ngModel)]="currentUser.gender">
-            <ion-select-option value="male">Male</ion-select-option>
-            <ion-select-option value="female">Female</ion-select-option>
-            <ion-select-option value="other">Other</ion-select-option>
+          <ion-label speakOnHover [textToSpeak]="'Gender'">Gender:</ion-label>
+          <ion-select speakOnHover [textToSpeak]="currentUser.gender" [(ngModel)]="currentUser.gender">
+            <ion-select-option speakOnHover [textToSpeak]="'Male'" value="male">Male</ion-select-option>
+            <ion-select-option speakOnHover [textToSpeak]="'Female'" value="female">Female</ion-select-option>
+            <ion-select-option speakOnHover [textToSpeak]="'Other'" value="other">Other</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item *ngIf="!editMode">
-          <ion-label>Gender:</ion-label>
-          <ion-text>{{ currentUser?.gender }}</ion-text>
+          <ion-label speakOnHover [textToSpeak]="'Gender'">Gender:</ion-label>
+          <ion-text speakOnHover [textToSpeak]="currentUser?.gender">{{ currentUser?.gender }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="!editMode">
-          <ion-label>Location:</ion-label>
-          <ion-text>{{ currentUser?.location }}</ion-text>
+          <ion-label speakOnHover [textToSpeak]="'Location'">Location:</ion-label>
+          <ion-text speakOnHover [textToSpeak]="currentUser?.location">{{ currentUser?.location }}</ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Location:</ion-label>
-          <ion-input [(ngModel)]="currentUser.location" slot="end" style="text-align: right;"></ion-input>
+          <ion-label speakOnHover [textToSpeak]="'Location'">Location:</ion-label>
+          <ion-input speakOnHover [textToSpeak]="currentUser?.location" [(ngModel)]="currentUser.location" slot="end" style="text-align: right;"></ion-input>
         </ion-item>
 
         <div *ngIf="editMode">
           <ion-item>
-            <ion-label>Interests:</ion-label>
+            <ion-label speakOnHover [textToSpeak]="'Interests'">Interests:</ion-label>
             <mat-form-field appearance="outline" class="interest-input" style="padding-top: 1.25rem;">
               <input matInput placeholder="Add an interest" [formControl]="interestCtrl" [matAutocomplete]="auto">
               <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event.option.value)">
-                <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion">
+                <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion"
+                speakOnHover [textToSpeak]="suggestion">
                   {{suggestion}}
                 </mat-option>
               </mat-autocomplete>
@@ -117,16 +108,16 @@
           </ion-item>
 
           <ion-chip *ngFor="let interest of interests">
-            <ion-label>{{interest}}</ion-label>
-            <ion-icon name="close" (click)="remove(interest)"></ion-icon>
+            <ion-label speakOnHover [textToSpeak]="interest">{{interest}}</ion-label>
+            <ion-icon name="close" (click)="remove(interest)" speakOnHover [textToSpeak]="'remove'"></ion-icon>
           </ion-chip>
         </div>
 
         <!-- Display interests as plain text when not in editMode -->
         <div *ngIf="!editMode">
           <ion-item>
-            <ion-label>Interests:</ion-label>
-            <ion-input readonly="true">{{ interests.join(', ') }}</ion-input>
+            <ion-label speakOnHover [textToSpeak]="'Interests'">Interests:</ion-label>
+            <ion-input readonly="true" speakOnHover [textToSpeak]="interests.join(', ')">{{ interests.join(', ') }}</ion-input>
           </ion-item>
         </div>
 
@@ -137,23 +128,23 @@
     <ion-card-content>
       <ion-list>
         <ion-item>
-          <ion-label>Current Password</ion-label>
+          <ion-label speakOnHover [textToSpeak]="'Current Password'">Current Password</ion-label>
           <ion-input type="password" [(ngModel)]="currentPassword"></ion-input>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>New Password</ion-label>
+          <ion-label speakOnHover [textToSpeak]="'New Password'">New Password</ion-label>
           <ion-input type="password" [(ngModel)]="newPassword"></ion-input>
         </ion-item>
 
         <ion-item *ngIf="editMode">
-          <ion-label>Confirm New Password</ion-label>
+          <ion-label speakOnHover [textToSpeak]="'Confirm new password'">Confirm New Password</ion-label>
           <ion-input type="password" [(ngModel)]="confirmNewPassword"></ion-input>
         </ion-item>
 
-        <p class="password-error-message">{{ passwordErrorMessage }}</p>
-        <p class="password-successful-message">{{ passwordChangeSuccessfulMessage }}</p>
-        <ion-button (click)="changePassword()">Change Password</ion-button>
+        <p class="password-error-message" speakOnHover [textToSpeak]="passwordErrorMessage">{{ passwordErrorMessage }}</p>
+        <p class="password-successful-message" speakOnHover [textToSpeak]="passwordChangeSuccessfulMessage">{{ passwordChangeSuccessfulMessage }}</p>
+        <ion-button (click)="changePassword()" speakOnHover [textToSpeak]="'Change Password'">Change Password</ion-button>
       </ion-list>
     </ion-card-content>
   </ion-card>

@@ -49,19 +49,6 @@ export class ConversationComponent implements OnInit, OnDestroy {
     });
   }
 
-  onMouseEnter(target: EventTarget | null) {
-    if (!this.touchDevice && target instanceof HTMLElement) {
-      const indexStr = target.getAttribute('data-index');
-      if (indexStr !== null) {
-        const index = parseInt(indexStr, 10);
-        const message = this.messages[index];
-        if (message) {
-          this.speakText(message.content);
-        }
-      }
-    }
-  }
-
   sayLastTenMessages() {
     const startIndex = Math.max(this.messages.length - 10, 0);
     const lastTenMessages = this.messages.slice(startIndex);
@@ -72,17 +59,6 @@ export class ConversationComponent implements OnInit, OnDestroy {
     }
   }
 
-  onMouseLeave() {
-    if (!this.touchDevice && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-  }
-
-
-  isTouchDevice(): boolean {
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  }
-
   speakText(textToSpeak: string) {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -91,6 +67,10 @@ export class ConversationComponent implements OnInit, OnDestroy {
     } else {
       console.error('Speech synthesis is not supported in this browser.');
     }
+  }
+
+  isTouchDevice(): boolean {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
   ngOnDestroy() {

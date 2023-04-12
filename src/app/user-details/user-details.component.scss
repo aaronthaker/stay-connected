@@ -4,6 +4,10 @@ ion-content {
   --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
 }
 
+.location, img, .name, .bio, .match-message, ion-title {
+  cursor: help;
+}
+
 ion-grid {
   padding: 0px;
 }

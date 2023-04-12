@@ -27,7 +27,6 @@ export class AppComponent implements OnInit, OnDestroy {
   interval: any;
 
   touchDevice: boolean;
-  hoverTimeout: any;
 
   constructor(
     private authService: AuthService,
@@ -38,7 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ) { }
 
   public appPages = [
-    { title: 'Home', url: '/home', icon: 'heart' },
+    { title: 'Meet People', url: '/home', icon: 'heart' },
     { title: 'Messages', url: '/messages', icon: 'chatbox' },
     { title: 'Events', url: '/events', icon: 'calendar' }
   ];
@@ -72,51 +71,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   isTouchDevice(): boolean {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  }
-
-  @HostListener('mouseenter', ['$event.target'])
-  onMouseEnter(target: EventTarget | null) {
-    if (!this.touchDevice && target instanceof HTMLElement) {
-      const elementId = target.getAttribute('id');
-      if (elementId) {
-        clearTimeout(this.hoverTimeout);
-        this.hoverTimeout = setTimeout(() => {
-          this.speakElementText(elementId);
-        }, 1500);
-      }
-    }
-  }
-
-  @HostListener('mouseleave', ['$event.target'])
-  onMouseLeave(target: EventTarget | null) {
-    if (!this.touchDevice && target instanceof HTMLElement) {
-      clearTimeout(this.hoverTimeout);
-    }
-  }
-
-  speakElementText(elementId: string) {
-    let textToSpeak = '';
-    const pagePrefix = 'page-';
-    if (elementId.startsWith(pagePrefix)) {
-      if (elementId) {
-        textToSpeak = elementId.substring(5);
-      }
-    }
-
-    if (textToSpeak) {
-      this.speakText(textToSpeak);
-    }
-  }
-
-  speakText(textToSpeak: string) {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      utterance.volume = 1;
-      window.speechSynthesis.speak(utterance);
-    } else {
-      // Handle the case where the browser doesn't support speech synthesis
-      console.error('Speech synthesis is not supported in this browser.');
-    }
   }
 
   updateUnreadMessagesCount() {

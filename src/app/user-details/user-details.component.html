@@ -7,7 +7,7 @@
         </ion-button>
       </ion-menu-toggle>
     </ion-buttons>
-    <ion-title>Meet</ion-title>
+    <ion-title speakOnHover [textToSpeak]="'Meet People'">Meet People</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -73,12 +73,14 @@
   <ion-toolbar>
     <ion-item class="ion-no-padding">
       <div id="buttons-div">
-        <ion-button (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)"
-          (click)="onCrossClick(displayedUser)" fill="clear" color="danger" id="cross-button" size="large">
+        <ion-button (click)="onCrossClick(displayedUser)" fill="clear" color="danger" id="cross-button" size="large"
+        speakOnHover [textToSpeak]="'Dislike'"
+        >
           <ion-icon name="close-circle-outline"></ion-icon>
         </ion-button>
-        <ion-button (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)"
-          (click)="onTickClick(displayedUser)" fill="clear" color="success" id="tick-button" size="large">
+        <ion-button (click)="onTickClick(displayedUser)" fill="clear" color="success" id="tick-button" size="large"
+        speakOnHover [textToSpeak]="'Like'"
+        >
           <ion-icon name="heart-outline"></ion-icon>
         </ion-button>
       </div>

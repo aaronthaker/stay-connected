@@ -25,7 +25,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
   interval: any;
   unreadCounts: { [userId: string]: number } = {};
   touchDevice: boolean;
-  hoverTimeout: any;
 
   constructor(
     public userService: UserService,
@@ -57,65 +56,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
-  @HostListener('mouseenter', ['$event.target'])
-  onMouseEnter(target: EventTarget | null) {
-    if (!this.touchDevice && target instanceof HTMLElement) {
-      const elementId = target.getAttribute('id');
-      if (elementId) {
-        clearTimeout(this.hoverTimeout);
-        this.hoverTimeout = setTimeout(() => {
-          this.speakElementText(elementId);
-        }, 1500);
-      }
-    }
-  }
-
-  @HostListener('mouseleave', ['$event.target'])
-  onMouseLeave(target: EventTarget | null) {
-    if (!this.touchDevice && target instanceof HTMLElement) {
-      clearTimeout(this.hoverTimeout);
-    }
-  }
-
-  speakElementText(elementId: string) {
-    let textToSpeak = '';
-    const matchedUserNamePrefix = 'matched-user-name-';
-    if (elementId.startsWith(matchedUserNamePrefix)) {
-      const userId = elementId.slice(matchedUserNamePrefix.length);
-      const matchedUser = this.matchedUsers.find(user => user._id === userId);
-      if (matchedUser) {
-        textToSpeak = matchedUser.name;
-      }
-    } else {
-      switch (elementId) {
-        case 'matched-users-title':
-          textToSpeak = 'Matched Users';
-          break;
-        case 'unmatchBtn':
-          textToSpeak = 'Unmatch';
-          break;
-        default:
-          break;
-      }
-    }
-
-    if (textToSpeak) {
-      this.speakText(textToSpeak);
-    }
-  }
-
-
-  speakText(textToSpeak: string) {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      utterance.volume = 1;
-      window.speechSynthesis.speak(utterance);
-    } else {
-      // Handle the case where the browser doesn't support speech synthesis
-      console.error('Speech synthesis is not supported in this browser.');
-    }
-  }
-
   getUnreadCount(userId: string): number {
     if (this.unreadCounts[userId]) {
       return this.unreadCounts[userId];
@@ -130,10 +70,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
     if (this.messageSub) {
       this.messageSub.unsubscribe();
-    }
-    // Stop any ongoing speech synthesis when the component is destroyed
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
     }
   }
 

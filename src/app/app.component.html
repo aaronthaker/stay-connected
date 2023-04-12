@@ -7,18 +7,23 @@
           <ion-list padding class="ion-text-center" id="welcome">
             <div class="profile-container">
               <a routerDirection="root" [routerLink]="['/profile']" lines="none" detail="false"
-                routerLinkActive="selected" class="profile-button" id="page-profile" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)">
+                routerLinkActive="selected" class="profile-button" id="page-profile" speakOnHover
+                [textToSpeak]="'My Profile'">
                 <ion-icon slot="start" ios="person-outline" md="person-sharp"></ion-icon>
               </a>
               <div>
-                <ion-title class="ion-text-center" id="page-stay-connected" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)">Stay Connected</ion-title>
-                <ion-label class="ion-text-center" id="page-welcome" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)" *ngIf="userIsAuthenticated">Welcome, {{
+                <ion-title class="ion-text-center" id="page-stay-connected" speakOnHover
+                  [textToSpeak]="'Stay Connected'">Stay Connected</ion-title>
+                <ion-label class="ion-text-center" id="page-welcome" speakOnHover
+                  [textToSpeak]="'Welcome, ' + (userName && userName.indexOf(' ') !== -1 ? userName.split(' ')[0] : userName)!"
+                  *ngIf="userIsAuthenticated">Welcome, {{
                   userName && userName.indexOf(' ') !== -1 ? userName.split(' ')[0] : userName
-                }}!</ion-label>
+                  }}!</ion-label>
               </div>
 
               <a routerDirection="root" [routerLink]="['/settings']" lines="none" detail="false"
-                routerLinkActive="selected" class="settings-button" id="page-settings" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)">
+                routerLinkActive="selected" class="settings-button" id="page-settings" speakOnHover
+                [textToSpeak]="'Settings'">
                 <ion-icon slot="start" ios="settings-outline" md="settings-sharp"></ion-icon>
               </a>
             </div>
@@ -32,7 +37,8 @@
                   <ion-item id="sidenav-ion-item">
                     <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
                       [md]="p.icon + '-outline'"></ion-icon>
-                    <ion-label id="page-{{ p.title }}" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)" class="page-title">{{ p.title }}</ion-label>
+                    <ion-label id="page-{{ p.title }}" speakOnHover [textToSpeak]="p.title" class="page-title">{{
+                      p.title }}</ion-label>
                   </ion-item>
                 </ion-item>
 
@@ -41,7 +47,7 @@
                   <ion-item id="sidenav-ion-item">
                     <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
                       [md]="p.icon + '-outline'"></ion-icon>
-                    <ion-label id="page-{{ p.title }}" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)" class="page-title">{{ p.title }}</ion-label>
+                    <ion-label id="page-{{ p.title }}" speakOnHover [textToSpeak]="p.title">{{ p.title }}</ion-label>
                     <ion-badge *ngIf="unreadMessagesCount > 0" slot="end">{{ unreadMessagesCount }}</ion-badge>
                   </ion-item>
                 </ion-item>
@@ -65,12 +71,13 @@
                   </ion-item>
                 </ion-item>
               </ng-container>
-                <ion-item lines="none" detail="false" class="sidenav-items" id="page-log-out" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)" [@fadeInOut]>
-                  <ion-item id="sidenav-ion-item" (click)="onLogout()">
-                    <ion-icon name="log-in-outline" slot="start"></ion-icon>
-                    <ion-label>Log Out</ion-label>
-                  </ion-item>
+              <ion-item lines="none" detail="false" class="sidenav-items" id="page-log-out" speakOnHover
+                [textToSpeak]="'Log Out'" [@fadeInOut]>
+                <ion-item id="sidenav-ion-item" (click)="onLogout()">
+                  <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                  <ion-label>Log Out</ion-label>
                 </ion-item>
+              </ion-item>
             </div>
           </div>
         </ion-list>

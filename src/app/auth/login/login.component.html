@@ -4,28 +4,28 @@
       <ion-col class="form-container">
         <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
         <form (submit)="onLogin(loginForm)" #loginForm="ngForm" *ngIf="!isLoading">
-            <h1 class="login-header" id="stay-connected">Stay Connected</h1>
-            <ion-button class="login-button" (mouseenter)="startHover('hover-onboarding')" (mouseleave)="stopHover()" (click)="speak('onboardingMessage')" style="width:100%;">Play Onboarding Message</ion-button>
-            <h1 class="login-header" id="login-text">Login</h1>
+            <h1 class="login-header" id="stay-connected" speakOnHover [textToSpeak]="'Stay Connected'">Stay Connected</h1>
+            <ion-button class="login-button" speakOnHover [textToSpeak]="'Click here to play the on-boarding message'" style="width:100%;">Play Onboarding Message</ion-button>
+            <h1 class="login-header" id="login-text" speakOnHover [textToSpeak]="'Login'">Login</h1>
           <!-- </div> -->
-          <ion-item class="input-container" (mouseenter)="startHover('email')" (mouseleave)="stopHover()">
+          <ion-item class="input-container input-f" speakOnHover [textToSpeak]="'Email input field'">
             <ion-label position="floating">Email</ion-label>
             <ion-input type="email" name="email" ngModel #emailInput="ngModel" required email
               clearInput="true"></ion-input>
             <ion-icon slot="start" name="mail-outline" class="input-icon"></ion-icon>
           </ion-item>
 
-          <ion-item class="input-container" (mouseenter)="startHover('password')" (mouseleave)="stopHover()">
+          <ion-item class="input-container input-f" speakOnHover [textToSpeak]="'Password input field'">
             <ion-label position="floating">Password</ion-label>
             <ion-input type="password" name="password" ngModel #passwordInput="ngModel"></ion-input>
             <ion-icon slot="start" name="lock-closed-outline" class="input-icon"></ion-icon>
           </ion-item>
 
-          <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+          <div class="error-message" *ngIf="errorMessage" speakOnHover [textToSpeak]="errorMessage">{{ errorMessage }}</div>
 
-          <ion-button type="submit" class="login-button" expand="block" (mouseenter)="startHover('login-button')" (mouseleave)="stopHover()">Login</ion-button>
+          <ion-button type="submit" class="login-button" expand="block" speakOnHover [textToSpeak]="'Login'">Login</ion-button>
 
-          <div class="signup-link-container" (mouseenter)="startHover('signup-message')" (mouseleave)="stopHover()">
+          <div class="signup-link-container" speakOnHover [textToSpeak]="'If you don\'t have an account, click here to sign up.'">
             Don't have an account? <a routerLink="/signup" class="signup-link">Sign up</a>
           </div>
         </form>

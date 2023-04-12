@@ -18,7 +18,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
   public userIsAuthenticated = false;
   userId: string | null;
 
-  constructor(public eventService: EventsService, private authService: AuthService, private datePipe: DatePipe) { }
+  constructor(public eventService: EventsService, private authService: AuthService, public datePipe: DatePipe) { }
 
   ngOnInit() {
     this.isLoading = true;

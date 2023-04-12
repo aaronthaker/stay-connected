@@ -21,7 +21,7 @@
   <ion-list class="message-list">
     <ion-item *ngFor="let message of messages; let i = index" [class.sent-message]="message.senderId === user._id"
       [class.received-message]="message.receiverId === user._id" [attr.data-index]="i"
-      [attr.id]="'message-' + i" (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave()">
+      [attr.id]="'message-' + i" speakOnHover [textToSpeak]="message.content">
       <div class="message-content">
         {{ message.content }}
       </div>

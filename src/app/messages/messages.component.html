@@ -7,37 +7,38 @@
         </ion-button>
       </ion-menu-toggle>
     </ion-buttons>
-    <ion-title id="matched-users-title" (mouseenter)="onMouseEnter($event.target)"
-      (mouseleave)="onMouseLeave($event.target)">Matched Users</ion-title>
+    <ion-title id="matched-users-title" speakOnHover [textToSpeak]="'Matched Users'">Matched Users</ion-title>
   </ion-toolbar>
 </ion-header>
 
 
 <ion-content class="ion-padding">
   <!-- <ion-button *ngIf="touchDevice" (click)="speakText('Matched Users')" size="small"></ion-button> -->
-    <ion-list *ngIf="matchedUsers.length > 0">
-      <ion-item (click)="onUserSelected(matchedUser)" *ngFor="let matchedUser of matchedUsers" class="user-item">
-        <ion-avatar slot="start" (click)="onUserProfileSelected(matchedUser._id); $event.stopPropagation()">
-          <img [src]="'http://localhost:3000/' + matchedUser.profileImage" class="users-profile-picture" />
-        </ion-avatar>
-        <ion-label>
-          <span id="matched-user-name-{{ matchedUser._id }}" class="speak-on-hover"
-          (mouseenter)="onMouseEnter($event.target)" (mouseleave)="onMouseLeave($event.target)">{{ matchedUser.name }}</span>
-        </ion-label>
-        <ion-badge *ngIf="getUnreadCount(matchedUser._id) > 0" slot="end">{{ getUnreadCount(matchedUser._id)
-          }}</ion-badge>
-        <ion-button slot="end" id="unmatchBtn" (click)="unmatchUser(matchedUser); $event.stopPropagation()" (mouseenter)="onMouseEnter($event.target)"
-        (mouseleave)="onMouseLeave($event.target)">Unmatch</ion-button>
-      </ion-item>
-    </ion-list>
+  <ion-list *ngIf="matchedUsers.length > 0">
+    <h2 speakOnHover [textToSpeak]="'Below is a list of users that you have matched with, and can now message.'">Below
+      is a list of users that you have matched with, and can now message.</h2>
+    <ion-item (click)="onUserSelected(matchedUser)" *ngFor="let matchedUser of matchedUsers" class="user-item">
+      <ion-avatar slot="start" (click)="onUserProfileSelected(matchedUser._id); $event.stopPropagation()">
+        <img [src]="'http://localhost:3000/' + matchedUser.profileImage" class="users-profile-picture" />
+      </ion-avatar>
+      <ion-label>
+        <span id="matched-user-name-{{ matchedUser._id }}" class="speak-on-hover" speakOnHover
+          [textToSpeak]="matchedUser.name">{{ matchedUser.name }}</span>
+      </ion-label>
+      <ion-badge *ngIf="getUnreadCount(matchedUser._id) > 0" slot="end">{{ getUnreadCount(matchedUser._id)
+        }}</ion-badge>
+      <ion-button slot="end" id="unmatchBtn" (click)="unmatchUser(matchedUser); $event.stopPropagation()" speakOnHover
+        [textToSpeak]="'Unmatch with ' + matchedUser.name">Unmatch</ion-button>
+    </ion-item>
+  </ion-list>
 
-    <div style="margin-top: 20px; text-align: center;" *ngIf="matchedUsers.length < 1">
-      <ion-title style="padding-bottom:10px;">No Matches Yet</ion-title>
-      <p>You haven't matched with any users yet.</p>
-      <p>Please go to the home page to like users. If you get a match, you'll be able to message them and they'll show
-        up
-        here.</p>
-      <ion-button routerLink="/home">Go to Home Page</ion-button>
-    </div>
+  <div style="margin-top: 20px; text-align: center;" *ngIf="matchedUsers.length < 1">
+    <ion-title style="padding-bottom:10px;">No Matches Yet</ion-title>
+    <p>You haven't matched with any users yet.</p>
+    <p>Please go to the home page to like users. If you get a match, you'll be able to message them and they'll show
+      up
+      here.</p>
+    <ion-button routerLink="/home">Go to Home Page</ion-button>
+  </div>
 
 </ion-content>

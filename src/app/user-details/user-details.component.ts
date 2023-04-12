@@ -136,26 +136,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/other-profile', userId]);
   }
 
-  @HostListener('mouseenter', ['$event.target'])
-  onMouseEnter(target: EventTarget | null) {
-    if (!this.touchDevice && target instanceof HTMLElement) {
-      const elementId = target.getAttribute('id');
-      if (elementId) {
-        clearTimeout(this.hoverTimeout);
-        this.hoverTimeout = setTimeout(() => {
-          this.speakElementText(elementId);
-        }, 1500);
-      }
-    }
-  }
-
-  @HostListener('mouseleave', ['$event.target'])
-  onMouseLeave(target: EventTarget | null) {
-    if (!this.touchDevice && target instanceof HTMLElement) {
-      clearTimeout(this.hoverTimeout);
-    }
-  }
-
   onListenToProfileClick() {
     if (this.displayedUser) {
       const profileText = `
@@ -163,45 +143,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         Location: ${this.displayedUser.location}.
         Bio: ${this.displayedUser.bio}.
       `;
-      this.speakText(profileText);
-    }
-  }
-
-  speakElementText(elementId: string) {
-    let textToSpeak = '';
-    switch (elementId) {
-      case 'location-span':
-        textToSpeak = this.displayedUser?.location!;
-        break;
-      case 'name':
-        textToSpeak = `${this.displayedUser?.name!}, ${this.displayedUser?.age!}`;
-        break;
-      case 'bio':
-        textToSpeak = this.displayedUser?.bio!;
-        break;
-      case 'match-message':
-        textToSpeak = 'You have common interests with this person!';
-        break;
-      case 'profileButton':
-        textToSpeak = `See ${this.displayedUser?.name!}'s full profile.`;
-        break;
-      case 'listenToProfileButton':
-        textToSpeak = `Listen to ${this.displayedUser?.name!}'s profile.`;
-        break;
-      case 'tick-button':
-        textToSpeak = 'Like';
-        break;
-      case 'cross-button':
-        textToSpeak = 'Dislike';
-        break;
-      case 'user-image':
-        textToSpeak = `An image of ${this.displayedUser?.name!}`;
-        break;
-      default:
-        break;
-    }
-    if (textToSpeak) {
-      this.speakText(textToSpeak);
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(profileText);
+        utterance.volume = 1;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        // Handle the case where the browser doesn't support speech synthesis
+        console.error('Speech synthesis is not supported in this browser.');
+      }
     }
   }
 

@@ -8,11 +8,13 @@
       </ion-menu-toggle>
     </ion-buttons>
     <div id="toolbar">
-      <ion-title>
+      <ion-title speakOnHover [textToSpeak]="'Events'">
         Events
       </ion-title>
-      <ion-button routerLink="create" style="padding: 0px 20px">Create Event</ion-button>
-      <app-voice-navigation-button></app-voice-navigation-button>
+      <ion-button routerLink="create" style="padding: 0px 20px" id="create-button" speakOnHover
+        [textToSpeak]="'Click here to Create an Event'">Create Event</ion-button>
+      <app-voice-navigation-button speakOnHover
+        [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -22,24 +24,30 @@
   <main *ngIf="events.length > 0 && !isLoading">
     <ion-card *ngFor="let event of events" id="event-card">
       <ion-item>
-        <ion-card-title>{{event.title}}</ion-card-title>
-        <ion-button fill="outline" (click)="readEventInfo(event)" slot="end" class="read-event-info-button">Read Event Info</ion-button>
+        <ion-card-title speakOnHover [textToSpeak]="event.title">{{event.title}}</ion-card-title>
+        <ion-button fill="outline" (click)="readEventInfo(event)" slot="end" class="read-event-info-button" speakOnHover
+          [textToSpeak]="'Click here to have the event details read aloud'">Read Event Info</ion-button>
       </ion-item>
       <ion-card-content>
-        <img *ngIf="event.imagePath" [src]="event.imagePath" alt="Event Image" class="event-image">
+        <img *ngIf="event.imagePath" speakOnHover [textToSpeak]="'Image of ' + event.title" [src]="event.imagePath"
+          alt="Event Image" class="event-image">
         <div id="card-stuff">
-          <ion-card-subtitle id="date-text">{{ event.date | date:'medium' }}</ion-card-subtitle>
-          <p id="description-text">{{event.description}}</p>
+          <ion-card-subtitle id="date-text" speakOnHover
+            [textToSpeak]="this.datePipe.transform(event.date, 'medium')">{{ event.date | date:'medium'
+            }}</ion-card-subtitle>
+          <p id="description-text" speakOnHover [textToSpeak]="event.description">{{event.description}}</p>
         </div>
       </ion-card-content>
-      <ion-label id="location-label"><ion-icon name="pin" slot="end"></ion-icon>{{ event.location }}</ion-label>
+      <ion-label id="location-label" speakOnHover [textToSpeak]="event.location"><ion-icon name="pin"
+          slot="end"></ion-icon>{{ event.location }}</ion-label>
       <ion-row *ngIf="userIsAuthenticated && userId === event.creator">
         <ion-col>
-          <ion-button fill="outline" [routerLink]="['/events/edit', event.id]" expand="block"
-            color="primary">Edit</ion-button>
+          <ion-button fill="outline" [routerLink]="['/events/edit', event.id]" expand="block" color="primary"
+            speakOnHover [textToSpeak]="'Edit'">Edit</ion-button>
         </ion-col>
         <ion-col>
-          <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id!)">Delete</ion-button>
+          <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id!)" speakOnHover
+            [textToSpeak]="'Delete'">Delete</ion-button>
         </ion-col>
       </ion-row>
     </ion-card>
@@ -47,7 +55,7 @@
 
   <main *ngIf="events.length === 0 && !isLoading">
     <ion-card>
-      <ion-card-content>
+      <ion-card-content id="no-events" speakOnHover [textToSpeak]="'There are no events set up yet'">
         <p style="text-align: center;">No events yet</p>
       </ion-card-content>
     </ion-card>
