@@ -17,6 +17,7 @@ import { PrivacyComponent } from './settings/privacy/privacy.component';
 import { SettingsComponent } from './settings/settings.component';
 import { OtherProfileComponent } from './other-profile/other-profile.component';
 import { UserDetailsComponent } from './user-details/user-details.component';
+import { MatchedUsersComponent } from './matched-users/matched-users.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -28,6 +29,11 @@ const routes: Routes = [
   {
     path: 'messages',
     component: MessagesComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'matched-users',
+    component: MatchedUsersComponent,
     canActivate: [AuthGuard]
   },
   {

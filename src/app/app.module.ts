@@ -38,6 +38,7 @@ import { DatePipe } from '@angular/common';
 import { A11yModule } from '@angular/cdk/a11y';
 import { VoiceNavigationButtonComponent } from './components/voice-navigation-button/voice-navigation-button.component';
 import { SpeakOnHoverDirective } from './speak-on-hover.directive';
+import { MatchedUsersComponent } from './matched-users/matched-users.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { SpeakOnHoverDirective } from './speak-on-hover.directive';
     LoginComponent,
     SignupComponent,
     MessagesComponent,
+    MatchedUsersComponent,
     ConversationComponent,
     ProfileComponent,
     SettingsComponent,

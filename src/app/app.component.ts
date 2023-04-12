@@ -38,8 +38,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public appPages = [
     { title: 'Meet People', url: '/home', icon: 'heart' },
-    { title: 'Messages', url: '/messages', icon: 'chatbox' },
-    { title: 'Events', url: '/events', icon: 'calendar' }
+    { title: 'Matched Users', url: '/matched-users', icon: 'chatbox' },
+    { title: 'Messages', url: '/messages', icon: 'people' },
+    { title: 'Events', url: '/events', icon: 'calendar' },
   ];
 
   private authListenerSubs: Subscription;
