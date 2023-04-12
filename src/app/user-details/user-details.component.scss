@@ -4,7 +4,12 @@ ion-content {
   --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
 }
 
-.location, img, .name, .bio, .match-message, ion-title {
+.location,
+img,
+.name,
+.bio,
+.match-message,
+ion-title {
   cursor: help;
 }
 
@@ -77,6 +82,7 @@ ion-footer ion-item {
 ion-button {
   margin-top: 1rem;
 }
+
 
 .match-message {
   background-color: rgb(70 133 73);
@@ -175,4 +181,13 @@ ion-grid {
   #cross-button ion-icon {
     font-size: 30px;
   }
+}
+
+.speak-flex {
+  display: inline-flex;
+  align-items: center;
+}
+
+.speak-button {
+  margin-left: 0.5rem;
 }

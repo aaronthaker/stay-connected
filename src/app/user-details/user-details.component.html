@@ -9,6 +9,8 @@
     </ion-buttons>
     <div id="toolbar">
       <ion-title speakOnHover [textToSpeak]="'Meet People'">Meet People</ion-title>
+      <ion-button *ngIf="touchDevice" (click)="speakText('Meet People')" size="small" slot="end"
+        class="speak-button">Speak</ion-button>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
@@ -37,7 +39,10 @@
       <ion-col size="12" size-md="6" class="image-col">
         <div class="location">
           <ion-icon name="location" style="color: white;"></ion-icon>
-          <span speakOnHover [textToSpeak]="displayedUser?.location">{{displayedUser?.location}}</span>
+          <span class="speak-flex" speakOnHover
+            [textToSpeak]="displayedUser?.location">{{displayedUser?.location}}<ion-button *ngIf="touchDevice"
+              (click)="speakText(displayedUser?.location + '')" size="small" slot="end"
+              class="speak-button">Speak</ion-button></span>
         </div>
         <div class="image-container">
           <img *ngIf="displayedUser?.profileImage" speakOnHover [textToSpeak]="'An image of ' + displayedUser?.name"
@@ -46,11 +51,14 @@
       </ion-col>
 
       <ion-col size="12" size-md="6" class="info-col">
-        <span class="name" speakOnHover [textToSpeak]="displayedUser?.name + ', ' + displayedUser?.age">
+        <span class="name speak-flex" speakOnHover [textToSpeak]="displayedUser?.name + ', ' + displayedUser?.age">
           {{displayedUser?.name}},
-          {{ displayedUser?.age }}</span>
-        <span class="bio" speakOnHover [textToSpeak]="displayedUser?.bio">
-          {{displayedUser?.bio}}</span>
+          {{ displayedUser?.age }}<ion-button *ngIf="touchDevice"
+            (click)="speakText(displayedUser?.name + ', ' + displayedUser?.age)" size="small" slot="end"
+            class="speak-button">Speak</ion-button></span>
+        <span class="bio speak-flex" speakOnHover [textToSpeak]="displayedUser?.bio">
+          {{displayedUser?.bio}}<ion-button *ngIf="touchDevice" (click)="speakText(displayedUser?.bio + '')"
+            size="small" slot="end" class="speak-button">Speak</ion-button></span>
 
         <div id="profile-buttons">
           <ion-button id="profileButton" (click)="onUserProfileSelected(displayedUser?._id!); $event.stopPropagation()"
