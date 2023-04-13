@@ -47,6 +47,12 @@ export class ProfileComponent implements OnInit {
     this.touchDevice = this.isTouchDevice();
   }
 
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+  }
+
   remove(interest: string): void {
     const index = this.interests.indexOf(interest);
 

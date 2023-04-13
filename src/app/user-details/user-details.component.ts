@@ -44,7 +44,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private messagesService: MessagesService,
     private userService: UserService,
     private router: Router,
-    private modalController: ModalController,
   ) { }
 
   ngOnInit() {
@@ -72,6 +71,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
     });
     this.touchDevice = this.isTouchDevice();
+  }
+
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
   }
 
   ngOnDestroy() {

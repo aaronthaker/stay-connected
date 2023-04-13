@@ -1,4 +1,11 @@
-ion-title, img, p, ion-input, ion-label, ion-text, ion-select, ion-select-option {
+ion-title,
+img,
+p,
+ion-input,
+ion-label,
+ion-text,
+ion-select,
+ion-select-option {
   cursor: help !important;
 }
 
@@ -46,4 +53,32 @@ input[type="file"] {
   color: green;
   text-align: center;
   margin-bottom: 10px;
+}
+
+.toolbar-dark-mode {
+  ion-toolbar {
+    background: black;
+    color: white;
+    border-bottom: 1px white solid;
+  }
+}
+
+.dark-mode {
+  background-color: black;
+
+  h1,
+  p,
+  ion-text,
+  ion-label,
+  ion-input {
+    color: white;
+  }
+
+  ion-card-content {
+    background-color: #3e3e3e;
+
+    ion-item {
+      border-bottom: 1px white solid;
+    }
+  }
 }

@@ -39,8 +39,10 @@ export class VoiceNavigationButtonComponent implements OnInit, OnDestroy {
     console.log(command)
     if (command.includes('events')) {
       this.router.navigate(['/events']);
-    } else if (command.includes('messages')) {
+    } else if (command.includes('messages') || command.includes('message') || command.includes('conversation') || command.includes('convo') || command.includes('convos')) {
       this.router.navigate(['/messages']);
+    } else if (command.includes('matched') || command.includes('match') || command.includes('matches') || command.includes('users')) {
+      this.router.navigate(['/matched-users']);
     } else if (command.includes('profile' || 'account')) {
       this.router.navigate(['/profile']);
     } else if (command.includes('settings')) {

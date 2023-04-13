@@ -80,6 +80,12 @@ export class AppComponent implements OnInit, OnDestroy {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+  }
+
   updateUnreadMessagesCount() {
     if (this.authService.getIsAuth()) {
       this.messagesService.getUnreadMessages().subscribe((messages) => {

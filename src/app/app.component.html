@@ -2,7 +2,7 @@
   <!-- Remove ng-container to show sidenav when not logged in -->
   <ng-container *ngIf="userIsAuthenticated">
     <ion-split-pane contentId="main-content" when="md">
-      <ion-menu class="sidemenu" id="top-level-menu" contentId="main-content" type="overlay">
+      <ion-menu class="sidemenu" id="top-level-menu" contentId="main-content" type="overlay" [class.dark-mode]="darkMode">
         <ion-list lines="full" id="meet-list">
           <ion-list padding class="ion-text-center" id="welcome">
             <div class="profile-container">
@@ -21,11 +21,7 @@
                   }}!</ion-label>
               </div>
 
-              <a routerDirection="root" [routerLink]="['/settings']" lines="none" detail="false"
-                routerLinkActive="selected" class="settings-button" id="page-settings" speakOnHover
-                [textToSpeak]="'Settings'">
-                <ion-icon slot="start" ios="settings-outline" md="settings-sharp"></ion-icon>
-              </a>
+              <ion-toggle id="page-settings" (ionChange)="toggleDarkMode()"></ion-toggle>
             </div>
           </ion-list>
 

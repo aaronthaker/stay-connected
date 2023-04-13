@@ -1,6 +1,7 @@
-<ion-header *ngIf="!touchDevice">
+<ion-header *ngIf="!touchDevice" [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
       <ion-menu-toggle>
         <ion-button>
           <ion-icon slot="icon-only" name="menu"></ion-icon>
@@ -11,6 +12,7 @@
       <ion-title speakOnHover [textToSpeak]="'Profile'">
         Profile
       </ion-title>
+      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
       <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode()" style="padding: 0px 20px">{{
         editMode ? 'Save' : 'Edit Profile' }}</ion-button>
       <app-voice-navigation-button speakOnHover
@@ -18,7 +20,7 @@
     </div>
   </ion-toolbar>
 </ion-header>
-<ion-header *ngIf="touchDevice">
+<ion-header *ngIf="touchDevice" [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
@@ -27,6 +29,7 @@
       Profile
     </ion-title>
     <ion-buttons slot="primary">
+      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
       <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode()" style="padding: 0px 20px">{{
         editMode ? 'Save' : 'Edit Profile' }}</ion-button>
     </ion-buttons>
@@ -37,7 +40,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" [class.dark-mode]="darkMode">
   <div class="profile-header">
 
     <img *ngIf="currentUser?.profileImage && !selectedImageFile; else previewImage"

@@ -4,7 +4,8 @@
   background-color: rgba(0, 0, 0, 0.25);
 }
 
-#page-profile:hover ion-icon, #page-settings:hover ion-icon {
+#page-profile:hover ion-icon,
+#page-settings:hover ion-icon {
   opacity: 0.4;
 }
 
@@ -85,11 +86,13 @@ ion-menu::part(container) {
 }
 
 @media only screen and (max-width: 768px) {
+
   /* styles for mobile and tablets */
   #top-level-menu {
     background: transparent;
   }
-  .profile-container{
+
+  .profile-container {
     justify-content: space-around;
   }
 
@@ -107,7 +110,8 @@ ion-menu::part(container) {
   background: #df1c6b;
 }
 
-.item.sc-ion-label-ios-h, .item .sc-ion-label-ios-h {
+.item.sc-ion-label-ios-h,
+.item .sc-ion-label-ios-h {
   color: white;
 }
 
@@ -128,7 +132,13 @@ ion-menu::part(container) {
   background-color: rgba(0, 0, 0, 0.25);
 }
 
-#page-log-out, #page-profile, #page-settings, .page-title, #page-welcome, #page-stay-connected, #page-Messages {
+#page-log-out,
+#page-profile,
+#page-settings,
+.page-title,
+#page-welcome,
+#page-stay-connected,
+#page-Messages {
   cursor: help !important;
 }
 
@@ -224,4 +234,31 @@ ion-menu.ios ion-note {
 
 ion-menu.ios ion-note {
   margin-bottom: 8px;
+}
+
+ion-toggle {
+  padding: 10px 0px;
+}
+
+.dark-mode {
+  border-right: 1px white solid;
+  background-color: black !important;
+
+  #meet-list {
+    background-color: black;
+  }
+
+  .selected {
+    background-color: lightgrey;
+    color: black;
+  }
+
+  .sidenav-container ion-item:hover {
+    background-color: white;
+
+    ion-label,
+    ion-icon {
+      color: black;
+    }
+  }
 }

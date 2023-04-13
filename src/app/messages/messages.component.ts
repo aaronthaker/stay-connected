@@ -74,6 +74,11 @@ export class MessagesComponent implements OnInit, ViewWillEnter {
       this.updateLastMessages();
     });
     this.initializeData();
+    this.touchDevice = this.isTouchDevice();
+  }
+
+  isTouchDevice(): boolean {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
   ngOnDestroy(): void {
@@ -153,6 +158,23 @@ export class MessagesComponent implements OnInit, ViewWillEnter {
 
   get currentUserId() {
     return this.messagesService.currentUserId;
+  }
+
+  speakText(textToSpeak: string) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      // Handle the case where the browser doesn't support speech synthesis
+      console.error('Speech synthesis is not supported in this browser.');
+    }
+  }
+
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
   }
 
 }

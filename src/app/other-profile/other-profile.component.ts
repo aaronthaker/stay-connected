@@ -25,4 +25,11 @@ export class OtherProfileComponent implements OnInit {
       this.otherUser = user;
     });
   }
+
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+  }
+
 }

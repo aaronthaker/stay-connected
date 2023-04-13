@@ -23,3 +23,32 @@
 .profile-card {
   margin-top: 1rem;
 }
+
+.toolbar-dark-mode {
+  ion-toolbar {
+    background: black;
+    color: white;
+    border-bottom: 1px white solid;
+  }
+}
+
+.dark-mode {
+  background-color: black;
+
+  h1,
+  p,
+  ion-text,
+  ion-label,
+  ion-input,
+  ion-card-title {
+    color: white;
+  }
+
+  ion-card-content, ion-card-header {
+    background-color: #3e3e3e;
+
+    ion-item {
+      border-bottom: 1px white solid;
+    }
+  }
+}

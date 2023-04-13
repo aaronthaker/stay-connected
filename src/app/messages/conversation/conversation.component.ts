@@ -108,6 +108,12 @@ export class ConversationComponent implements OnInit, OnDestroy {
     }
   }
 
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+  }
+
   sendMessage() {
     const message: Message = {
       id: null,

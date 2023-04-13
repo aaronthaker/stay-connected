@@ -179,6 +179,12 @@ ion-grid {
 }
 
 @media only screen and (max-width: 576px) {
+  ion-button {
+    margin-top: 0px;
+  }
+  .match-message {
+    margin-top: 0px;
+  }
 
   #tick-button ion-icon,
   #cross-button ion-icon {
@@ -193,4 +199,35 @@ ion-grid {
 
 .speak-button {
   margin-left: 0.5rem;
+}
+
+.dark-mode {
+  --background: #1c1c1c;
+}
+
+.footer-dark-mode {
+  ion-icon {
+    color: white;
+  }
+
+  #cross-button {
+    background: red !important;
+  }
+
+  #tick-button {
+    background-color: green;
+  }
+
+  #cross-button:hover, #tick-button:hover {
+    opacity: 0.5;
+  }
+
+}
+
+.toolbar-dark-mode {
+  ion-toolbar {
+    background: #1c1c1c;
+    color: white;
+    border-bottom: 1px white solid;
+  }
 }

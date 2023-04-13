@@ -69,6 +69,12 @@ export class EventsListComponent implements OnInit, OnDestroy {
     }
   }
 
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+  }
+
   isTouchDevice(): boolean {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }

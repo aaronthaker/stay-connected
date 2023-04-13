@@ -1,4 +1,4 @@
-<ion-header *ngIf="!touchDevice">
+<ion-header *ngIf="!touchDevice" [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-toggle>
@@ -11,13 +11,14 @@
       <ion-title speakOnHover [textToSpeak]="'Matched Users'">
         Matched Users
       </ion-title>
+      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-header *ngIf="touchDevice">
+<ion-header *ngIf="touchDevice" [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
@@ -26,13 +27,14 @@
       Matched Users
     </ion-title>
     <ion-buttons slot="end">
+      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" [class.dark-mode]="darkMode">
   <!-- <ion-button *ngIf="touchDevice" (click)="speakText('Matched Users')" size="small"></ion-button> -->
   <ion-list *ngIf="matchedUsers.length > 0">
     <h2 speakOnHover [textToSpeak]="'Below is a list of users that you have matched with, and can now message.'">Below

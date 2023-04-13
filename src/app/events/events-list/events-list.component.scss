@@ -1,3 +1,7 @@
+ion-content {
+  background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+}
+
 ion-title,
 ion-card-title,
 #create-button,
@@ -11,6 +15,10 @@ ion-label,
 
 main {
   width: 100%;
+}
+
+#create-button {
+  padding: 0px 20px;
 }
 
 mat-spinner {
@@ -116,5 +124,27 @@ ion-item {
     justify-content: space-between;
     width: 100%;
   }
+}
 
+.dark-mode {
+  background: #1c1c1c;
+  ion-card {
+    background: black !important;
+    border: 2px white solid;
+    box-shadow: 0px 0px 15px white;
+    ion-item {
+      border-bottom: 1px white solid;
+    }
+    ion-card-title, ion-card-subtitle, p, ion-label {
+      color: white !important;
+    }
+  }
+}
+
+.toolbar-dark-mode {
+  ion-toolbar {
+    background: #1c1c1c;
+    color: white;
+    border-bottom: 1px white solid;
+  }
 }

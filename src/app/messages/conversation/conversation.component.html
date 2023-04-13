@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/messages"></ion-back-button>
@@ -12,12 +12,13 @@
       <ion-title>
         {{ user?.name }}
       </ion-title>
+      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
       <ion-button slot="end" style="padding: 0px 20px" (click)="sayLastTenMessages()" [disabled]="messages.length === 0">Say last 10 messages</ion-button>
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content #content>
+<ion-content #content [class.dark-mode]="darkMode">
   <ion-list class="message-list">
     <ion-item *ngFor="let message of messages; let i = index" [class.sent-message]="message.senderId === user._id"
       [class.received-message]="message.receiverId === user._id" [attr.data-index]="i"

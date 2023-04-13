@@ -1,4 +1,4 @@
-<ion-header *ngIf="!touchDevice">
+<ion-header *ngIf="!touchDevice" [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-toggle>
@@ -11,7 +11,8 @@
       <ion-title speakOnHover [textToSpeak]="'Events'">
         Events
       </ion-title>
-      <ion-button routerLink="create" style="padding: 0px 20px" id="create-button" speakOnHover
+      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
+      <ion-button routerLink="create" id="create-button" speakOnHover
         [textToSpeak]="'Click here to Create an Event'">Create Event</ion-button>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
@@ -19,7 +20,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-header *ngIf="touchDevice">
+<ion-header *ngIf="touchDevice" [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
@@ -27,18 +28,19 @@
     <ion-title speakOnHover [textToSpeak]="'Events'">
       Events
     </ion-title>
-    <ion-buttons slot="primary">
-      <ion-button routerLink="create" style="padding: 0px 20px" id="create-button" speakOnHover
-        [textToSpeak]="'Click here to Create an Event'">Create Event</ion-button>
+    <ion-buttons slot="start">
+      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
     </ion-buttons>
-    <ion-buttons slot="end">
+      <ion-buttons slot="end">
+      <ion-button routerLink="create" id="create-button" speakOnHover
+        [textToSpeak]="'Click here to Create an Event'">Create Event</ion-button>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content style="background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%)">
+<ion-content [class.dark-mode]="darkMode">
   <mat-spinner *ngIf="isLoading"></mat-spinner>
   <main *ngIf="events.length > 0 && !isLoading">
     <ion-card *ngFor="let event of events" id="event-card">

@@ -41,3 +41,26 @@
   color: var(--ion-color-primary);
   font-weight: bold;
 }
+
+.toolbar-dark-mode {
+  ion-toolbar {
+    background: #1c1c1c;
+    color: white;
+    border-bottom: 1px white solid;
+  }
+}
+
+.dark-mode {
+  background: black;
+  h2, p {
+    color: white;
+  }
+  ion-item {
+    border-bottom: 1px white solid;
+  }
+  ion-item:hover {
+    h2, p {
+      color: black;
+    }
+  }
+}

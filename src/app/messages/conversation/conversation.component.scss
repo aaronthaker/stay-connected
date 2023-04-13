@@ -71,3 +71,31 @@
     flex-direction: row-reverse;
   }
 }
+
+.toolbar-dark-mode {
+  ion-toolbar {
+    background: #1c1c1c;
+    color: white;
+    border-bottom: 1px white solid;
+  }
+}
+
+.dark-mode {
+  background-color: black;
+  .sent-message {
+    background-color: black;
+    border: 1px white solid;
+    color: white;
+    .message-content {
+      border-bottom: 1px white solid;
+    }
+  }
+  .received-message {
+    background-color: white;
+    border: 1px black solid;
+    color: black;
+    .message-content {
+      border-bottom: 1px black solid;
+    }
+  }
+}

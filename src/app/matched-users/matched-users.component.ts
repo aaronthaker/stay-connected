@@ -52,6 +52,12 @@ export class MatchedUsersComponent implements OnInit {
     this.touchDevice = this.isTouchDevice();
   }
 
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+  }
+
   isTouchDevice(): boolean {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }

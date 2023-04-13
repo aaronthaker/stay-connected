@@ -14,3 +14,29 @@
   margin: 0px;
   font-size: 18px;
 }
+
+.dark-mode {
+  background: #1c1c1c;
+
+  ion-item {
+    border-bottom: 1px white solid;
+  }
+
+  ion-item:hover {
+    span {
+      color: black;
+    }
+  }
+
+  span, h2 {
+    color: white;
+  }
+}
+
+.toolbar-dark-mode {
+  ion-toolbar {
+    background: #1c1c1c;
+    color: white;
+    border-bottom: 1px white solid;
+  }
+}
