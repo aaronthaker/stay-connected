@@ -62,9 +62,11 @@ ion-menu {
 }
 
 @media only screen and (max-width: 768px) {
-  .toolbar-dark-mode {
-    ion-title {
-      color: black;
+  @supports (-webkit-touch-callout: none) {
+    .toolbar-dark-mode {
+      ion-title {
+        color: black;
+      }
     }
   }
 }

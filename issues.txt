@@ -1,6 +1,6 @@
 BEFORE COMPILE:
 Get demo ready
+Buttons to speak profile out loud
 
 Implement accessibility stuff:
-- High contrast mode / Implement accessibility settings pages
 - Noise every time a button is clicked
