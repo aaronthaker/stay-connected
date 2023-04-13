@@ -2,6 +2,5 @@ BEFORE COMPILE:
 Get demo ready
 
 Implement accessibility stuff:
-- High contrast mode - voice command (button on every screen to talk to?)
-- Noise every time a letter is input in messaging (OR BUTTON IS CLICKED)
-- Implement accessibility settings pages
+- High contrast mode / Implement accessibility settings pages
+- Noise every time a button is clicked
