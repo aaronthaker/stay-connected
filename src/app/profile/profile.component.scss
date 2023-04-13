@@ -63,6 +63,9 @@ input[type="file"] {
     background: black;
     color: white;
     border-bottom: 1px white solid;
+    ion-title {
+      color: white;
+    }
   }
 }
 

@@ -13,13 +13,15 @@
         Profile
       </ion-title>
       <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
-      <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode();playButtonSound();" style="padding: 0px 20px">{{
+      <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode();playButtonSound();"
+        style="padding: 0px 20px">{{
         editMode ? 'Save' : 'Edit Profile' }}</ion-button>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
   </ion-toolbar>
 </ion-header>
+
 <ion-header *ngIf="touchDevice" [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -28,12 +30,13 @@
     <ion-title speakOnHover [textToSpeak]="'Profile'">
       Profile
     </ion-title>
-    <ion-buttons slot="primary">
+    <ion-buttons slot="start">
       <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
-      <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode();playButtonSound();" style="padding: 0px 20px">{{
-        editMode ? 'Save' : 'Edit Profile' }}</ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
+      <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode();playButtonSound();"
+        style="padding: 0px 20px">{{
+        editMode ? 'Save' : 'Edit Profile' }}</ion-button>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </ion-buttons>
@@ -52,13 +55,16 @@
         class="profile-picture" speakOnHover [textToSpeak]="'Your new profile picture'">
     </ng-template>
 
-    <button mat-stroked-button type="button" (click)="filePicker.click();playButtonSound()" *ngIf="editMode" speakOnHover
-      [textToSpeak]="'Change Profile Picture'">Change Profile Picture</button>
+    <button mat-stroked-button type="button" (click)="filePicker.click();playButtonSound()" *ngIf="editMode"
+      speakOnHover [textToSpeak]="'Change Profile Picture'">Change Profile Picture</button>
     <input type="file" (change)="onImageSelected($event)" #filePicker class="image-upload" accept="image/*">
-    <h1 *ngIf="!touchDevice" class="profile-name" speakOnHover [textToSpeak]="currentUser?.name">{{ currentUser?.name }}</h1>
+    <h1 *ngIf="!touchDevice" class="profile-name" speakOnHover [textToSpeak]="currentUser?.name">{{ currentUser?.name }}
+    </h1>
     <div *ngIf="touchDevice" style="display: flex;align-items: center;justify-items: center;width:75%">
-      <h1 style="width: 80%;text-align: center;" class="profile-name" speakOnHover [textToSpeak]="currentUser?.name">{{ currentUser?.name }}</h1>
-      <ion-button (click)="speakText(currentUser.name + '');playButtonSound();" style="width:20%"><ion-icon name="volume-high"></ion-icon></ion-button>
+      <h1 style="width: 80%;text-align: center;" class="profile-name" speakOnHover [textToSpeak]="currentUser?.name">{{
+        currentUser?.name }}</h1>
+      <ion-button (click)="speakText(currentUser.name + '');playButtonSound();" style="width:20%"><ion-icon
+          name="volume-high"></ion-icon></ion-button>
     </div>
     <p class="profile-bio" *ngIf="!editMode && !touchDevice" speakOnHover [textToSpeak]="currentUser?.bio">
       {{currentUser?.bio}}
@@ -67,7 +73,8 @@
       <p class="profile-bio" speakOnHover [textToSpeak]="currentUser?.bio" style="width:85%">
         {{currentUser?.bio}}
       </p>
-      <ion-button (click)="speakText(currentUser.bio + '');playButtonSound();" style="width:15%"><ion-icon name="volume-high"></ion-icon></ion-button>
+      <ion-button (click)="speakText(currentUser.bio + '');playButtonSound();" style="width:15%"><ion-icon
+          name="volume-high"></ion-icon></ion-button>
     </div>
     <p class="profile-bio" *ngIf="editMode" speakOnHover [textToSpeak]="currentUser?.bio">
       <ion-input [(ngModel)]="currentUser.bio"></ion-input>
@@ -79,7 +86,8 @@
         <ion-item *ngIf="!editMode">
           <ion-label speakOnHover [textToSpeak]="'Name'">Name:</ion-label>
           <ion-text speakOnHover [textToSpeak]="currentUser?.name">{{ currentUser?.name }}
-            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.name + '');playButtonSound();" style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
+            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.name + '');playButtonSound();"
+              style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
           </ion-text>
         </ion-item>
 
@@ -92,21 +100,24 @@
         <ion-item *ngIf="!editMode">
           <ion-label speakOnHover [textToSpeak]="'Email'">Email:</ion-label>
           <ion-text speakOnHover [textToSpeak]="currentUser?.email">{{ currentUser?.email }}
-            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.email + '');playButtonSound();" style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
+            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.email + '');playButtonSound();"
+              style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
           </ion-text>
         </ion-item>
 
         <ion-item *ngIf="editMode">
           <ion-label speakOnHover [textToSpeak]="'Email'">Email:</ion-label>
           <ion-text speakOnHover [textToSpeak]="currentUser?.email">{{ currentUser?.email }}
-            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.email + '');playButtonSound();" style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
+            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.email + '');playButtonSound();"
+              style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
           </ion-text>
         </ion-item>
 
         <ion-item *ngIf="!editMode">
           <ion-label speakOnHover [textToSpeak]="'Age'">Age:</ion-label>
           <ion-text speakOnHover [textToSpeak]="currentUser?.age">{{ currentUser?.age }}
-            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.age + '');playButtonSound();" style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
+            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.age + '');playButtonSound();"
+              style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
           </ion-text>
         </ion-item>
 
@@ -127,14 +138,16 @@
         <ion-item *ngIf="!editMode">
           <ion-label speakOnHover [textToSpeak]="'Gender'">Gender:</ion-label>
           <ion-text speakOnHover [textToSpeak]="currentUser?.gender">{{ currentUser?.gender }}
-            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.gender + '');playButtonSound();" style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
+            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.gender + '');playButtonSound();"
+              style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
           </ion-text>
         </ion-item>
 
         <ion-item *ngIf="!editMode">
           <ion-label speakOnHover [textToSpeak]="'Location'">Location:</ion-label>
           <ion-text speakOnHover [textToSpeak]="currentUser?.location">{{ currentUser?.location }}
-            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.location + '');playButtonSound();" style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
+            <ion-button *ngIf="touchDevice" (click)="speakText(currentUser.location + '');playButtonSound();"
+              style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button>
           </ion-text>
         </ion-item>
 
@@ -149,7 +162,8 @@
             <ion-label speakOnHover [textToSpeak]="'Interests'">Interests:</ion-label>
             <mat-form-field appearance="outline" class="interest-input" style="padding-top: 1.25rem;">
               <input matInput placeholder="Add an interest" [formControl]="interestCtrl" [matAutocomplete]="auto">
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event.option.value);playButtonSound();">
+              <mat-autocomplete #auto="matAutocomplete"
+                (optionSelected)="selected($event.option.value);playButtonSound();">
                 <mat-option *ngFor="let suggestion of filteredInterests | async" [value]="suggestion" speakOnHover
                   [textToSpeak]="suggestion">
                   {{suggestion}}
@@ -160,7 +174,8 @@
 
           <ion-chip *ngFor="let interest of interests">
             <ion-label speakOnHover [textToSpeak]="interest">{{interest}}</ion-label>
-            <ion-icon name="close" (click)="remove(interest);playButtonSound();" speakOnHover [textToSpeak]="'remove'"></ion-icon>
+            <ion-icon name="close" (click)="remove(interest);playButtonSound();" speakOnHover
+              [textToSpeak]="'remove'"></ion-icon>
           </ion-chip>
         </div>
 
@@ -169,7 +184,8 @@
             <ion-label speakOnHover [textToSpeak]="'Interests'">Interests:</ion-label>
             <ion-input readonly="true" speakOnHover [textToSpeak]="interests.join(', ')">{{ interests.join(', ')
               }}
-              <ion-button *ngIf="touchDevice" (click)="speakText(interests.join(', ') + '');playButtonSound();" style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button></ion-input>
+              <ion-button *ngIf="touchDevice" (click)="speakText(interests.join(', ') + '');playButtonSound();"
+                style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button></ion-input>
           </ion-item>
         </div>
 

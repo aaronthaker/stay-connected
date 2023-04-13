@@ -60,13 +60,3 @@ ion-menu {
 #toolbar {
   display: flex;
 }
-
-@media only screen and (max-width: 768px) {
-  @supports (-webkit-touch-callout: none) {
-    .toolbar-dark-mode {
-      ion-title {
-        color: black;
-      }
-    }
-  }
-}
