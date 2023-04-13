@@ -47,6 +47,17 @@ export class ProfileComponent implements OnInit {
     this.touchDevice = this.isTouchDevice();
   }
 
+  speakText(textToSpeak: string) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      // Handle the case where the browser doesn't support speech synthesis
+      console.error('Speech synthesis is not supported in this browser.');
+    }
+  }
+
   darkMode = false;
 
   toggleDarkMode() {

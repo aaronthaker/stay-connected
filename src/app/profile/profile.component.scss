@@ -25,10 +25,13 @@ ion-select-option {
 
 .profile-name {
   margin-bottom: 0.5rem;
+  font-size: 28px;
 }
 
 .profile-bio {
   text-align: center;
+  font-size: 24px;
+  line-height: normal;
 }
 
 .profile-card {
@@ -81,4 +84,9 @@ input[type="file"] {
       border-bottom: 1px white solid;
     }
   }
+}
+
+.profile-card ion-card-content ion-text {
+  align-items: center;
+  display: flex;
 }
