@@ -1,6 +1,0 @@
-BEFORE COMPILE:
-Get demo ready
-Buttons to speak profile out loud
-
-Implement accessibility stuff:
-- Noise every time a button is clicked
