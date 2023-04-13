@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Event as MyEvent } from '../event.model';
 import { EventsService } from '../events.service';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-create-event',
@@ -24,7 +25,8 @@ export class CreateEventComponent implements OnInit {
   constructor(
     public eventService: EventsService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private soundService: SoundService
   ) { }
 
   ngOnInit() {
@@ -48,6 +50,10 @@ export class CreateEventComponent implements OnInit {
         this.eventId = null;
       }
     });
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   onImagePicked(event: Event) {

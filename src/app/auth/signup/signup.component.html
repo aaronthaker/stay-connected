@@ -4,7 +4,7 @@
       <ion-col class="form-container">
         <form (submit)="onSignup(signupForm)" #signupForm="ngForm" *ngIf="!isLoading">
           <h1 class="signup-header" id="stay-connected">Stay Connected</h1>
-          <ion-button class="login-button" speakOnHover [textToSpeak]="'Click here to play the on-boarding message'" (click)="speak('onboardingMessage')" style="width:100%;">Play Onboarding Message</ion-button>
+          <ion-button class="login-button" speakOnHover [textToSpeak]="'Click here to play the on-boarding message'" (click)="speak('onboardingMessage');playButtonSound();" style="width:100%;">Play Onboarding Message</ion-button>
           <h1 class="signup-header" id="sign-up-text" speakOnHover [textToSpeak]="'Sign up'">Sign Up</h1>
 
           <ion-item style="display: flex;align-items: center;" class="input-container" speakOnHover [textToSpeak]="'Please input an email address for your Stay Connected account.'">
@@ -22,10 +22,10 @@
 
           <!-- <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div> -->
 
-          <ion-button type="submit" class="signup-button" expand="block" speakOnHover [textToSpeak]="'Sign up'">Sign Up</ion-button>
+          <ion-button type="submit" class="signup-button" expand="block" speakOnHover [textToSpeak]="'Sign up'" (click)="playButtonSound()">Sign Up</ion-button>
 
           <div class="signup-link-container" speakOnHover [textToSpeak]="'If you already have an account, click here to sign in.'">
-            Already have an account? <a routerLink="/login" class="signup-link">Login</a>
+            Already have an account? <a routerLink="/login" class="signup-link" (click)="playButtonSound();">Login</a>
           </div>
         </form>
 

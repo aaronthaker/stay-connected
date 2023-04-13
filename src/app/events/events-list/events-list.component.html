@@ -11,9 +11,9 @@
       <ion-title speakOnHover [textToSpeak]="'Events'">
         Events
       </ion-title>
-      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
+      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <ion-button routerLink="create" id="create-button" speakOnHover
-        [textToSpeak]="'Click here to Create an Event'">Create Event</ion-button>
+        [textToSpeak]="'Click here to Create an Event'" (click)="playButtonSound()">Create Event</ion-button>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
@@ -29,9 +29,9 @@
       Events
     </ion-title>
     <ion-buttons slot="start">
-      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
+      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
     </ion-buttons>
-      <ion-buttons slot="end">
+    <ion-buttons slot="end">
       <ion-button routerLink="create" id="create-button" speakOnHover
         [textToSpeak]="'Click here to Create an Event'">Create Event</ion-button>
       <app-voice-navigation-button speakOnHover
@@ -47,7 +47,7 @@
       <ion-item id="card-title">
         <div class="title-button-container">
           <ion-card-title speakOnHover [textToSpeak]="event.title">{{event.title}}</ion-card-title>
-          <ion-button fill="outline" (click)="readEventInfo(event)" size="large" slot="end"
+          <ion-button fill="outline" (click)="readEventInfo(event);playButtonSound();" size="large" slot="end"
             class="read-event-info-button" speakOnHover
             [textToSpeak]="'Click here to have the event details read aloud'" id="readEventInfo">
             <ion-icon name="volume-high"></ion-icon>
@@ -69,10 +69,10 @@
       <ion-row *ngIf="userIsAuthenticated && userId === event.creator">
         <ion-col>
           <ion-button fill="outline" [routerLink]="['/events/edit', event.id]" expand="block" color="primary"
-            speakOnHover [textToSpeak]="'Edit'">Edit</ion-button>
+            speakOnHover [textToSpeak]="'Edit'" (click)="playButtonSound();">Edit</ion-button>
         </ion-col>
         <ion-col>
-          <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id!)" speakOnHover
+          <ion-button fill="outline" expand="block" color="danger" (click)="onDelete(event.id!);playButtonSound();" speakOnHover
             [textToSpeak]="'Delete'">Delete</ion-button>
         </ion-col>
       </ion-row>

@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   onboardingMessage = "Welcome to the Stay Connected login screen. To access your account, please enter your email and password in the provided fields. If you need assistance, you can hover over any part of the form and have the information red aloud to you. To enable this feature, simply hover over the input fields, buttons, or links for 2 seconds, and a description will be spoken. Once you have filled in your details, click the 'Login' button to enter the application. If you don't have an account yet, click the 'Sign up' link at the bottom of the form to register for a new account.";
   constructor(
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private soundService: SoundService,
   ) { }
 
   ngOnInit() {
@@ -78,8 +80,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       utterance.text = 'Do you not have an account? Click here to sign up.';
     } else if (field === 'hover-onboarding') {
       utterance.text = 'Click here to play the onboarding message.';
+    } else {
+      utterance.text = field;
     }
     synth.speak(utterance);
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
 }

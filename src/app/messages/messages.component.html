@@ -11,7 +11,7 @@
       <ion-title speakOnHover [textToSpeak]="'Messages'">
         Messages
       </ion-title>
-      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
+      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
@@ -27,7 +27,7 @@
       Messages
     </ion-title>
     <ion-buttons slot="end">
-      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
+      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </ion-buttons>
@@ -38,7 +38,7 @@
   <ion-list>
     <ion-item *ngFor="let conversation of conversations"
       [routerLink]="['/conversation', conversation.contact._id]"
-      class="conversation-item">
+      class="conversation-item" (click)="playButtonSound()">
       <ion-avatar slot="start">
         <img [src]="'http://localhost:3000/' + conversation.contact.profileImage" />
       </ion-avatar>

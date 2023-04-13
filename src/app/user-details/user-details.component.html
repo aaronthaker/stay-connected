@@ -9,9 +9,9 @@
     </ion-buttons>
     <div id="toolbar">
       <ion-title speakOnHover [textToSpeak]="'Meet People'">Meet People</ion-title>
-      <ion-button *ngIf="touchDevice" (click)="speakText('Meet People')" size="small" slot="end"
+      <ion-button *ngIf="touchDevice" (click)="speakText('Meet People');playButtonSound()" size="small" slot="end"
         class="speak-button">Speak</ion-button>
-        <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
+        <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
@@ -27,7 +27,7 @@
       Meet People
     </ion-title>
     <ion-buttons slot="end">
-      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
+      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound()"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </ion-buttons>
@@ -43,7 +43,7 @@
           <ion-icon name="location" style="color: white;"></ion-icon>
           <span class="speak-flex" speakOnHover
             [textToSpeak]="displayedUser?.location">{{displayedUser?.location}}<ion-button *ngIf="touchDevice"
-              (click)="speakText(displayedUser?.location + '')" size="small" slot="end"
+              (click)="speakText(displayedUser?.location + '');playButtonSound();" size="small" slot="end"
               class="speak-button">Speak</ion-button></span>
         </div>
         <div class="image-container">
@@ -63,11 +63,11 @@
             size="small" slot="end" class="speak-button">Speak</ion-button></span>
 
         <div id="profile-buttons">
-          <ion-button id="profileButton" (click)="onUserProfileSelected(displayedUser?._id!); $event.stopPropagation()"
+          <ion-button id="profileButton" (click)="onUserProfileSelected(displayedUser?._id!); $event.stopPropagation();playButtonSound();"
             speakOnHover [textToSpeak]="'Click here to see' + displayedUser?.name + '\'s full profile'">
             See full profile
           </ion-button>
-          <ion-button id="listenToProfileButton" (click)="onListenToProfileClick()" speakOnHover
+          <ion-button id="listenToProfileButton" (click)="onListenToProfileClick();playButtonSound();" speakOnHover
             [textToSpeak]="'Click here to listen to '  + displayedUser?.name + '\'s full profile'">
             Listen to Profile <ion-icon name="volume-high" style="margin-left: 5px;"></ion-icon>
           </ion-button>
@@ -107,11 +107,11 @@
   <ion-toolbar>
     <ion-item class="ion-no-padding">
       <div id="buttons-div">
-        <ion-button (click)="onCrossClick(displayedUser)" fill="clear" color="danger" id="cross-button" size="large"
+        <ion-button (click)="onCrossClick(displayedUser);playButtonSound();" fill="clear" color="danger" id="cross-button" size="large"
           speakOnHover [textToSpeak]="'Dislike'">
           <ion-icon name="close-circle-outline"></ion-icon>
         </ion-button>
-        <ion-button (click)="onTickClick(displayedUser)" fill="clear" color="success" id="tick-button" size="large"
+        <ion-button (click)="onTickClick(displayedUser);playButtonSound();" fill="clear" color="success" id="tick-button" size="large"
           speakOnHover [textToSpeak]="'Like'">
           <ion-icon name="heart-outline"></ion-icon>
         </ion-button>

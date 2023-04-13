@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-voice-navigation-button',
@@ -11,7 +12,7 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 export class VoiceNavigationButtonComponent implements OnInit, OnDestroy {
   private recognition: any;
 
-  constructor(private router: Router, private liveAnnouncer: LiveAnnouncer) {
+  constructor(private router: Router, private liveAnnouncer: LiveAnnouncer, private soundService: SoundService) {
     this.recognition = new (window as any).webkitSpeechRecognition();
     this.recognition.lang = 'en-US';
     this.recognition.interimResults = false;
@@ -24,6 +25,10 @@ export class VoiceNavigationButtonComponent implements OnInit, OnDestroy {
       const command = event.results[last][0].transcript.trim().toLowerCase();
       this.handleVoiceCommand(command);
     };
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   ngOnDestroy(): void {

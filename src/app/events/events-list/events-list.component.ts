@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { Event } from '../event.model';
 import { EventsService } from '../events.service';
 import { DatePipe } from '@angular/common';
+import { SoundService } from 'src/app/sound.service';
 @Component({
   selector: 'app-events-list',
   templateUrl: './events-list.component.html',
@@ -19,7 +20,12 @@ export class EventsListComponent implements OnInit, OnDestroy {
   userId: string | null;
   touchDevice: boolean;
 
-  constructor(public eventService: EventsService, private authService: AuthService, public datePipe: DatePipe) { }
+  constructor(
+    public eventService: EventsService,
+    private authService: AuthService,
+    public datePipe: DatePipe,
+    public soundService: SoundService,
+    ) { }
 
   ngOnInit() {
     this.isLoading = true;
@@ -67,6 +73,10 @@ export class EventsListComponent implements OnInit, OnDestroy {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   darkMode = false;

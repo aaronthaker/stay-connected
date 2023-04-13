@@ -6,6 +6,7 @@ import { Message } from '../message.model';
 import { User } from 'src/app/users/user.model';
 import { AnimationController, IonContent } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-conversation',
@@ -25,6 +26,7 @@ export class ConversationComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     public messagesService: MessagesService,
     private userService: UserService,
+    private soundService: SoundService,
     private animationCtrl: AnimationController
   ) {
     this.touchDevice = this.isTouchDevice();
@@ -106,6 +108,10 @@ export class ConversationComponent implements OnInit, OnDestroy {
     if (messageIds.length > 0) {
       this.messagesService.updateUnreadMessagesCount(messageIds);
     }
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   darkMode = false;

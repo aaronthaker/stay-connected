@@ -7,6 +7,7 @@ import { MessagesService } from './messages/messages.service';
 import { SharedService } from './shared.service';
 import { ModalController } from '@ionic/angular';
 import { ConfirmLogoutModalComponent } from './confirm-logout-modal/confirm-logout-modal.component';
+import { SoundService } from './sound.service';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +34,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
     private messagesService: MessagesService,
     private sharedService: SharedService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private soundService: SoundService
   ) { }
 
   public appPages = [
@@ -74,6 +76,10 @@ export class AppComponent implements OnInit, OnDestroy {
       this.updateUnreadMessagesCount();
     });
     this.touchDevice = this.isTouchDevice();
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   isTouchDevice(): boolean {

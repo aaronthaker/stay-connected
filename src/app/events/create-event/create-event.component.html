@@ -2,7 +2,7 @@
   <ion-header>
     <ion-toolbar>
       <div style="display: flex;margin-right: 1rem;">
-        <ion-back-button defaultHref="/events"></ion-back-button>
+        <ion-back-button defaultHref="/events" (click)="playButtonSound()"></ion-back-button>
         <ion-title>
           Create Event
         </ion-title>
@@ -12,7 +12,7 @@
 
   <ion-card class="event-card">
     <mat-spinner *ngIf="isLoading"></mat-spinner>
-    <form (submit)="onSaveEvent(eventForm)" #eventForm="ngForm" *ngIf="!isLoading">
+    <form (submit)="onSaveEvent(eventForm);playButtonSound();" #eventForm="ngForm" *ngIf="!isLoading">
 
       <ion-item>
         <ion-label position="floating">Event Title:</ion-label>

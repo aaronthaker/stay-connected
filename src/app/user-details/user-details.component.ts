@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { MessagesService } from 'src/app/messages/messages.service';
 import { User } from 'src/app/users/user.model';
 import { UserService } from 'src/app/users/users.service';
+import { SoundService } from '../sound.service';
 
 @Component({
   selector: 'app-user-details',
@@ -44,6 +45,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private messagesService: MessagesService,
     private userService: UserService,
     private router: Router,
+    private soundService: SoundService
   ) { }
 
   ngOnInit() {
@@ -71,6 +73,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
     });
     this.touchDevice = this.isTouchDevice();
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   darkMode = false;

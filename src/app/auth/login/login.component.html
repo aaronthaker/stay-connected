@@ -6,7 +6,7 @@
         <form (submit)="onLogin(loginForm)" #loginForm="ngForm" *ngIf="!isLoading">
           <h1 class="login-header" id="stay-connected" speakOnHover [textToSpeak]="'Stay Connected'">Stay Connected</h1>
           <ion-button class="login-button" speakOnHover [textToSpeak]="'Click here to play the on-boarding message'"
-            style="width:100%;">Play Onboarding Message</ion-button>
+            style="width:100%;" (click)="playButtonSound();speak('Welcome to Stay Connected. Please log in here.')">Play Onboarding Message</ion-button>
           <h1 class="login-header" id="login-text" speakOnHover [textToSpeak]="'Login'">Login</h1>
 
           <ion-item style="display: flex;align-items: center;" class="input-container input-f" speakOnHover
@@ -28,11 +28,11 @@
           </div>
 
           <ion-button type="submit" class="login-button" expand="block" speakOnHover
-            [textToSpeak]="'Login'">Login</ion-button>
+            [textToSpeak]="'Login'" (click)="playButtonSound()">Login</ion-button>
 
           <div class="signup-link-container" speakOnHover
             [textToSpeak]="'If you don\'t have an account, click here to sign up.'">
-            Don't have an account? <a routerLink="/signup" class="signup-link">Sign up</a>
+            Don't have an account? <a routerLink="/signup" class="signup-link" (click)="playButtonSound();">Sign up</a>
           </div>
         </form>
 

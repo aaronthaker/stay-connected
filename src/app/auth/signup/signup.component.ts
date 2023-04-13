@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-signup',
@@ -14,7 +15,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   private hoverTimeout: any;
   onboardingMessage = "Welcome to the Stay Connected signup screen. To create an account, please enter your email and password in the provided fields. If you need assistance, you can hover over any part of the form and have the information red aloud to you. To enable this feature, simply hover over the input fields, buttons, or links for 2 seconds, and a description will be spoken. Once you have filled in your details, click the 'Sign Up' button to complete the registration process. If you already have an account, click the 'Login' link at the bottom of the form to return to the login screen.";
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private soundService: SoundService) { }
 
   ngOnInit() {
     this.authStatusSub = this.authService.getAuthStatusListener().subscribe(
@@ -68,4 +69,9 @@ export class SignupComponent implements OnInit, OnDestroy {
     }
     synth.speak(utterance);
   }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
+  }
+
 }

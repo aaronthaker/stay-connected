@@ -16,12 +16,12 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <ion-button (click)="dismiss(false)" color="primary" expand="block" speakOnHover [textToSpeak]="'Cancel'">
+        <ion-button (click)="dismiss(false);playButtonSound();" color="primary" expand="block" speakOnHover [textToSpeak]="'Cancel'">
           Cancel
         </ion-button>
       </ion-col>
       <ion-col>
-        <ion-button (click)="dismiss(true)" color="danger" expand="block" speakOnHover [textToSpeak]="'Log Out'">
+        <ion-button (click)="dismiss(true);playButtonSound();" color="danger" expand="block" speakOnHover [textToSpeak]="'Log Out'">
           Log Out
         </ion-button>
       </ion-col>

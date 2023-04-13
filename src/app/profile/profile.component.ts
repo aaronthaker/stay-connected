@@ -5,6 +5,7 @@ import { UserService } from '../users/users.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { SoundService } from '../sound.service';
 
 @Component({
   selector: 'app-profile',
@@ -29,6 +30,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private messagesService: MessagesService,
+    private soundService: SoundService,
     private userService: UserService,
   ) {
     this.timestamp = new Date().getTime();
@@ -45,6 +47,10 @@ export class ProfileComponent implements OnInit {
       map((interest: string | null) => interest ? this._filter(interest) : this.allInterests.slice())
     );
     this.touchDevice = this.isTouchDevice();
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   speakText(textToSpeak: string) {

@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { User } from '../users/user.model';
 import { UserService } from '../users/users.service';
 import { ViewWillEnter } from '@ionic/angular';
+import { SoundService } from '../sound.service';
 
 @Component({
   selector: 'app-messages',
@@ -28,7 +29,11 @@ export class MessagesComponent implements OnInit, ViewWillEnter {
   unreadCounts: { [userId: string]: number } = {};
   touchDevice: boolean;
 
-  constructor(public messagesService: MessagesService, public userService: UserService,) { }
+  constructor(
+    public messagesService: MessagesService,
+    public userService: UserService,
+    private soundService: SoundService
+    ) { }
 
   ngOnInit(): void {
     this.userSub = this.userService.getUsers().subscribe(users => {
@@ -158,6 +163,10 @@ export class MessagesComponent implements OnInit, ViewWillEnter {
 
   get currentUserId() {
     return this.messagesService.currentUserId;
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   speakText(textToSpeak: string) {

@@ -7,6 +7,7 @@ import { MessagesService } from '../messages/messages.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { SharedService } from '../shared.service';
+import { SoundService } from '../sound.service';
 
 @Component({
   selector: 'app-matched-users',
@@ -31,6 +32,7 @@ export class MatchedUsersComponent implements OnInit {
     public messagesService: MessagesService,
     private router: Router,
     private authService: AuthService,
+    private soundService: SoundService,
     private sharedService: SharedService
   ) { }
 
@@ -50,6 +52,10 @@ export class MatchedUsersComponent implements OnInit {
       this.updateUnreadCounts();
     });
     this.touchDevice = this.isTouchDevice();
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   darkMode = false;

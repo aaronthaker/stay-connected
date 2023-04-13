@@ -6,7 +6,7 @@
         <ion-list lines="full" id="meet-list">
           <ion-list padding class="ion-text-center" id="welcome">
             <div class="profile-container">
-              <a routerDirection="root" [routerLink]="['/profile']" lines="none" detail="false"
+              <a routerDirection="root" (click)="playButtonSound()" [routerLink]="['/profile']" lines="none" detail="false"
                 routerLinkActive="selected" class="profile-button" id="page-profile" speakOnHover
                 [textToSpeak]="'My Profile'">
                 <ion-icon slot="start" ios="person-outline" md="person-sharp"></ion-icon>
@@ -21,7 +21,7 @@
                   }}!</ion-label>
               </div>
 
-              <ion-toggle id="page-settings" (ionChange)="toggleDarkMode()"></ion-toggle>
+              <ion-toggle id="page-settings" (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
             </div>
           </ion-list>
 
@@ -69,7 +69,7 @@
               </ng-container>
               <ion-item lines="none" detail="false" class="sidenav-items" id="page-log-out" speakOnHover
                 [textToSpeak]="'Log Out'" [@fadeInOut]>
-                <ion-item id="sidenav-ion-item" (click)="onLogout()">
+                <ion-item id="sidenav-ion-item" (click)="onLogout();playButtonSound();">
                   <ion-icon name="log-in-outline" slot="start"></ion-icon>
                   <ion-label>Log Out</ion-label>
                 </ion-item>
