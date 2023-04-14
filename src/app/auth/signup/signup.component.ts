@@ -74,4 +74,10 @@ export class SignupComponent implements OnInit, OnDestroy {
     this.soundService.playSound(440, 0.3);
   }
 
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+  }
+
 }

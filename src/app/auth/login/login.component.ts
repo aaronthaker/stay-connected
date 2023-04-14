@@ -86,6 +86,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     synth.speak(utterance);
   }
 
+  darkMode = false;
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+  }
+
   playButtonSound() {
     this.soundService.playSound(440, 0.3);
   }

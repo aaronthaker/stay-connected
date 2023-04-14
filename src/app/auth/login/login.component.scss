@@ -1,5 +1,70 @@
-#stay-connected, #login-text, .input-f, .error-message, .login-button, .signup-link-container {
+#stay-connected,
+#login-text,
+.input-f,
+.error-message,
+.login-button,
+.signup-link-container {
   cursor: help !important;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+  left: 80%; // Position tooltip to the right of the ion-toggle
+  top: 62px; // Vertically center the tooltip
+  transform: translateY(-50%); // Adjust the vertical position
+
+  // Arrow pointing to the ion-toggle
+  &:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent rgba(0, 0, 0, 0.7) transparent transparent;
+  }
+}
+
+ion-toggle:hover + .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.dark-mode {
+  ion-grid {
+    background-color: #585858;
+    ion-col{
+      background-color: black;
+      border: 2px white solid;
+      .tooltip {
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+    &:after {
+      border-color: transparent white transparent transparent;
+    }
+      }
+      .login-button {
+        --background: #00006a;
+        border: 2px white solid;
+      }
+      ion-icon, h1, ion-label, .signup-link-container, a, ion-input {
+        color: white;
+      }
+      .input-container {
+        --border-color: white;
+      }
+    }
+  }
 }
 
 .login-container {
@@ -25,6 +90,7 @@ form {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -43,7 +109,7 @@ form {
   animation: fadeInDown 1s ease-in-out;
 }
 
-#form-row{
+#form-row {
   max-width: 100%;
   width: 50rem;
 }
