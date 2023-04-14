@@ -11,7 +11,8 @@
       <ion-title speakOnHover [textToSpeak]="'Matched Users'">
         Matched Users
       </ion-title>
-      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+      <ion-toggle speakOnHover [textToSpeak]="'Toggle high contrast mode'"
+        (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
@@ -27,7 +28,8 @@
       Matched Users
     </ion-title>
     <ion-buttons slot="end">
-      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+      <ion-toggle speakOnHover [textToSpeak]="'Toggle high contrast mode'"
+        (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </ion-buttons>
@@ -39,8 +41,10 @@
   <ion-list *ngIf="matchedUsers.length > 0">
     <h2 speakOnHover [textToSpeak]="'Below is a list of users that you have matched with, and can now message.'">Below
       is a list of users that you have matched with, and can now message.</h2>
-    <ion-item (click)="onUserSelected(matchedUser);playButtonSound();" *ngFor="let matchedUser of matchedUsers" class="user-item">
-      <ion-avatar slot="start" (click)="onUserProfileSelected(matchedUser._id);playButtonSound(); $event.stopPropagation()">
+    <ion-item (click)="onUserSelected(matchedUser);playButtonSound();" *ngFor="let matchedUser of matchedUsers"
+      class="user-item">
+      <ion-avatar slot="start"
+        (click)="onUserProfileSelected(matchedUser._id);playButtonSound(); $event.stopPropagation()">
         <img [src]="'http://localhost:3000/' + matchedUser.profileImage" class="users-profile-picture" />
       </ion-avatar>
       <ion-label>
@@ -49,7 +53,8 @@
       </ion-label>
       <ion-badge *ngIf="getUnreadCount(matchedUser._id) > 0" slot="end">{{ getUnreadCount(matchedUser._id)
         }}</ion-badge>
-      <ion-button slot="end" id="unmatchBtn" (click)="unmatchUser(matchedUser);playButtonSound(); $event.stopPropagation()" speakOnHover
+      <ion-button slot="end" id="unmatchBtn"
+        (click)="unmatchUser(matchedUser);playButtonSound(); $event.stopPropagation()" speakOnHover
         [textToSpeak]="'Unmatch with ' + matchedUser.name">Unmatch</ion-button>
     </ion-item>
   </ion-list>

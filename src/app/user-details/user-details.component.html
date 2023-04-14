@@ -11,7 +11,8 @@
       <ion-title speakOnHover [textToSpeak]="'Meet People'">Meet People</ion-title>
       <ion-button *ngIf="touchDevice" (click)="speakText('Meet People');playButtonSound()" size="small" slot="end"
         class="speak-button">Speak</ion-button>
-        <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+        <ion-toggle speakOnHover
+        [textToSpeak]="'Toggle high contrast mode'" (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
@@ -27,7 +28,8 @@
       Meet People
     </ion-title>
     <ion-buttons slot="end">
-      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound()"></ion-toggle>
+      <ion-toggle speakOnHover
+        [textToSpeak]="'Toggle High Constrast Mode'" (ionChange)="toggleDarkMode();playButtonSound()"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </ion-buttons>

@@ -11,7 +11,8 @@
       <ion-title speakOnHover [textToSpeak]="'Events'">
         Events
       </ion-title>
-      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+      <ion-toggle speakOnHover
+      [textToSpeak]="'Toggle high contrast mode'" (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <ion-button routerLink="create" id="create-button" speakOnHover
         [textToSpeak]="'Click here to Create an Event'" (click)="playButtonSound()">Create Event</ion-button>
       <app-voice-navigation-button speakOnHover
@@ -29,7 +30,8 @@
       Events
     </ion-title>
     <ion-buttons slot="start">
-      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+      <ion-toggle speakOnHover
+      [textToSpeak]="'Toggle high contrast mode'" (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button routerLink="create" id="create-button" speakOnHover

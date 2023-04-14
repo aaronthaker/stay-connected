@@ -12,7 +12,8 @@
       <ion-title speakOnHover [textToSpeak]="'Profile'">
         Profile
       </ion-title>
-      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+      <ion-toggle speakOnHover [textToSpeak]="'Toggle high contrast mode'"
+        (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
       <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode();playButtonSound();"
         style="padding: 0px 20px">{{
         editMode ? 'Save' : 'Edit Profile' }}</ion-button>
@@ -31,7 +32,8 @@
       Profile
     </ion-title>
     <ion-buttons slot="start">
-      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+      <ion-toggle speakOnHover [textToSpeak]="'Toggle high contrast mode'"
+        (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode();playButtonSound();"

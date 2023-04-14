@@ -2,18 +2,20 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/messages" (click)="playButtonSound();"></ion-back-button>
-        <ion-menu-toggle>
-          <ion-button>
-            <ion-icon slot="icon-only" name="menu"></ion-icon>
-          </ion-button>
-        </ion-menu-toggle>
+      <ion-menu-toggle>
+        <ion-button>
+          <ion-icon slot="icon-only" name="menu"></ion-icon>
+        </ion-button>
+      </ion-menu-toggle>
     </ion-buttons>
     <div id="toolbar">
       <ion-title>
         {{ user?.name }}
       </ion-title>
-      <ion-toggle (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
-      <ion-button slot="end" style="padding: 0px 20px" (click)="sayLastTenMessages();playButtonSound();" [disabled]="messages.length === 0">Say last 10 messages</ion-button>
+      <ion-toggle speakOnHover [textToSpeak]="'Toggle high contrast mode'"
+        (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+      <ion-button slot="end" style="padding: 0px 20px" (click)="sayLastTenMessages();playButtonSound();"
+        [disabled]="messages.length === 0">Say last 10 messages</ion-button>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -21,8 +23,8 @@
 <ion-content #content [class.dark-mode]="darkMode">
   <ion-list class="message-list">
     <ion-item *ngFor="let message of messages; let i = index" [class.sent-message]="message.senderId === user._id"
-      [class.received-message]="message.receiverId === user._id" [attr.data-index]="i"
-      [attr.id]="'message-' + i" speakOnHover [textToSpeak]="message.content">
+      [class.received-message]="message.receiverId === user._id" [attr.data-index]="i" [attr.id]="'message-' + i"
+      speakOnHover [textToSpeak]="message.content">
       <div class="message-content">
         {{ message.content }}
       </div>

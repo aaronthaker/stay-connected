@@ -7,7 +7,7 @@
       <ion-title>
         {{otherUser?.name}}
       </ion-title>
-      <ion-toggle (ionChange)="toggleDarkMode()"></ion-toggle>
+      <ion-toggle speakOnHover [textToSpeak]="'Toggle high contrast mode'" (ionChange)="toggleDarkMode()"></ion-toggle>
       <app-voice-navigation-button speakOnHover
         [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>

@@ -2,12 +2,13 @@
   <!-- Remove ng-container to show sidenav when not logged in -->
   <ng-container *ngIf="userIsAuthenticated">
     <ion-split-pane contentId="main-content" when="md">
-      <ion-menu class="sidemenu" id="top-level-menu" contentId="main-content" type="overlay" [class.dark-mode]="darkMode">
+      <ion-menu class="sidemenu" id="top-level-menu" contentId="main-content" type="overlay"
+        [class.dark-mode]="darkMode">
         <ion-list lines="full" id="meet-list">
           <ion-list padding class="ion-text-center" id="welcome">
             <div class="profile-container">
-              <a routerDirection="root" (click)="playButtonSound()" [routerLink]="['/profile']" lines="none" detail="false"
-                routerLinkActive="selected" class="profile-button" id="page-profile" speakOnHover
+              <a routerDirection="root" (click)="playButtonSound()" [routerLink]="['/profile']" lines="none"
+                detail="false" routerLinkActive="selected" class="profile-button" id="page-profile" speakOnHover
                 [textToSpeak]="'My Profile'">
                 <ion-icon slot="start" ios="person-outline" md="person-sharp"></ion-icon>
               </a>
@@ -21,7 +22,8 @@
                   }}!</ion-label>
               </div>
 
-              <ion-toggle id="page-settings" (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
+              <ion-toggle speakOnHover [textToSpeak]="'Toggle high contrast mode'" id="page-settings"
+                (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
             </div>
           </ion-list>
 
