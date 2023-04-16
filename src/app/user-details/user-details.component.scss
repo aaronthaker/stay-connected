@@ -1,7 +1,8 @@
 @import "~@ionic/angular/css/core.css";
 
 ion-content {
-  --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+  // --background: linear-gradient(to top, rgb(224, 74, 124) 0%, rgb(246, 94, 105) 100%);
+  background: radial-gradient(circle, #a71d31, #5e0d18);
 }
 
 #toolbar {

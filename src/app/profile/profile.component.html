@@ -68,9 +68,9 @@
       <ion-button (click)="speakText(currentUser.name + '');playButtonSound();" style="width:20%"><ion-icon
           name="volume-high"></ion-icon></ion-button>
     </div>
-    <p class="profile-bio" *ngIf="!editMode && !touchDevice" speakOnHover [textToSpeak]="currentUser?.bio">
+    <ion-input class="profile-bio" *ngIf="!editMode && !touchDevice" speakOnHover [textToSpeak]="currentUser?.bio">
       {{currentUser?.bio}}
-    </p>
+    </ion-input>
     <div *ngIf="!editMode && touchDevice" style="display: flex;align-items: center;justify-items: center;">
       <p class="profile-bio" speakOnHover [textToSpeak]="currentUser?.bio" style="width:85%">
         {{currentUser?.bio}}
@@ -78,9 +78,8 @@
       <ion-button (click)="speakText(currentUser.bio + '');playButtonSound();" style="width:15%"><ion-icon
           name="volume-high"></ion-icon></ion-button>
     </div>
-    <p class="profile-bio" *ngIf="editMode" speakOnHover [textToSpeak]="currentUser?.bio">
-      <ion-input [(ngModel)]="currentUser.bio"></ion-input>
-    </p>
+    <ion-input class="profile-bio" label="Enter bio here" placeholder="Enter bio here" *ngIf="editMode" speakOnHover [textToSpeak]="currentUser?.bio" [(ngModel)]="currentUser.bio">
+    </ion-input>
   </div>
   <ion-card class="profile-card">
     <ion-card-content>
@@ -184,10 +183,11 @@
         <div *ngIf="!editMode">
           <ion-item>
             <ion-label speakOnHover [textToSpeak]="'Interests'">Interests:</ion-label>
-            <ion-input readonly="true" speakOnHover [textToSpeak]="interests.join(', ')">{{ interests.join(', ')
+            <ion-input readonly="true" slot="end" speakOnHover [textToSpeak]="interests.join(', ')">{{ interests.join(', ')
               }}
-              <ion-button *ngIf="touchDevice" (click)="speakText(interests.join(', ') + '');playButtonSound();"
-                style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button></ion-input>
+              <!-- <ion-button *ngIf="touchDevice" (click)="speakText(interests.join(', ') + '');playButtonSound();"
+                style="margin-left:3px;"><ion-icon name="volume-high"></ion-icon></ion-button> -->
+              </ion-input>
           </ion-item>
         </div>
 

@@ -77,7 +77,8 @@ ion-menu::part(container) {
 }
 
 #top-level-menu {
-  background: #df1c6b;
+  // background: #df1c6b;
+  background: radial-gradient(circle, #a71d31, #5e0d18);
   // background: transparent;
 }
 
@@ -107,7 +108,10 @@ ion-menu::part(container) {
   width: 100%;
   height: 100%;
   position: relative;
-  background: #df1c6b;
+  // background: #df1c6b;
+  background: #5e0d18;
+  // background: radial-gradient(circle, #a71d31, #5e0d18);
+  ;
 }
 
 .item.sc-ion-label-ios-h,
