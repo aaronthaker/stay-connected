@@ -39,8 +39,7 @@
       <ion-button speakOnHover [textToSpeak]="'Edit Profile'" (click)="toggleEditMode();playButtonSound();"
         style="padding: 0px 20px">{{
         editMode ? 'Save' : 'Edit Profile' }}</ion-button>
-      <app-voice-navigation-button speakOnHover
-        [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
+      <app-voice-navigation-button></app-voice-navigation-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
