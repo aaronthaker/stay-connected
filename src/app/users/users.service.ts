@@ -47,7 +47,7 @@ export class UserService {
   }
 
   unmatchUser(userId: string | null, unmatchedUserId: string | null): Observable<any> {
-    return this.http.put(`http://localhost:3000/api/users/${userId}/unmatch`, { unmatchedUserId });
+    return this.http.put(`http://localhost:3000/api/user/${userId}/unmatch`, { unmatchedUserId });
   }
 
   uploadProfilePicture(userId: string, formData: FormData): Observable<{ message: string; imagePath: string }> {
