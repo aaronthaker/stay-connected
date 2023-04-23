@@ -88,7 +88,6 @@ export class MessagesService {
     return this.messageRead.asObservable();
   }
 
-
   getMatchedUsers(userId: string | null): Observable<User[]> {
     return this.http.get<User[]>(`http://localhost:3000/api/user/${userId}/matches`);
   }

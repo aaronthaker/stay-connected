@@ -57,7 +57,7 @@
       </ion-item>
       <ion-card-content>
         <img *ngIf="event.imagePath" speakOnHover [textToSpeak]="'Image of ' + event.title" [src]="event.imagePath"
-          alt="Event Image" class="event-image">
+          [alt]="'Image of ' + event.title" class="event-image">
         <div id="card-stuff">
           <ion-card-subtitle id="date-text" speakOnHover
             [textToSpeak]="this.datePipe.transform(event.date, 'medium')">{{ event.date | date:'medium'

@@ -5,8 +5,8 @@ const profileController = require('../controllers/profile.controller');
 
 router.get('/', (req, res, next) => {
   User.find()
-    // FIX BELOW MAJOR CYBERSEC ISSUE - Ask OpenAI how you'd diagnose against these kinds of errors
-    // .select('email') // Replace 'email' with any other fields you want to return
+    // FIX BELOW CYBERSEC ISSUE - sending back too much data in GET request
+    // .select('email') // Replace 'email' with any other fields to return
     .then(users => {
       res.status(200).json({
         message: "Successful",

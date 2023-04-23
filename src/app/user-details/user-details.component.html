@@ -13,8 +13,7 @@
         class="speak-button">Speak</ion-button>
         <ion-toggle speakOnHover
         [textToSpeak]="'Toggle high contrast mode'" (ionChange)="toggleDarkMode();playButtonSound();"></ion-toggle>
-      <app-voice-navigation-button speakOnHover
-        [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
+      <app-voice-navigation-button speakOnHover [textToSpeak]="'Click here to use voice navigation'"></app-voice-navigation-button>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -49,7 +48,7 @@
         </div>
         <div class="image-container">
           <img *ngIf="displayedUser?.profileImage" speakOnHover [textToSpeak]="'An image of ' + displayedUser?.name"
-            [src]="'http://localhost:3000/' + displayedUser.profileImage" class="profile-img" />
+            [src]="'http://localhost:3000/' + displayedUser.profileImage" [alt]="'An image of ' + displayedUser?.name" class="profile-img" />
         </div>
       </ion-col>
 
