@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { User } from '../users/user.model';
 import { UserService } from '../users/users.service';
+import { SoundService } from '../sound.service';
 
 @Component({
   selector: 'app-other-profile',
@@ -16,6 +17,7 @@ export class OtherProfileComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private userService: UserService,
+    private soundService: SoundService,
   ) {
   }
 
@@ -24,6 +26,10 @@ export class OtherProfileComponent implements OnInit {
     this.userService.getUser(this.otherUserId).subscribe((user: any) => {
       this.otherUser = user;
     });
+  }
+
+  playButtonSound() {
+    this.soundService.playSound(440, 0.3);
   }
 
   darkMode = false;

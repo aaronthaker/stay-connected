@@ -1,7 +1,7 @@
 <ion-header [class.toolbar-dark-mode]="darkMode">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/messages"></ion-back-button>
+      <ion-back-button defaultHref="/messages" (click)="playButtonSound()"></ion-back-button>
     </ion-buttons>
     <div id="toolbar">
       <ion-title>

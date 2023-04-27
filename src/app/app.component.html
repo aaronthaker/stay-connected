@@ -30,7 +30,7 @@
           <div class="sidenav-container">
             <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
               <ng-container *ngIf="userIsAuthenticated">
-                <ion-item *ngIf="p.title !== 'Messages'" routerDirection="root" [routerLink]="[p.url]" lines="none"
+                <ion-item *ngIf="p.title !== 'Messages'" routerDirection="root" [routerLink]="[p.url]" lines="none" (click)="playButtonSound()"
                   detail="false" routerLinkActive="selected" class="sidenav-items" [@fadeInOut]>
                   <ion-item id="sidenav-ion-item">
                     <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
@@ -40,7 +40,7 @@
                   </ion-item>
                 </ion-item>
 
-                <ion-item *ngIf="p.title === 'Messages'" routerDirection="root" [routerLink]="[p.url]" lines="none"
+                <ion-item *ngIf="p.title === 'Messages'" routerDirection="root" [routerLink]="[p.url]" lines="none" (click)="playButtonSound()"
                   detail="false" routerLinkActive="selected" class="sidenav-items" [@fadeInOut]>
                   <ion-item id="sidenav-ion-item">
                     <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
