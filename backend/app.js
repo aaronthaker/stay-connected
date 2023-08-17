@@ -19,7 +19,8 @@ const userRoutes = require("./routes/user");
 const messagesRoutes = require("./routes/messages");
 const usersRoutes = require("./routes/users");
 
-mongoose.connect('mongodb+srv://190088169:MX2mOQCX1GUrktZY@cluster0.5lzxrui.mongodb.net/stay-connected?retryWrites=true&w=majority')
+// mongoose.connect('mongodb+srv://190088169:MX2mOQCX1GUrktZY@cluster0.5lzxrui.mongodb.net/stay-connected?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://190088169:MX2mOQCX1GUrktZY@cluster0.sdbcjgp.mongodb.net/')
   .then(() => {
     console.log('Connected to database!')
   })
