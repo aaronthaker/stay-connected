@@ -1,0 +1,40 @@
+import hashlib
+import os
+
+def file_hash(filepath):
+    """Calculate the MD5 hash of a file."""
+    hash_md5 = hashlib.md5()
+    with open(filepath, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+def get_file_hashes(directory):
+    """Get hashes of all files in a directory."""
+    file_hashes = {}
+    for filename in os.listdir(directory):
+        filepath = os.path.join(directory, filename)
+        file_hash_value = file_hash(filepath)
+        file_hashes[file_hash_value] = filename
+    return file_hashes
+
+def compare_hashes(original_dir, seeds_dir):
+    """Compare hashes of files in two directories to find matches."""
+    original_hashes = get_file_hashes(original_dir)
+    seeds_hashes = get_file_hashes(seeds_dir)
+    matches = {}
+    for hash_val, orig_filename in original_hashes.items():
+        if hash_val in seeds_hashes:
+            matches[orig_filename] = seeds_hashes[hash_val]
+    return matches
+
+# Specify the directories
+original_dir = r'C:\Users\athaker\Downloads\Original'
+seeds_dir = r'C:\Users\athaker\Downloads\Seeds'
+
+# Find matches
+file_matches = compare_hashes(original_dir, seeds_dir)
+
+# Print the result
+for original, new in file_matches.items():
+    print(f"Original file {original} is now {new}")
