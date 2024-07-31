@@ -3,11 +3,12 @@ import pandas as pd
 import scipy.stats as st
 from math import ceil
 from datetime import datetime
+import csv
 
 API_TOKEN = '123456789'
 SSL_CERT_PATH = "./glencore.behavox-saas.crt"
 
-def sample_size(N: int, C: float, E: float, p: float = 0.5, round: bool = True) -> int:
+def sample_size(N: int, C: float, E: float, p: float = 0.5, round: bool = True):
     Z = st.norm.ppf(1 - (1 - C) / 2)
     size = Z**2 * N * p * (1 - p) / (E**2 * (N - 1) + Z**2 * p * (1 - p))
     if round:
@@ -27,9 +28,9 @@ def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: i
             response.raise_for_status()
         data = response.json()
         comms += data['communications']
-        if (cursor := data['pagination'].get('cursor')):
-            base_url = f"{base_url}&cursor={cursor}"
-            print(f"Page {page}: +{len(data['communications'])} communications.\n")
+
+        if (cursor := data['pagination']['cursor']):
+            base_url = base_url + '&cursor=' + cursor
         else:
             print(f"Page {page}: +{len(data['communications'])} communications.\n\nNo more pages, {len(comms)} comms in total.\n")
         page += 1
@@ -51,24 +52,17 @@ def main(save_file: bool = False):
         df_all_comms = df_all_comms[(df_all_comms['dataType'] == 'email') | (df_all_comms['dataType'] == 'ms_teams_message')]
         # remove comms with no alert IDs
         df_unalerted_comms = df_all_comms[df_all_comms['alertIds'].apply(lambda x: len(x)) == 0]
-        
+
         # sample unalerted comms
         size = sample_size(N=len(df_unalerted_comms), C=0.9, E=0.05)
         df_sample = df_unalerted_comms.sample(n=size)
-        
         # replace "+" symbol in content IDs (utf-8) with the ASCII code for this symbol, as the utf-8 version throws errors when querying the API
         df_sample['id'] = df_sample['id'].str.replace('+', '%2B')
-        
         # pull in text content for each communication
         comms_content = []
         for c_id in df_sample['id']:
-            comms_content.append(get_comms_by_id(s, c_id)['content']['text'])
+            comms_content += [get_comms_by_id(s, c_id)['content']['text']]
         df_sample['content'] = comms_content
-        
-        # Add unique delimiters to the content field
-        unique_delim = "|||CONTENT|||"
-        df_sample['content'] = unique_delim + df_sample['content'] + unique_delim
-
     if save_file:
         now = datetime.now().strftime("%Y-%m-%dT%H%M")
         # write sampling stats to file
@@ -79,9 +73,9 @@ def main(save_file: bool = False):
     sample: {size}
     pop:    {len(df_unalerted_comms)}
     all:    {len(df_all_comms)}""")
-        
-        # write sampled comms to file using a tab delimiter
-        df_sample.to_csv(f"{now}_sample.csv", sep="\t", index=False)
+        # write sampled comms to file
+        df_sample.to_csv(f"{now}_sample.csv", quoting=csv.QUOTE_ALL)
+        # df_sample.to_text(f"{now}_sample.txt")
 
 if __name__ == "__main__":
     main(save_file=True)
