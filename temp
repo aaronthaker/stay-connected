@@ -7,43 +7,43 @@ from datetime import datetime
 API_TOKEN = '123456789'
 SSL_CERT_PATH = "./glencore.behavox-saas.crt"
 
-def sample_size(N: int, C: float, E: float, p: float = 0.5, round_result: bool = True) -> int:
-    Z = st.norm.ppf(1 - (1 - C) / 2)
+def sample_size(N:int, C:float, E:float, p:float=0.5, round:bool=True):
+    Z = st.norm.ppf(1 - (1 - C)/2)
     size = Z**2 * N * p * (1 - p) / (E**2 * (N - 1) + Z**2 * p * (1 - p))
-    if round_result:
+    if round:
         size = ceil(size)
     return size
 
-def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: int = 3000) -> pd.DataFrame:
+def get_comms_by_date(session, start_date:str, end_date:str, comms_per_page:int=3000) -> pd.DataFrame:
     if comms_per_page > 3000:
         raise ValueError("Comms per page must be less than 3000")
     base_url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications/find?start-date={start_date}&end-date={end_date}&field=alertIds&limit={comms_per_page}"
     comms = []
-    cursor = None
+    cursor = 1
     page = 0
-    while True:
-        url = base_url if cursor is None else base_url + '&cursor=' + cursor
+    url = base_url
+    while cursor:
         response = session.get(url, headers={"Authorization": "Bearer " + API_TOKEN}, verify=SSL_CERT_PATH)
         if response.status_code != requests.codes.ok:
             response.raise_for_status()
         data = response.json()
         comms += data['communications']
-        cursor = data['pagination'].get('cursor')
-        print(f"Page {page}: +{len(data['communications'])} communications.")
+        if (cursor := data['pagination']['cursor']):
+            url = base_url + '&cursor=' + cursor
+            print(f"Page {page}: +{len(data['communications'])} communications.\n")
+        else:
+            print(f"Page {page}: +{len(data['communications'])} communications.\n\nNo more pages, {len(comms)} comms in total.\n")
         page += 1
-        if not cursor:
-            break
-    print(f"\nNo more pages, {len(comms)} comms in total.")
     return pd.json_normalize(comms)
 
-def get_comms_by_id(session, c_id: str) -> dict:
+def get_comms_by_id(session, c_id:str) -> dict:
     url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications?ids={c_id}"
     response = session.get(url, headers={"Authorization": "Bearer " + API_TOKEN}, verify=SSL_CERT_PATH)
     if response.status_code != requests.codes.ok:
         response.raise_for_status()
     return response.json()[0]
 
-def main(save_file: bool = False):
+def main(save_file:bool=False):
     start_date = "2024-05-20T00:00:00.000Z"
     end_date = "2024-05-20T03:59:59.999Z"
     with requests.Session() as s:
@@ -61,7 +61,7 @@ def main(save_file: bool = False):
         # pull in text content for each communication
         comms_content = []
         for c_id in df_sample['id']:
-            comms_content.append(get_comms_by_id(s, c_id)['content']['text'])
+            comms_content += [get_comms_by_id(s, c_id)['content']['text']]
         df_sample['content'] = comms_content
 
     if save_file:
@@ -74,9 +74,9 @@ def main(save_file: bool = False):
     sample: {size}
     pop:    {len(df_unalerted_comms)}
     all:    {len(df_all_comms)}""")
-        # write sampled comms to file
-        df_sample.to_csv(f"{now}_sample.csv", sep='****START OF MESSAGE****', index=False)
+        
+        # write sampled comms to Excel file
+        df_sample.to_excel(f"{now}_sample.xlsx", index=False)
 
 if __name__ == "__main__":
     main(save_file=True)
-
