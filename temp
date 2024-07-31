@@ -3,7 +3,6 @@ import pandas as pd
 import scipy.stats as st
 from math import ceil
 from datetime import datetime
-import csv
 
 API_TOKEN = '123456789'
 SSL_CERT_PATH = "./glencore.behavox-saas.crt"
@@ -65,6 +64,10 @@ def main(save_file: bool = False):
         for c_id in df_sample['id']:
             comms_content.append(get_comms_by_id(s, c_id)['content']['text'])
         df_sample['content'] = comms_content
+        
+        # Add unique delimiters to the content field
+        unique_delim = "|||CONTENT|||"
+        df_sample['content'] = unique_delim + df_sample['content'] + unique_delim
 
     if save_file:
         now = datetime.now().strftime("%Y-%m-%dT%H%M")
@@ -77,16 +80,8 @@ def main(save_file: bool = False):
     pop:    {len(df_unalerted_comms)}
     all:    {len(df_all_comms)}""")
         
-        # Convert the DataFrame to a CSV-friendly format
-        def escape_special_chars(text):
-            if isinstance(text, str):
-                return text.replace('\n', '\\n').replace('\r', '\\r').replace(',', '\\,').replace('\t', '\\t')
-            return text
-
-        df_sample = df_sample.applymap(escape_special_chars)
-
-        # write sampled comms to file using comma as the delimiter
-        df_sample.to_csv(f"{now}_sample.csv", sep=",", index=False, quoting=csv.QUOTE_ALL)
+        # write sampled comms to file using a tab delimiter
+        df_sample.to_csv(f"{now}_sample.csv", sep="\t", index=False)
 
 if __name__ == "__main__":
     main(save_file=True)
