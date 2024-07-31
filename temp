@@ -3,6 +3,7 @@ import pandas as pd
 import scipy.stats as st
 from math import ceil
 from datetime import datetime
+import csv
 
 API_TOKEN = '123456789'
 SSL_CERT_PATH = "./glencore.behavox-saas.crt"
@@ -77,7 +78,7 @@ def main(save_file: bool = False):
     all:    {len(df_all_comms)}""")
         
         # write sampled comms to file using comma as the delimiter
-        df_sample.to_csv(f"{now}_sample.csv", sep=",", index=False, quoting=pd.io.formats.csv.QUOTE_ALL)
+        df_sample.to_csv(f"{now}_sample.csv", sep=",", index=False, quoting=csv.QUOTE_ALL)
 
 if __name__ == "__main__":
     main(save_file=True)
