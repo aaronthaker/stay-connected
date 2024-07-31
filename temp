@@ -1,40 +1,83 @@
-import hashlib
-import os
+import requests
+import pandas as pd
+import scipy.stats as st
+from math import ceil
+from datetime import datetime
 
-def file_hash(filepath):
-    """Calculate the MD5 hash of a file."""
-    hash_md5 = hashlib.md5()
-    with open(filepath, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
+API_TOKEN = '123456789'
+SSL_CERT_PATH = "./glencore.behavox-saas.crt"
 
-def get_file_hashes(directory):
-    """Get hashes of all files in a directory."""
-    file_hashes = {}
-    for filename in os.listdir(directory):
-        filepath = os.path.join(directory, filename)
-        file_hash_value = file_hash(filepath)
-        file_hashes[file_hash_value] = filename
-    return file_hashes
+def sample_size(N: int, C: float, E: float, p: float = 0.5, round: bool = True) -> int:
+    Z = st.norm.ppf(1 - (1 - C) / 2)
+    size = Z**2 * N * p * (1 - p) / (E**2 * (N - 1) + Z**2 * p * (1 - p))
+    if round:
+        size = ceil(size)
+    return size
 
-def compare_hashes(original_dir, seeds_dir):
-    """Compare hashes of files in two directories to find matches."""
-    original_hashes = get_file_hashes(original_dir)
-    seeds_hashes = get_file_hashes(seeds_dir)
-    matches = {}
-    for hash_val, orig_filename in original_hashes.items():
-        if hash_val in seeds_hashes:
-            matches[orig_filename] = seeds_hashes[hash_val]
-    return matches
+def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: int = 3000) -> pd.DataFrame:
+    if comms_per_page > 3000:
+        raise ValueError("Comms per page must be less than 3000")
+    base_url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications/find?start-date={start_date}&end-date={end_date}&field=alertIds&limit={comms_per_page}"
+    comms = []
+    cursor = 1
+    page = 0
+    while cursor:
+        response = session.get(base_url, headers={"Authorization": "Bearer " + API_TOKEN}, verify=SSL_CERT_PATH)
+        if response.status_code != requests.codes.ok:
+            response.raise_for_status()
+        data = response.json()
+        comms += data['communications']
+        if (cursor := data['pagination'].get('cursor')):
+            base_url = f"{base_url}&cursor={cursor}"
+            print(f"Page {page}: +{len(data['communications'])} communications.\n")
+        else:
+            print(f"Page {page}: +{len(data['communications'])} communications.\n\nNo more pages, {len(comms)} comms in total.\n")
+        page += 1
+    return pd.json_normalize(comms)
 
-# Specify the directories
-original_dir = r'C:\Users\athaker\Downloads\Original'
-seeds_dir = r'C:\Users\athaker\Downloads\Seeds'
+def get_comms_by_id(session, c_id: str) -> dict:
+    url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications?ids={c_id}"
+    response = session.get(url, headers={"Authorization": "Bearer " + API_TOKEN}, verify=SSL_CERT_PATH)
+    if response.status_code != requests.codes.ok:
+        response.raise_for_status()
+    return response.json()[0]
 
-# Find matches
-file_matches = compare_hashes(original_dir, seeds_dir)
+def main(save_file: bool = False):
+    start_date = "2024-05-20T00:00:00.000Z"
+    end_date = "2024-05-20T03:59:59.999Z"
+    with requests.Session() as s:
+        # get all comms in period that are ms_teams or email
+        df_all_comms = get_comms_by_date(s, start_date, end_date)
+        df_all_comms = df_all_comms[(df_all_comms['dataType'] == 'email') | (df_all_comms['dataType'] == 'ms_teams_message')]
+        # remove comms with no alert IDs
+        df_unalerted_comms = df_all_comms[df_all_comms['alertIds'].apply(lambda x: len(x)) == 0]
+        
+        # sample unalerted comms
+        size = sample_size(N=len(df_unalerted_comms), C=0.9, E=0.05)
+        df_sample = df_unalerted_comms.sample(n=size)
+        
+        # replace "+" symbol in content IDs (utf-8) with the ASCII code for this symbol, as the utf-8 version throws errors when querying the API
+        df_sample['id'] = df_sample['id'].str.replace('+', '%2B')
+        
+        # pull in text content for each communication
+        comms_content = []
+        for c_id in df_sample['id']:
+            comms_content.append(get_comms_by_id(s, c_id)['content']['text'])
+        df_sample['content'] = comms_content
 
-# Print the result
-for original, new in file_matches.items():
-    print(f"Original file {original} is now {new}")
+    if save_file:
+        now = datetime.now().strftime("%Y-%m-%dT%H%M")
+        # write sampling stats to file
+        with open("sampling_stats.txt", "a") as f:
+            f.write(f"""\n***** {now} *****
+    start:  {start_date}
+    end:    {end_date}
+    sample: {size}
+    pop:    {len(df_unalerted_comms)}
+    all:    {len(df_all_comms)}""")
+        
+        # write sampled comms to file
+        df_sample.to_csv(f"{now}_sample.csv", sep="\t")
+
+if __name__ == "__main__":
+    main(save_file=True)
