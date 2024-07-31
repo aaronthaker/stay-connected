@@ -3,15 +3,14 @@ import pandas as pd
 import scipy.stats as st
 from math import ceil
 from datetime import datetime
-import csv
 
 API_TOKEN = '123456789'
 SSL_CERT_PATH = "./glencore.behavox-saas.crt"
 
-def sample_size(N: int, C: float, E: float, p: float = 0.5, round: bool = True):
+def sample_size(N: int, C: float, E: float, p: float = 0.5, round_result: bool = True) -> int:
     Z = st.norm.ppf(1 - (1 - C) / 2)
     size = Z**2 * N * p * (1 - p) / (E**2 * (N - 1) + Z**2 * p * (1 - p))
-    if round:
+    if round_result:
         size = ceil(size)
     return size
 
@@ -20,20 +19,21 @@ def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: i
         raise ValueError("Comms per page must be less than 3000")
     base_url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications/find?start-date={start_date}&end-date={end_date}&field=alertIds&limit={comms_per_page}"
     comms = []
-    cursor = 1
+    cursor = None
     page = 0
-    while cursor:
-        response = session.get(base_url, headers={"Authorization": "Bearer " + API_TOKEN}, verify=SSL_CERT_PATH)
+    while True:
+        url = base_url if cursor is None else base_url + '&cursor=' + cursor
+        response = session.get(url, headers={"Authorization": "Bearer " + API_TOKEN}, verify=SSL_CERT_PATH)
         if response.status_code != requests.codes.ok:
             response.raise_for_status()
         data = response.json()
         comms += data['communications']
-
-        if (cursor := data['pagination']['cursor']):
-            base_url = base_url + '&cursor=' + cursor
-        else:
-            print(f"Page {page}: +{len(data['communications'])} communications.\n\nNo more pages, {len(comms)} comms in total.\n")
+        cursor = data['pagination'].get('cursor')
+        print(f"Page {page}: +{len(data['communications'])} communications.")
         page += 1
+        if not cursor:
+            break
+    print(f"\nNo more pages, {len(comms)} comms in total.")
     return pd.json_normalize(comms)
 
 def get_comms_by_id(session, c_id: str) -> dict:
@@ -61,8 +61,9 @@ def main(save_file: bool = False):
         # pull in text content for each communication
         comms_content = []
         for c_id in df_sample['id']:
-            comms_content += [get_comms_by_id(s, c_id)['content']['text']]
+            comms_content.append(get_comms_by_id(s, c_id)['content']['text'])
         df_sample['content'] = comms_content
+
     if save_file:
         now = datetime.now().strftime("%Y-%m-%dT%H%M")
         # write sampling stats to file
@@ -74,8 +75,7 @@ def main(save_file: bool = False):
     pop:    {len(df_unalerted_comms)}
     all:    {len(df_all_comms)}""")
         # write sampled comms to file
-        df_sample.to_csv(f"{now}_sample.csv", quoting=csv.QUOTE_ALL)
-        # df_sample.to_text(f"{now}_sample.txt")
+        df_sample.to_csv(f"{now}_sample.csv", sep='****START OF MESSAGE****', index=False)
 
 if __name__ == "__main__":
     main(save_file=True)
