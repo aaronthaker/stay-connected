@@ -3,6 +3,7 @@ import pandas as pd
 import scipy.stats as st
 from math import ceil
 from datetime import datetime
+import json
 
 API_TOKEN = '123456789'
 SSL_CERT_PATH = "./glencore.behavox-saas.crt"
@@ -76,14 +77,12 @@ def main(save_file: bool = False):
     pop:    {len(df_unalerted_comms)}
     all:    {len(df_all_comms)}""")
         
-        # Flattening the 'participants' and 'attachments' columns for proper CSV formatting
-        df_sample = df_sample.explode('participants').explode('attachments')
-        df_sample = pd.concat([df_sample.drop(['participants', 'attachments'], axis=1), 
-                               df_sample['participants'].apply(pd.Series).add_prefix('participant_'),
-                               df_sample['attachments'].apply(pd.Series).add_prefix('attachment_')], axis=1)
+        # Convert nested JSON columns to string for proper CSV formatting
+        df_sample['participants'] = df_sample['participants'].apply(lambda x: json.dumps(x))
+        df_sample['attachments'] = df_sample['attachments'].apply(lambda x: json.dumps(x))
         
         # write sampled comms to file
-        df_sample.to_csv(f"{now}_sample.csv", sep="\t", index=False)
+        df_sample.to_csv(f"{now}_sample.csv", sep=",", index=False)
 
 if __name__ == "__main__":
     main(save_file=True)
