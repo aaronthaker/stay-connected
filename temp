@@ -1,1 +1,100 @@
+import requests
+import pandas as pd
+from datetime import datetime
+from math import ceil
+import scipy.stats as st
 
+API_TOKEN = 'YOUR_API_KEY'
+BASE_URL = "https://glencore.behavox-saas.com/dashboard/api"
+SSL_CERT_PATH = "./glencore.behavox-saas.crt"
+
+# Helper Functions
+def sample_size(N: int, C: float, E: float, p: float = 0.5, round_value: bool = True) -> int:
+    Z = st.norm.ppf(1 - (1 - C) / 2)
+    size = Z**2 * N * p * (1 - p) / (E**2 * (N - 1) + Z**2 * p * (1 - p))
+    return ceil(size) if round_value else size
+
+def get_paginated_results(session, url: str, params: dict = {}) -> list:
+    results = []
+    while True:
+        response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
+        response.raise_for_status()
+        data = response.json()
+        results.extend(data['communications'])
+        if not data.get('pagination', {}).get('cursor'):
+            break
+        params['cursor'] = data['pagination']['cursor']
+    return results
+
+# API Functions
+def get_comms_by_date(session, start_date: str, end_date: str, data_type: list = None, limit: int = 3000) -> pd.DataFrame:
+    url = f"{BASE_URL}/api/3/communications/find"
+    params = {
+        "start-date": start_date,
+        "end-date": end_date,
+        "limit": limit,
+        "data-type": data_type,
+        "field": ["alertIds", "personIds", "persons"]
+    }
+    comms = get_paginated_results(session, url, params)
+    return pd.json_normalize(comms)
+
+def get_comms_by_id(session, comm_id: str) -> dict:
+    url = f"{BASE_URL}/api/3/communications"
+    params = {"ids": [comm_id]}
+    response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
+    response.raise_for_status()
+    return response.json()[0]
+
+def get_unalerted_comms(session, start_date: str, end_date: str, data_type: list = None) -> pd.DataFrame:
+    df_all_comms = get_comms_by_date(session, start_date, end_date, data_type)
+    return df_all_comms[df_all_comms['alertIds'].apply(len) == 0]
+
+def get_alerts(session, start_date: str, end_date: str, severity: str = None, limit: int = 1000) -> pd.DataFrame:
+    url = f"{BASE_URL}/api/1/alerts"
+    params = {
+        "start-date": start_date,
+        "end-date": end_date,
+        "severity": severity,
+        "limit": limit
+    }
+    response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
+    response.raise_for_status()
+    return pd.json_normalize(response.json()['alerts'])
+
+def get_person_info(session, person_id: int) -> dict:
+    url = f"{BASE_URL}/api/1/person"
+    params = {"personId": person_id}
+    response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
+    response.raise_for_status()
+    return response.json()[0]
+
+# Main Function Example
+def main():
+    start_date = "2024-05-20T00:00:00.000Z"
+    end_date = "2024-05-20T23:59:59.999Z"
+    
+    with requests.Session() as session:
+        # Example: Get unalerted communications within a date range
+        df_unalerted_comms = get_unalerted_comms(session, start_date, end_date, ["email", "ms_teams_message"])
+        
+        # Example: Sample some unalerted communications
+        sample_size_value = sample_size(len(df_unalerted_comms), 0.9, 0.05)
+        df_sample = df_unalerted_comms.sample(n=sample_size_value)
+        
+        # Example: Retrieve content of sampled communications
+        comms_content = []
+        for comm_id in df_sample['id']:
+            comms_content.append(get_comms_by_id(session, comm_id).get('content', {}).get('text', ''))
+        df_sample['content'] = comms_content
+
+        # Example: Retrieve alerts within a date range
+        df_alerts = get_alerts(session, start_date, end_date)
+        
+        # Save to file if necessary
+        now = datetime.now().strftime("%Y-%m-%dT%H%M")
+        df_sample.to_csv(f"{now}_sampled_comms.csv", index=False)
+        df_alerts.to_csv(f"{now}_alerts.csv", index=False)
+
+if __name__ == "__main__":
+    main()
