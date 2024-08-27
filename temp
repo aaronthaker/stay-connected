@@ -1,100 +1,155 @@
 import requests
 import pandas as pd
 from datetime import datetime
-from math import ceil
-import scipy.stats as st
 
-API_TOKEN = 'YOUR_API_KEY'
-BASE_URL = "https://glencore.behavox-saas.com/dashboard/api"
+API_TOKEN = '123456789'  # Replace with your actual API token
 SSL_CERT_PATH = "./glencore.behavox-saas.crt"
+BASE_URL = "https://glencore.behavox-saas.com/dashboard/api/3"
 
-# Helper Functions
-def sample_size(N: int, C: float, E: float, p: float = 0.5, round_value: bool = True) -> int:
-    Z = st.norm.ppf(1 - (1 - C) / 2)
-    size = Z**2 * N * p * (1 - p) / (E**2 * (N - 1) + Z**2 * p * (1 - p))
-    return ceil(size) if round_value else size
 
-def get_paginated_results(session, url: str, params: dict = {}) -> list:
-    results = []
+def create_session():
+    session = requests.Session()
+    session.headers.update({"Authorization": "Bearer " + API_TOKEN})
+    return session
+
+
+def get_comms_by_date(session, start_date: str, end_date: str, data_types=None, comms_per_page: int=3000) -> pd.DataFrame:
+    if comms_per_page > 3000:
+        raise ValueError("Comms per page must be less than 3000")
+
+    url = f"{BASE_URL}/communications/find?start-date={start_date}&end-date={end_date}&limit={comms_per_page}"
+    if data_types:
+        url += f"&data-type={','.join(data_types)}"
+
+    comms = []
+    cursor = None
     while True:
-        response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
+        if cursor:
+            url += f"&cursor={cursor}"
+        response = session.get(url, verify=SSL_CERT_PATH)
         response.raise_for_status()
         data = response.json()
-        results.extend(data['communications'])
-        if not data.get('pagination', {}).get('cursor'):
+        comms.extend(data['communications'])
+        cursor = data['pagination'].get('cursor')
+        if not cursor:
             break
-        params['cursor'] = data['pagination']['cursor']
-    return results
 
-# API Functions
-def get_comms_by_date(session, start_date: str, end_date: str, data_type: list = None, limit: int = 3000) -> pd.DataFrame:
-    url = f"{BASE_URL}/api/3/communications/find"
-    params = {
-        "start-date": start_date,
-        "end-date": end_date,
-        "limit": limit,
-        "data-type": data_type,
-        "field": ["alertIds", "personIds", "persons"]
-    }
-    comms = get_paginated_results(session, url, params)
     return pd.json_normalize(comms)
 
-def get_comms_by_id(session, comm_id: str) -> dict:
-    url = f"{BASE_URL}/api/3/communications"
-    params = {"ids": [comm_id]}
-    response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
+
+def get_comms_by_id(session, c_ids: list) -> pd.DataFrame:
+    url = f"{BASE_URL}/communications?ids={','.join(c_ids)}"
+    response = session.get(url, verify=SSL_CERT_PATH)
     response.raise_for_status()
-    return response.json()[0]
+    return pd.json_normalize(response.json())
 
-def get_unalerted_comms(session, start_date: str, end_date: str, data_type: list = None) -> pd.DataFrame:
-    df_all_comms = get_comms_by_date(session, start_date, end_date, data_type)
-    return df_all_comms[df_all_comms['alertIds'].apply(len) == 0]
 
-def get_alerts(session, start_date: str, end_date: str, severity: str = None, limit: int = 1000) -> pd.DataFrame:
-    url = f"{BASE_URL}/api/1/alerts"
-    params = {
-        "start-date": start_date,
-        "end-date": end_date,
-        "severity": severity,
-        "limit": limit
-    }
-    response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
+def get_all_unalerted_comms(session, start_date: str, end_date: str, data_types=None) -> pd.DataFrame:
+    df_all_comms = get_comms_by_date(session, start_date, end_date, data_types)
+    df_unalerted_comms = df_all_comms[df_all_comms['alertIds'].apply(lambda x: len(x)) == 0]
+    return df_unalerted_comms
+
+
+def get_person_details(session, person_ids: list) -> pd.DataFrame:
+    url = f"{BASE_URL}/persons?person-ids={','.join(map(str, person_ids))}"
+    response = session.get(url, verify=SSL_CERT_PATH)
+    response.raise_for_status()
+    return pd.json_normalize(response.json()['persons'])
+
+
+def get_alerts_for_person(session, person_id: str, start_date: str, end_date: str) -> pd.DataFrame:
+    url = f"{BASE_URL.replace('/3', '/1')}/alerts?monitored-employee={person_id}&start-date={start_date}&end-date={end_date}"
+    response = session.get(url, verify=SSL_CERT_PATH)
     response.raise_for_status()
     return pd.json_normalize(response.json()['alerts'])
 
-def get_person_info(session, person_id: int) -> dict:
-    url = f"{BASE_URL}/api/1/person"
-    params = {"personId": person_id}
-    response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
-    response.raise_for_status()
-    return response.json()[0]
 
-# Main Function Example
+def get_activity_logs(session, start_date: str, end_date: str, user: str = None, action: str = None) -> pd.DataFrame:
+    url = f"{BASE_URL.replace('/3', '/1')}/activity-logs?start-date={start_date}&end-date={end_date}"
+    if user:
+        url += f"&user={user}"
+    if action:
+        url += f"&action={action}"
+    response = session.get(url, verify=SSL_CERT_PATH)
+    response.raise_for_status()
+    return pd.json_normalize(response.json()['actions'])
+
+
 def main():
     start_date = "2024-05-20T00:00:00.000Z"
-    end_date = "2024-05-20T23:59:59.999Z"
+    end_date = "2024-05-20T03:59:59.999Z"
     
-    with requests.Session() as session:
-        # Example: Get unalerted communications within a date range
-        df_unalerted_comms = get_unalerted_comms(session, start_date, end_date, ["email", "ms_teams_message"])
+    with create_session() as session:
+        # Example 1: Get all unalerted communications for a date range
+        df_unalerted_comms = get_all_unalerted_comms(session, start_date, end_date, data_types=['email', 'ms_teams_message'])
+        print(df_unalerted_comms)
         
-        # Example: Sample some unalerted communications
-        sample_size_value = sample_size(len(df_unalerted_comms), 0.9, 0.05)
-        df_sample = df_unalerted_comms.sample(n=sample_size_value)
+        # Example 2: Get detailed information about specific communications by IDs
+        comm_ids = ['comm_id1', 'comm_id2']  # Replace with actual IDs
+        df_comms_details = get_comms_by_id(session, comm_ids)
+        print(df_comms_details)
         
-        # Example: Retrieve content of sampled communications
-        comms_content = []
-        for comm_id in df_sample['id']:
-            comms_content.append(get_comms_by_id(session, comm_id).get('content', {}).get('text', ''))
-        df_sample['content'] = comms_content
+        # Example 3: Get person details by person IDs
+        person_ids = [123, 456]  # Replace with actual person IDs
+        df_person_details = get_person_details(session, person_ids)
+        print(df_person_details)
+        
+        # Example 4: Get alerts for a specific person within a date range
+        person_id = '12345'  # Replace with actual person ID
+        df_alerts = get_alerts_for_person(session, person_id, start_date, end_date)
+        print(df_alerts)
+        
+        # Example 5: Get activity logs for a date range
+        df_activity_logs = get_activity_logs(session, start_date, end_date)
+        print(df_activity_logs)
 
-        # Example: Retrieve alerts within a date range
-        df_alerts = get_alerts(session, start_date, end_date)
+
+if __name__ == "__main__":
+    main()
+
+
+-----
+
+def get_all_people(session, limit: int = 1000) -> pd.DataFrame:
+    """
+    Retrieves a list of all people and their IDs from the Behavox API.
+    
+    Parameters:
+    session (requests.Session): The session object with the API token.
+    limit (int): The maximum number of people to retrieve per API call. Default is 1000.
+    
+    Returns:
+    pd.DataFrame: A DataFrame containing all people and their IDs.
+    """
+    url = f"{BASE_URL.replace('/3', '/1')}/persons?limit={limit}"
+    
+    people = []
+    cursor = None
+    
+    while True:
+        if cursor:
+            paged_url = f"{url}&cursor={cursor}"
+        else:
+            paged_url = url
         
-        # Save to file if necessary
-        now = datetime.now().strftime("%Y-%m-%dT%H%M")
-        df_sample.to_csv(f"{now}_sampled_comms.csv", index=False)
-        df_alerts.to_csv(f"{now}_alerts.csv", index=False)
+        response = session.get(paged_url, verify=SSL_CERT_PATH)
+        response.raise_for_status()
+        data = response.json()
+        
+        people.extend(data['persons'])
+        
+        cursor = data['pagination'].get('cursor')
+        if not cursor:
+            break
+    
+    return pd.json_normalize(people)
+
+# Example usage in the main function
+def main():
+    with create_session() as session:
+        # Example: Get a list of all people and their IDs
+        df_people = get_all_people(session)
+        print(df_people)
 
 if __name__ == "__main__":
     main()
