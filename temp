@@ -1,155 +1,38 @@
-import requests
 import pandas as pd
-from datetime import datetime
+import ast  # For safely evaluating the JSON-like strings
 
-API_TOKEN = '123456789'  # Replace with your actual API token
-SSL_CERT_PATH = "./glencore.behavox-saas.crt"
-BASE_URL = "https://glencore.behavox-saas.com/dashboard/api/3"
+# Load the filtered sample dataframe
+df_sample = pd.read_excel('filtered_sample.xlsx')
 
+# Load the emails.xlsx file which contains the list of emails to check
+df_emails = pd.read_excel('emails.xlsx', header=None)
+email_list = df_emails[0].str.strip().str.lower().tolist()  # Convert to a list and normalize case
 
-def create_session():
-    session = requests.Session()
-    session.headers.update({"Authorization": "Bearer " + API_TOKEN})
-    return session
+# Function to check if any participant's email matches the email list
+def find_matching_email(row):
+    try:
+        # Convert the string in 'participants' to a list of dictionaries
+        participants = ast.literal_eval(row['participants'])
+        # Extract all the email addresses from the participants field
+        for participant in participants:
+            if 'EMAIL' in participant.get('contactType', ''):
+                email = participant.get('contact', '').lower()
+                if email in email_list:
+                    return email  # Return the matching email
+        return None
+    except (ValueError, SyntaxError):
+        return None  # Handle any errors in parsing the 'participants' field
 
+# Apply the function across all rows of df_sample and create a new column with the matching email (if any)
+df_sample['matching_email'] = df_sample.apply(find_matching_email, axis=1)
 
-def get_comms_by_date(session, start_date: str, end_date: str, data_types=None, comms_per_page: int=3000) -> pd.DataFrame:
-    if comms_per_page > 3000:
-        raise ValueError("Comms per page must be less than 3000")
+# Filter rows that contain a matching email
+matching_rows = df_sample[df_sample['matching_email'].notna()]
 
-    url = f"{BASE_URL}/communications/find?start-date={start_date}&end-date={end_date}&limit={comms_per_page}"
-    if data_types:
-        url += f"&data-type={','.join(data_types)}"
-
-    comms = []
-    cursor = None
-    while True:
-        if cursor:
-            url += f"&cursor={cursor}"
-        response = session.get(url, verify=SSL_CERT_PATH)
-        response.raise_for_status()
-        data = response.json()
-        comms.extend(data['communications'])
-        cursor = data['pagination'].get('cursor')
-        if not cursor:
-            break
-
-    return pd.json_normalize(comms)
-
-
-def get_comms_by_id(session, c_ids: list) -> pd.DataFrame:
-    url = f"{BASE_URL}/communications?ids={','.join(c_ids)}"
-    response = session.get(url, verify=SSL_CERT_PATH)
-    response.raise_for_status()
-    return pd.json_normalize(response.json())
-
-
-def get_all_unalerted_comms(session, start_date: str, end_date: str, data_types=None) -> pd.DataFrame:
-    df_all_comms = get_comms_by_date(session, start_date, end_date, data_types)
-    df_unalerted_comms = df_all_comms[df_all_comms['alertIds'].apply(lambda x: len(x)) == 0]
-    return df_unalerted_comms
-
-
-def get_person_details(session, person_ids: list) -> pd.DataFrame:
-    url = f"{BASE_URL}/persons?person-ids={','.join(map(str, person_ids))}"
-    response = session.get(url, verify=SSL_CERT_PATH)
-    response.raise_for_status()
-    return pd.json_normalize(response.json()['persons'])
-
-
-def get_alerts_for_person(session, person_id: str, start_date: str, end_date: str) -> pd.DataFrame:
-    url = f"{BASE_URL.replace('/3', '/1')}/alerts?monitored-employee={person_id}&start-date={start_date}&end-date={end_date}"
-    response = session.get(url, verify=SSL_CERT_PATH)
-    response.raise_for_status()
-    return pd.json_normalize(response.json()['alerts'])
-
-
-def get_activity_logs(session, start_date: str, end_date: str, user: str = None, action: str = None) -> pd.DataFrame:
-    url = f"{BASE_URL.replace('/3', '/1')}/activity-logs?start-date={start_date}&end-date={end_date}"
-    if user:
-        url += f"&user={user}"
-    if action:
-        url += f"&action={action}"
-    response = session.get(url, verify=SSL_CERT_PATH)
-    response.raise_for_status()
-    return pd.json_normalize(response.json()['actions'])
-
-
-def main():
-    start_date = "2024-05-20T00:00:00.000Z"
-    end_date = "2024-05-20T03:59:59.999Z"
-    
-    with create_session() as session:
-        # Example 1: Get all unalerted communications for a date range
-        df_unalerted_comms = get_all_unalerted_comms(session, start_date, end_date, data_types=['email', 'ms_teams_message'])
-        print(df_unalerted_comms)
-        
-        # Example 2: Get detailed information about specific communications by IDs
-        comm_ids = ['comm_id1', 'comm_id2']  # Replace with actual IDs
-        df_comms_details = get_comms_by_id(session, comm_ids)
-        print(df_comms_details)
-        
-        # Example 3: Get person details by person IDs
-        person_ids = [123, 456]  # Replace with actual person IDs
-        df_person_details = get_person_details(session, person_ids)
-        print(df_person_details)
-        
-        # Example 4: Get alerts for a specific person within a date range
-        person_id = '12345'  # Replace with actual person ID
-        df_alerts = get_alerts_for_person(session, person_id, start_date, end_date)
-        print(df_alerts)
-        
-        # Example 5: Get activity logs for a date range
-        df_activity_logs = get_activity_logs(session, start_date, end_date)
-        print(df_activity_logs)
-
-
-if __name__ == "__main__":
-    main()
-
-
------
-
-def get_all_people(session, limit: int = 1000) -> pd.DataFrame:
-    """
-    Retrieves a list of all people and their IDs from the Behavox API.
-    
-    Parameters:
-    session (requests.Session): The session object with the API token.
-    limit (int): The maximum number of people to retrieve per API call. Default is 1000.
-    
-    Returns:
-    pd.DataFrame: A DataFrame containing all people and their IDs.
-    """
-    url = f"{BASE_URL.replace('/3', '/1')}/persons?limit={limit}"
-    
-    people = []
-    cursor = None
-    
-    while True:
-        if cursor:
-            paged_url = f"{url}&cursor={cursor}"
-        else:
-            paged_url = url
-        
-        response = session.get(paged_url, verify=SSL_CERT_PATH)
-        response.raise_for_status()
-        data = response.json()
-        
-        people.extend(data['persons'])
-        
-        cursor = data['pagination'].get('cursor')
-        if not cursor:
-            break
-    
-    return pd.json_normalize(people)
-
-# Example usage in the main function
-def main():
-    with create_session() as session:
-        # Example: Get a list of all people and their IDs
-        df_people = get_all_people(session)
-        print(df_people)
-
-if __name__ == "__main__":
-    main()
+# Check if any matching rows were found
+if not matching_rows.empty:
+    print(f"Emails from emails.xlsx found in {len(matching_rows)} rows of the sample file.")
+    # Print out the matching rows and the matching emails
+    print(matching_rows[['participants', 'matching_email']])
+else:
+    print("No matching emails found in the sample file.")
