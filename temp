@@ -1,1 +1,5 @@
-
+=IF(AND(COUNTIF(Refinitiv_US!A:A, P2) = 0, COUNTIF(Refinitiv_UK!A:A, P2) = 0), "In Bhox_Employee_List but not in Refinitiv_US or Refinitiv_UK", 
+IF(AND(COUNTIF(Refinitiv_US!A:A, P2) > 0, COUNTIF(Refinitiv_UK!A:A, P2) > 0), "In both Refinitiv_US and Refinitiv_UK", 
+IF(AND(COUNTIF(Refinitiv_US!A:A, P2) > 0, COUNTIF(Refinitiv_UK!A:A, P2) = 0), "In Refinitiv_US but not in Refinitiv_UK", 
+IF(AND(COUNTIF(Refinitiv_US!A:A, P2) = 0, COUNTIF(Refinitiv_UK!A:A, P2) > 0), "In Refinitiv_UK but not in Refinitiv_US", 
+"In Refinitiv_UK and Refinitiv_US but not Bhox_Employee_List"))))
