@@ -1,6 +1,8 @@
 import pandas as pd
 import glob
 import os
+import chardet
+from datetime import datetime, timedelta
 
 # Function to find the latest file matching a pattern
 def find_latest_file(pattern):
@@ -10,14 +12,42 @@ def find_latest_file(pattern):
         exit()
     return max(files, key=os.path.getctime)
 
+# Function to extract date from the Report#28 filename
+def extract_date_from_filename(filename):
+    base = os.path.basename(filename)
+    # Filename format: 'Report#28-15-11-2024_10_30_UTC.csv'
+    # Extract the part after 'Report#28-' and before the next underscore
+    try:
+        date_str = base.split('Report#28-')[1].split('_')[0]
+        # Convert string to datetime object
+        date = datetime.strptime(date_str, '%d-%m-%Y')
+        return date
+    except (IndexError, ValueError):
+        print('Error: Unable to extract date from Report#28 filename.')
+        exit()
+
 # Find the latest 'Report#28' file
 report_file = find_latest_file('Report#28*.csv')
+
+# Extract the date from the filename
+report_date = extract_date_from_filename(report_file)
+
+# Calculate the previous week's date range
+week_end_date = report_date - timedelta(days=1)  # Sunday of the previous week
+week_start_date = week_end_date - timedelta(days=6)  # Monday of the previous week
+date_range_str = f'{week_start_date.strftime("%d-%m-%Y")} to {week_end_date.strftime("%d-%m-%Y")}'
 
 # Find the latest 'hr_data_HRIdentities' file
 hr_file = find_latest_file('hr_data_HRIdentities*.csv')
 
-# Read the HR identities data
-hr_data = pd.read_csv(hr_file)
+# Detect encoding of the HR file
+with open(hr_file, 'rb') as f:
+    result = chardet.detect(f.read())
+    hr_encoding = result['encoding']
+    print(f'Detected encoding for HR file: {hr_encoding}')
+
+# Read the HR identities data with detected encoding
+hr_data = pd.read_csv(hr_file, encoding=hr_encoding)
 
 # Ensure the required columns are present
 required_columns_hr = ['DISPLAY_NAME', 'COUNTRY', 'MONITORED_STATUS']
@@ -36,7 +66,10 @@ with open(report_file, 'r', encoding='utf-8-sig') as f:
         skiprows = [0]
     else:
         skiprows = []
+    # Read the rest of the file content
+    # rest_of_file = f.read()  # Not needed
 
+# Read the Report#28 data
 report_data = pd.read_csv(report_file, skiprows=skiprows)
 
 # Ensure 'ME Name' column exists
@@ -48,6 +81,7 @@ if 'ME Name' not in report_data.columns:
 merged_data = pd.merge(report_data, hr_data, left_on='ME Name', right_on='DISPLAY_NAME', how='left')
 
 # Filter for 'in-scope' MEs
+merged_data['MONITORED_STATUS'] = merged_data['MONITORED_STATUS'].astype(str).str.lower()
 in_scope_data = merged_data[merged_data['MONITORED_STATUS'] == 'in-scope']
 
 # Identify communication count columns starting from 'Generated Content'
@@ -55,10 +89,31 @@ comm_start_idx = report_data.columns.get_loc('Generated Content')
 comm_columns = report_data.columns[comm_start_idx:]
 
 # Group by 'COUNTRY' and sum the communication counts
-grouped_data = in_scope_data.groupby('COUNTRY')[comm_columns].sum()
+grouped_data = in_scope_data.groupby('COUNTRY')[comm_columns].sum().reset_index()
 
-# Write the result to a new Excel file
+# Add the date range to the dataframe
+grouped_data['Date Range'] = date_range_str
+
+# Reorder columns to have 'Date Range' first
+cols = ['Date Range', 'COUNTRY'] + list(comm_columns)
+grouped_data = grouped_data[cols]
+
+# Output file name
 output_file = 'communication_counts_by_territory.xlsx'
-grouped_data.to_excel(output_file)
 
-print(f'Communication counts per territory have been written to {output_file}')
+# Check if the output file already exists
+if os.path.exists(output_file):
+    # Read the existing data
+    existing_data = pd.read_excel(output_file)
+    # Append the new data to the existing data
+    # Add a separator row (optional)
+    separator = pd.DataFrame([[''] * len(grouped_data.columns)], columns=grouped_data.columns)
+    combined_data = pd.concat([existing_data, separator, grouped_data], ignore_index=True)
+else:
+    combined_data = grouped_data
+
+# Write the result to the Excel file
+with pd.ExcelWriter(output_file, engine='openpyxl', mode='w') as writer:
+    combined_data.to_excel(writer, index=False)
+
+print(f'Communication counts for {date_range_str} have been appended to {output_file}')
