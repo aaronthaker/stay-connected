@@ -15,10 +15,17 @@ def find_latest_file(pattern):
 # Function to extract date from the Report#28 filename
 def extract_date_from_filename(filename):
     base = os.path.basename(filename)
-    # Filename format: 'Report#28-15-11-2024_10_30_UTC.csv'
-    # Extract the part after 'Report#28-' and before the next underscore
+    # Filename format: 'Report#28-15_11_2024_10_30_UTC.csv'
     try:
-        date_str = base.split('Report#28-')[1].split('_')[0]
+        # Remove 'Report#28-' prefix
+        date_time_str = base.split('Report#28-')[1].split('_UTC')[0]
+        # date_time_str is now '15_11_2024_10_30'
+        
+        # Split into date and time components
+        date_part = '_'.join(date_time_str.split('_')[:3])  # '15_11_2024'
+        # Convert underscores to hyphens for date parsing
+        date_str = date_part.replace('_', '-')
+        
         # Convert string to datetime object
         date = datetime.strptime(date_str, '%d-%m-%Y')
         return date
