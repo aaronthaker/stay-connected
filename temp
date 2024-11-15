@@ -3,6 +3,9 @@ import glob
 import os
 import chardet
 from datetime import datetime, timedelta
+from openpyxl import load_workbook
+from openpyxl.styles import PatternFill
+from openpyxl.formatting.rule import CellIsRule
 
 # Function to find the latest file matching a pattern
 def find_latest_file(pattern):
@@ -15,17 +18,10 @@ def find_latest_file(pattern):
 # Function to extract date from the Report#28 filename
 def extract_date_from_filename(filename):
     base = os.path.basename(filename)
-    # Filename format: 'Report#28-15_11_2024_10_30_UTC.csv'
+    # Filename format: 'Report#28-15-11-2024_10_30_UTC.csv'
+    # Extract the part after 'Report#28-' and before the next underscore
     try:
-        # Remove 'Report#28-' prefix
-        date_time_str = base.split('Report#28-')[1].split('_UTC')[0]
-        # date_time_str is now '15_11_2024_10_30'
-        
-        # Split into date and time components
-        date_part = '_'.join(date_time_str.split('_')[:3])  # '15_11_2024'
-        # Convert underscores to hyphens for date parsing
-        date_str = date_part.replace('_', '-')
-        
+        date_str = base.split('Report#28-')[1].split('_')[0]
         # Convert string to datetime object
         date = datetime.strptime(date_str, '%d-%m-%Y')
         return date
@@ -42,7 +38,10 @@ report_date = extract_date_from_filename(report_file)
 # Calculate the previous week's date range
 week_end_date = report_date - timedelta(days=1)  # Sunday of the previous week
 week_start_date = week_end_date - timedelta(days=6)  # Monday of the previous week
-date_range_str = f'{week_start_date.strftime("%d-%m-%Y")} to {week_end_date.strftime("%d-%m-%Y")}'
+
+# Convert dates to strings
+date_range_start_str = week_start_date.strftime('%d-%m-%Y')
+date_range_end_str = week_end_date.strftime('%d-%m-%Y')
 
 # Find the latest 'hr_data_HRIdentities' file
 hr_file = find_latest_file('hr_data_HRIdentities*.csv')
@@ -73,11 +72,12 @@ with open(report_file, 'r', encoding='utf-8-sig') as f:
         skiprows = [0]
     else:
         skiprows = []
-    # Read the rest of the file content
-    # rest_of_file = f.read()  # Not needed
 
 # Read the Report#28 data
 report_data = pd.read_csv(report_file, skiprows=skiprows)
+
+# Remove 'Typename ' prefix from column names
+report_data.columns = [col.replace('Typename ', '') for col in report_data.columns]
 
 # Ensure 'ME Name' column exists
 if 'ME Name' not in report_data.columns:
@@ -98,11 +98,12 @@ comm_columns = report_data.columns[comm_start_idx:]
 # Group by 'COUNTRY' and sum the communication counts
 grouped_data = in_scope_data.groupby('COUNTRY')[comm_columns].sum().reset_index()
 
-# Add the date range to the dataframe
-grouped_data['Date Range'] = date_range_str
+# Add the date range start and end to the dataframe
+grouped_data['Date Range Start'] = date_range_start_str
+grouped_data['Date Range End'] = date_range_end_str
 
-# Reorder columns to have 'Date Range' first
-cols = ['Date Range', 'COUNTRY'] + list(comm_columns)
+# Reorder columns to have 'Date Range Start' and 'Date Range End' first
+cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + list(comm_columns)
 grouped_data = grouped_data[cols]
 
 # Output file name
@@ -112,15 +113,64 @@ output_file = 'communication_counts_by_territory.xlsx'
 if os.path.exists(output_file):
     # Read the existing data
     existing_data = pd.read_excel(output_file)
+
     # Append the new data to the existing data
-    # Add a separator row (optional)
-    separator = pd.DataFrame([[''] * len(grouped_data.columns)], columns=grouped_data.columns)
-    combined_data = pd.concat([existing_data, separator, grouped_data], ignore_index=True)
+    combined_data = pd.concat([existing_data, grouped_data], ignore_index=True)
 else:
-    combined_data = grouped_data
+    combined_data = grouped_data.copy()
 
-# Write the result to the Excel file
-with pd.ExcelWriter(output_file, engine='openpyxl', mode='w') as writer:
-    combined_data.to_excel(writer, index=False)
+# Calculate percentage change compared to previous weeks
+# Exclude the date and country columns for calculation
+value_columns = comm_columns
 
-print(f'Communication counts for {date_range_str} have been appended to {output_file}')
+# Check if there is previous data to compare
+if len(combined_data) > len(grouped_data):
+    # Get the data excluding the current week's data
+    previous_data = combined_data.iloc[:-len(grouped_data)]
+
+    # Calculate the average of previous data grouped by COUNTRY
+    avg_previous = previous_data.groupby('COUNTRY')[value_columns].mean().reset_index()
+
+    # Merge current data with average previous data
+    comparison = pd.merge(grouped_data, avg_previous, on='COUNTRY', how='left', suffixes=('', '_Previous'))
+
+    # Calculate percentage change
+    for col in value_columns:
+        col_prev = f'{col}_Previous'
+        comparison[f'{col}_% Change'] = ((comparison[col] - comparison[col_prev]) / comparison[col_prev]) * 100
+
+    # Select relevant columns
+    percentage_change_columns = [f'{col}_% Change' for col in value_columns]
+    percentage_data = comparison[['Date Range Start', 'Date Range End', 'COUNTRY'] + percentage_change_columns]
+
+    # Append percentage change as the last row
+    # For simplicity, we will append percentage change as additional rows per country
+    combined_data = pd.concat([combined_data, percentage_data], ignore_index=True)
+
+    # Apply conditional formatting if changes are above 20%
+    # We need to write the DataFrame to Excel first, then apply formatting using openpyxl
+
+    # Write the combined data to Excel without index
+    combined_data.to_excel(output_file, index=False)
+
+    # Load the workbook to apply formatting
+    wb = load_workbook(output_file)
+    ws = wb.active
+
+    # Find the rows containing percentage changes
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+        # Check if the row contains '% Change' in any of the headers
+        if any(cell.value == '% Change' for cell in ws[1]):
+            for cell in row:
+                if isinstance(cell.value, float):
+                    if abs(cell.value) > 20:
+                        cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Yellow highlight
+
+    wb.save(output_file)
+else:
+    # No previous data to compare, just write the combined data
+    combined_data.to_excel(output_file, index=False)
+
+    print('No previous data to compare for percentage change.')
+
+print(f'Communication counts for {date_range_start_str} to {date_range_end_str} have been updated in {output_file}')
