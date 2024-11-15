@@ -1,5 +1,64 @@
-=IF(AND(COUNTIF(Refinitiv_US!A:A, P2) = 0, COUNTIF(Refinitiv_UK!A:A, P2) = 0), "In Bhox_Employee_List but not in Refinitiv_US or Refinitiv_UK", 
-IF(AND(COUNTIF(Refinitiv_US!A:A, P2) > 0, COUNTIF(Refinitiv_UK!A:A, P2) > 0), "In both Refinitiv_US and Refinitiv_UK", 
-IF(AND(COUNTIF(Refinitiv_US!A:A, P2) > 0, COUNTIF(Refinitiv_UK!A:A, P2) = 0), "In Refinitiv_US but not in Refinitiv_UK", 
-IF(AND(COUNTIF(Refinitiv_US!A:A, P2) = 0, COUNTIF(Refinitiv_UK!A:A, P2) > 0), "In Refinitiv_UK but not in Refinitiv_US", 
-"In Refinitiv_UK and Refinitiv_US but not Bhox_Employee_List"))))
+import pandas as pd
+import glob
+import os
+
+# Function to find the latest file matching a pattern
+def find_latest_file(pattern):
+    files = glob.glob(pattern)
+    if not files:
+        print(f'Error: No files found matching {pattern}')
+        exit()
+    return max(files, key=os.path.getctime)
+
+# Find the latest 'Report#28' file
+report_file = find_latest_file('Report#28*.csv')
+
+# Find the latest 'hr_data_HRIdentities' file
+hr_file = find_latest_file('hr_data_HRIdentities*.csv')
+
+# Read the HR identities data
+hr_data = pd.read_csv(hr_file)
+
+# Ensure the required columns are present
+required_columns_hr = ['DISPLAY_NAME', 'COUNTRY', 'MONITORED_STATUS']
+if not all(col in hr_data.columns for col in required_columns_hr):
+    print('Error: Required columns missing in hr_data_HRIdentities CSV.')
+    exit()
+
+# Select necessary columns
+hr_data = hr_data[required_columns_hr]
+
+# Read the Report#28 data
+# Check if the first line is 'sep=,' and skip it if necessary
+with open(report_file, 'r', encoding='utf-8-sig') as f:
+    first_line = f.readline()
+    if 'sep=,' in first_line:
+        skiprows = [0]
+    else:
+        skiprows = []
+
+report_data = pd.read_csv(report_file, skiprows=skiprows)
+
+# Ensure 'ME Name' column exists
+if 'ME Name' not in report_data.columns:
+    print('Error: "ME Name" column missing in Report#28 CSV.')
+    exit()
+
+# Merge the dataframes on 'ME Name' and 'DISPLAY_NAME'
+merged_data = pd.merge(report_data, hr_data, left_on='ME Name', right_on='DISPLAY_NAME', how='left')
+
+# Filter for 'in-scope' MEs
+in_scope_data = merged_data[merged_data['MONITORED_STATUS'] == 'in-scope']
+
+# Identify communication count columns starting from 'Generated Content'
+comm_start_idx = report_data.columns.get_loc('Generated Content')
+comm_columns = report_data.columns[comm_start_idx:]
+
+# Group by 'COUNTRY' and sum the communication counts
+grouped_data = in_scope_data.groupby('COUNTRY')[comm_columns].sum()
+
+# Write the result to a new Excel file
+output_file = 'communication_counts_by_territory.xlsx'
+grouped_data.to_excel(output_file)
+
+print(f'Communication counts per territory have been written to {output_file}')
