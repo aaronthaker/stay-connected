@@ -1,11 +1,9 @@
 import pandas as pd
-import numpy as np
 import glob
 import os
 import chardet
 from datetime import datetime, timedelta
 
-# Existing imports and setup
 script_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(os.path.dirname(script_dir), 'Data')
 output_dir = os.path.dirname(script_dir)
@@ -33,9 +31,9 @@ report_date = extract_date_from_filename(report_file)
 week_end_date = report_date - timedelta(days=1)
 week_start_date = week_end_date - timedelta(days=6)
 
-# **Change 1: Add separate date range start and end columns**
-date_range_start_str = week_start_date.strftime('%d-%m-%Y')
-date_range_end_str = week_end_date.strftime('%d-%m-%Y')
+# Convert date range to strings
+date_range_start_str = week_start_date.strftime("%d-%m-%Y")
+date_range_end_str = week_end_date.strftime("%d-%m-%Y")
 
 hr_file = find_latest_file('hr_data_HRIdentities*.csv')
 
@@ -61,7 +59,7 @@ with open(report_file, 'r', encoding='utf-8-sig') as f:
 
 report_data = pd.read_csv(report_file, skiprows=skiprows)
 
-# **Change 2: Remove 'Typename ' prefix from column names**
+# Remove 'Typename ' prefix from column names
 report_data.columns = [col.replace('Typename ', '') for col in report_data.columns]
 
 if 'ME Name' not in report_data.columns:
@@ -71,17 +69,16 @@ if 'ME Name' not in report_data.columns:
 merged_data = pd.merge(report_data, hr_data, left_on='ME Name', right_on='DISPLAY_NAME', how='left')
 merged_data['MONITORED_STATUS'] = merged_data['MONITORED_STATUS'].astype(str).str.lower()
 in_scope_data = merged_data[merged_data['MONITORED_STATUS'] == 'in-scope']
-
 comm_start_idx = report_data.columns.get_loc('Generated Content')
 comm_columns = report_data.columns[comm_start_idx:]
 
 grouped_data = in_scope_data.groupby('COUNTRY')[comm_columns].sum().reset_index()
 
-# **Change 1 (continued): Add date range start and end to the dataframe**
+# Add the date range start and end to the dataframe
 grouped_data['Date Range Start'] = date_range_start_str
 grouped_data['Date Range End'] = date_range_end_str
 
-# Reorder columns to have 'Date Range Start' and 'Date Range End' first
+# Reorder columns to have 'Date Range Start', 'Date Range End', 'COUNTRY', then comm_columns
 cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + list(comm_columns)
 grouped_data = grouped_data[cols]
 
@@ -89,44 +86,8 @@ output_file = os.path.join(output_dir, 'communication_counts_by_territory.xlsx')
 
 if os.path.exists(output_file):
     existing_data = pd.read_excel(output_file)
-    # Remove any separator rows (if previously added)
-    existing_data = existing_data.dropna(how='all')
-
-    # Append the new data to the existing data
-    combined_data = pd.concat([existing_data, grouped_data], ignore_index=True)
-
-    # **Change 3: Calculate and append percentage statistics**
-    # Check if there is previous data to compare
-    if len(combined_data) > len(grouped_data):
-        # Get the data excluding the current week's data
-        previous_data = combined_data.iloc[:-len(grouped_data)]
-        previous_data = previous_data.dropna(how='all')
-
-        # Calculate the average of previous data grouped by 'COUNTRY'
-        avg_previous = previous_data.groupby('COUNTRY')[comm_columns].mean().reset_index()
-
-        # Merge current data with average previous data
-        comparison = pd.merge(grouped_data, avg_previous, on='COUNTRY', how='left', suffixes=('', '_Previous'))
-
-        # Calculate percentage change
-        for col in comm_columns:
-            col_prev = f'{col}_Previous'
-            pct_change_col = f'{col} % Change'
-            comparison[pct_change_col] = np.where(
-                comparison[col_prev] != 0,
-                ((comparison[col] - comparison[col_prev]) / comparison[col_prev]) * 100,
-                None
-            )
-
-        # Append percentage change columns to grouped_data
-        pct_change_cols = [f'{col} % Change' for col in comm_columns]
-        grouped_data = pd.concat([grouped_data, comparison[pct_change_cols]], axis=1)
-
-        # Update combined_data with the new grouped_data
-        combined_data = pd.concat([existing_data, grouped_data], ignore_index=True)
-    else:
-        print('No previous data to compare for percentage change.')
-        combined_data = combined_data  # unchanged
+    separator = pd.DataFrame([[''] * len(grouped_data.columns)], columns=grouped_data.columns)
+    combined_data = pd.concat([existing_data, separator, grouped_data], ignore_index=True)
 else:
     combined_data = grouped_data
 
