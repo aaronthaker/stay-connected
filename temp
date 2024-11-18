@@ -1,71 +1,57 @@
 import pandas as pd
+import numpy as np
 import glob
 import os
 import chardet
 from datetime import datetime, timedelta
-from openpyxl import load_workbook
-from openpyxl.styles import PatternFill
-from openpyxl.formatting.rule import CellIsRule
 
-# Function to find the latest file matching a pattern
+# Existing imports and setup
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(os.path.dirname(script_dir), 'Data')
+output_dir = os.path.dirname(script_dir)
+
 def find_latest_file(pattern):
-    files = glob.glob(pattern)
+    search_pattern = os.path.join(data_dir, pattern)
+    files = glob.glob(search_pattern)
     if not files:
-        print(f'Error: No files found matching {pattern}')
+        print(f'Error: No files found matching {pattern} in {data_dir}')
         exit()
     return max(files, key=os.path.getctime)
 
-# Function to extract date from the Report#28 filename
 def extract_date_from_filename(filename):
     base = os.path.basename(filename)
-    # Filename format: 'Report#28-15-11-2024_10_30_UTC.csv'
-    # Extract the part after 'Report#28-' and before the next underscore
     try:
-        date_str = base.split('Report#28-')[1].split('_')[0]
-        # Convert string to datetime object
+        date_str = base[10:20].replace('_','-')
         date = datetime.strptime(date_str, '%d-%m-%Y')
         return date
     except (IndexError, ValueError):
         print('Error: Unable to extract date from Report#28 filename.')
         exit()
 
-# Find the latest 'Report#28' file
 report_file = find_latest_file('Report#28*.csv')
-
-# Extract the date from the filename
 report_date = extract_date_from_filename(report_file)
+week_end_date = report_date - timedelta(days=1)
+week_start_date = week_end_date - timedelta(days=6)
 
-# Calculate the previous week's date range
-week_end_date = report_date - timedelta(days=1)  # Sunday of the previous week
-week_start_date = week_end_date - timedelta(days=6)  # Monday of the previous week
-
-# Convert dates to strings
+# **Change 1: Add separate date range start and end columns**
 date_range_start_str = week_start_date.strftime('%d-%m-%Y')
 date_range_end_str = week_end_date.strftime('%d-%m-%Y')
 
-# Find the latest 'hr_data_HRIdentities' file
 hr_file = find_latest_file('hr_data_HRIdentities*.csv')
 
-# Detect encoding of the HR file
 with open(hr_file, 'rb') as f:
     result = chardet.detect(f.read())
     hr_encoding = result['encoding']
     print(f'Detected encoding for HR file: {hr_encoding}')
 
-# Read the HR identities data with detected encoding
 hr_data = pd.read_csv(hr_file, encoding=hr_encoding)
-
-# Ensure the required columns are present
 required_columns_hr = ['DISPLAY_NAME', 'COUNTRY', 'MONITORED_STATUS']
 if not all(col in hr_data.columns for col in required_columns_hr):
     print('Error: Required columns missing in hr_data_HRIdentities CSV.')
     exit()
 
-# Select necessary columns
 hr_data = hr_data[required_columns_hr]
 
-# Read the Report#28 data
-# Check if the first line is 'sep=,' and skip it if necessary
 with open(report_file, 'r', encoding='utf-8-sig') as f:
     first_line = f.readline()
     if 'sep=,' in first_line:
@@ -73,32 +59,25 @@ with open(report_file, 'r', encoding='utf-8-sig') as f:
     else:
         skiprows = []
 
-# Read the Report#28 data
 report_data = pd.read_csv(report_file, skiprows=skiprows)
 
-# Remove 'Typename ' prefix from column names
+# **Change 2: Remove 'Typename ' prefix from column names**
 report_data.columns = [col.replace('Typename ', '') for col in report_data.columns]
 
-# Ensure 'ME Name' column exists
 if 'ME Name' not in report_data.columns:
     print('Error: "ME Name" column missing in Report#28 CSV.')
     exit()
 
-# Merge the dataframes on 'ME Name' and 'DISPLAY_NAME'
 merged_data = pd.merge(report_data, hr_data, left_on='ME Name', right_on='DISPLAY_NAME', how='left')
-
-# Filter for 'in-scope' MEs
 merged_data['MONITORED_STATUS'] = merged_data['MONITORED_STATUS'].astype(str).str.lower()
 in_scope_data = merged_data[merged_data['MONITORED_STATUS'] == 'in-scope']
 
-# Identify communication count columns starting from 'Generated Content'
 comm_start_idx = report_data.columns.get_loc('Generated Content')
 comm_columns = report_data.columns[comm_start_idx:]
 
-# Group by 'COUNTRY' and sum the communication counts
 grouped_data = in_scope_data.groupby('COUNTRY')[comm_columns].sum().reset_index()
 
-# Add the date range start and end to the dataframe
+# **Change 1 (continued): Add date range start and end to the dataframe**
 grouped_data['Date Range Start'] = date_range_start_str
 grouped_data['Date Range End'] = date_range_end_str
 
@@ -106,71 +85,52 @@ grouped_data['Date Range End'] = date_range_end_str
 cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + list(comm_columns)
 grouped_data = grouped_data[cols]
 
-# Output file name
-output_file = 'communication_counts_by_territory.xlsx'
+output_file = os.path.join(output_dir, 'communication_counts_by_territory.xlsx')
 
-# Check if the output file already exists
 if os.path.exists(output_file):
-    # Read the existing data
     existing_data = pd.read_excel(output_file)
+    # Remove any separator rows (if previously added)
+    existing_data = existing_data.dropna(how='all')
 
     # Append the new data to the existing data
     combined_data = pd.concat([existing_data, grouped_data], ignore_index=True)
+
+    # **Change 3: Calculate and append percentage statistics**
+    # Check if there is previous data to compare
+    if len(combined_data) > len(grouped_data):
+        # Get the data excluding the current week's data
+        previous_data = combined_data.iloc[:-len(grouped_data)]
+        previous_data = previous_data.dropna(how='all')
+
+        # Calculate the average of previous data grouped by 'COUNTRY'
+        avg_previous = previous_data.groupby('COUNTRY')[comm_columns].mean().reset_index()
+
+        # Merge current data with average previous data
+        comparison = pd.merge(grouped_data, avg_previous, on='COUNTRY', how='left', suffixes=('', '_Previous'))
+
+        # Calculate percentage change
+        for col in comm_columns:
+            col_prev = f'{col}_Previous'
+            pct_change_col = f'{col} % Change'
+            comparison[pct_change_col] = np.where(
+                comparison[col_prev] != 0,
+                ((comparison[col] - comparison[col_prev]) / comparison[col_prev]) * 100,
+                None
+            )
+
+        # Append percentage change columns to grouped_data
+        pct_change_cols = [f'{col} % Change' for col in comm_columns]
+        grouped_data = pd.concat([grouped_data, comparison[pct_change_cols]], axis=1)
+
+        # Update combined_data with the new grouped_data
+        combined_data = pd.concat([existing_data, grouped_data], ignore_index=True)
+    else:
+        print('No previous data to compare for percentage change.')
+        combined_data = combined_data  # unchanged
 else:
-    combined_data = grouped_data.copy()
+    combined_data = grouped_data
 
-# Calculate percentage change compared to previous weeks
-# Exclude the date and country columns for calculation
-value_columns = comm_columns
+with pd.ExcelWriter(output_file, engine='openpyxl', mode='w') as writer:
+    combined_data.to_excel(writer, index=False)
 
-# Check if there is previous data to compare
-if len(combined_data) > len(grouped_data):
-    # Get the data excluding the current week's data
-    previous_data = combined_data.iloc[:-len(grouped_data)]
-
-    # Calculate the average of previous data grouped by COUNTRY
-    avg_previous = previous_data.groupby('COUNTRY')[value_columns].mean().reset_index()
-
-    # Merge current data with average previous data
-    comparison = pd.merge(grouped_data, avg_previous, on='COUNTRY', how='left', suffixes=('', '_Previous'))
-
-    # Calculate percentage change
-    for col in value_columns:
-        col_prev = f'{col}_Previous'
-        comparison[f'{col}_% Change'] = ((comparison[col] - comparison[col_prev]) / comparison[col_prev]) * 100
-
-    # Select relevant columns
-    percentage_change_columns = [f'{col}_% Change' for col in value_columns]
-    percentage_data = comparison[['Date Range Start', 'Date Range End', 'COUNTRY'] + percentage_change_columns]
-
-    # Append percentage change as the last row
-    # For simplicity, we will append percentage change as additional rows per country
-    combined_data = pd.concat([combined_data, percentage_data], ignore_index=True)
-
-    # Apply conditional formatting if changes are above 20%
-    # We need to write the DataFrame to Excel first, then apply formatting using openpyxl
-
-    # Write the combined data to Excel without index
-    combined_data.to_excel(output_file, index=False)
-
-    # Load the workbook to apply formatting
-    wb = load_workbook(output_file)
-    ws = wb.active
-
-    # Find the rows containing percentage changes
-    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
-        # Check if the row contains '% Change' in any of the headers
-        if any(cell.value == '% Change' for cell in ws[1]):
-            for cell in row:
-                if isinstance(cell.value, float):
-                    if abs(cell.value) > 20:
-                        cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Yellow highlight
-
-    wb.save(output_file)
-else:
-    # No previous data to compare, just write the combined data
-    combined_data.to_excel(output_file, index=False)
-
-    print('No previous data to compare for percentage change.')
-
-print(f'Communication counts for {date_range_start_str} to {date_range_end_str} have been updated in {output_file}')
+print(f'Communication counts for {date_range_start_str} to {date_range_end_str} have been appended to {output_file}')
