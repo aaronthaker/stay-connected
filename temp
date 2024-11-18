@@ -1,6 +1,283 @@
+Certainly! Below are detailed, step-by-step instructions on how to set up the “Analysis” tab in your communication_counts_by_territory.xlsx Excel file. I’ll specify exactly what to put in each cell, including the formulas and any necessary formatting.
+
+Objective:
+
+	•	Create an “Analysis” sheet that allows you to:
+	•	Input two date ranges and a country.
+	•	Automatically calculate the counts and percentage changes in communications between the two date ranges for the specified country.
+	•	Easily update the inputs to analyze different periods or countries.
+
+Assumptions:
+
+	•	Data Sheet: Your script writes data to a sheet named “Data” in the Excel file.
+	•	Data Structure: The “Data” sheet has the following columns (from left to right):
+	•	Column A: Date Range Start
+	•	Column B: Date Range End
+	•	Column C: COUNTRY
+	•	Column D onwards: Communication channels with custom display names (e.g., Total Communications, Email, Bloomberg IM, etc.).
+
+Steps to Set Up the Analysis Tab:
+
+1. Open the Excel File:
+
+	•	Open communication_counts_by_territory.xlsx in Excel.
+
+2. Add a New Sheet for Analysis:
+
+	•	Click the ”+” icon at the bottom to add a new sheet.
+	•	Right-click the new sheet’s tab (probably named “Sheet1”) and select “Rename”.
+	•	Name the sheet “Analysis”.
+
+3. Create the Input Parameters Section:
+
+	•	We’ll use the top part of the “Analysis” sheet for input parameters.
+
+A. Enter Labels for Input Parameters:
+	•	Cell A1: Type “Input Parameters” (this is a header).
+	•	Leave Row 1 empty below this header for better readability.
+	•	Cell A2: Type “Date Range 1 Start:”
+	•	Cell A3: Type “Date Range 1 End:”
+	•	Cell A4: Type “Date Range 2 Start:”
+	•	Cell A5: Type “Date Range 2 End:”
+	•	Cell A6: Type “Country:”
+
+B. Enter Initial Input Values:
+	•	Cell B2: Type your first date range’s start date, e.g., 01-01-2024.
+	•	Cell B3: Type your first date range’s end date, e.g., 07-01-2024.
+	•	Cell B4: Type your second date range’s start date, e.g., 08-01-2024.
+	•	Cell B5: Type your second date range’s end date, e.g., 14-01-2024.
+	•	Cell B6: Type the country you want to analyze, e.g., UK MEs.
+
+Note: Ensure the dates are in the same format as in your “Data” sheet (e.g., dd-mm-yyyy).
+
+C. Apply Date Formatting:
+	•	Select cells B2:B5.
+	•	Right-click and choose “Format Cells…”.
+	•	In the “Number” tab, select “Date” and choose the appropriate date format (e.g., DD-MM-YYYY).
+
+D. Apply Data Validation for Country (Optional):
+	•	To create a dropdown list for countries:
+	•	Select Cell B6.
+	•	Go to the “Data” tab on the ribbon.
+	•	Click “Data Validation”.
+	•	In the “Settings” tab, set:
+	•	Allow: List
+	•	Source: Type =Data!$C$2:$C$1000 (adjust the range as needed).
+	•	Click “OK”.
+
+4. Create the Analysis Table Headers:
+
+	•	Leave a blank row after the input parameters for readability.
+	•	Cell A8: Type “Communication Channel”.
+	•	Cell B8: Type “Date Range 1 Count”.
+	•	Cell C8: Type “Date Range 2 Count”.
+	•	Cell D8: Type “Percentage Change”.
+	•	Bold the headers in Row 8 for emphasis.
+
+5. List the Communication Channels:
+
+	•	Starting from Cell A9, list the communication channels you want to analyze, matching the display names in your “Data” sheet.
+
+Example:
+	•	Cell A9: Total Communications
+	•	Cell A10: Email
+	•	Cell A11: WhatsApp Chat Entry
+	•	Cell A12: Bloomberg IM
+	•	Cell A13: MS Teams Message
+	•	Cell A14: ICE Chat
+	•	Cell A15: Chat
+	•	(Continue listing any other channels you have)
+
+6. Write Formulas to Calculate Counts:
+
+We’ll use the SUMIFS function to calculate counts based on your inputs.
+
+A. For Date Range 1 Counts:
+	•	Cell B9: Enter the following formula:
+
 =SUMIFS(
   Data!D:D,         // Sum values in 'Total Communications' column
   Data!$A:$A, $B$2, // Where 'Date Range Start' equals B2
   Data!$B:$B, $B$3, // And 'Date Range End' equals B3
   Data!$C:$C, $B$6  // And 'COUNTRY' equals B6
 )
+
+
+	•	Explanation:
+	•	Data!D:D: The column in the “Data” sheet for “Total Communications”. Adjust the column letter if necessary.
+	•	Data!$A:$A: The “Date Range Start” column in the “Data” sheet.
+	•	Data!$B:$B: The “Date Range End” column.
+	•	Data!$C:$C: The “COUNTRY” column.
+	•	$B$2, $B$3, $B$6: Absolute references to your input parameters.
+
+B. Adjust Formulas for Each Communication Channel:
+	•	For each communication channel, adjust the column in Data! accordingly.
+
+Example:
+	•	Cell B10 (for “Email”):
+
+=SUMIFS(
+  Data!E:E,         // 'Email' column in 'Data' sheet
+  Data!$A:$A, $B$2,
+  Data!$B:$B, $B$3,
+  Data!$C:$C, $B$6
+)
+
+
+	•	Cell B11 (for “WhatsApp Chat Entry”):
+
+=SUMIFS(
+  Data!F:F,         // 'WhatsApp Chat Entry' column
+  Data!$A:$A, $B$2,
+  Data!$B:$B, $B$3,
+  Data!$C:$C, $B$6
+)
+
+
+	•	Continue this pattern for all communication channels, updating the column references (D:D, E:E, F:F, etc.) as needed.
+
+C. For Date Range 2 Counts:
+	•	Repeat the same process in Column C, but adjust the date range references.
+	•	Cell C9 (for “Total Communications”):
+
+=SUMIFS(
+  Data!D:D,
+  Data!$A:$A, $B$4, // Date Range 2 Start (B4)
+  Data!$B:$B, $B$5, // Date Range 2 End (B5)
+  Data!$C:$C, $B$6
+)
+
+
+	•	Adjust the formulas for each communication channel, as done for Date Range 1.
+
+Tip: Once you have the formula in Cell B9, you can copy it to Cell C9 and just change the date references from $B$2 and $B$3 to $B$4 and $B$5.
+
+7. Calculate Percentage Change:
+
+	•	Cell D9: Enter the following formula:
+
+=IF(B9=0, "", (C9 - B9) / ABS(B9))
+
+
+	•	Explanation:
+	•	IF(B9=0, "", ...): Checks if the initial count is zero to avoid division by zero errors.
+	•	(C9 - B9) / ABS(B9): Calculates the percentage change from Date Range 1 to Date Range 2.
+	•	ABS(B9): Ensures the denominator is positive.
+	•	Format Cell D9 as a Percentage:
+	•	Select Cell D9.
+	•	Right-click and choose “Format Cells…”.
+	•	Select “Percentage” and set decimal places as desired (e.g., 2).
+	•	Copy the Formula Down:
+	•	Select Cell D9.
+	•	Click and drag the fill handle (small square at the bottom-right corner of the cell) down to apply the formula to the other rows (e.g., D10, D11, etc.).
+
+8. Adjust Column References (Important):
+
+	•	Ensure that in each formula, the column references in Data! correspond to the correct communication channel.
+	•	For example, if “Email” is in Column E in the “Data” sheet, then in the formula for “Email”, you should use Data!E:E.
+	•	Summary of Column References:
+	•	Total Communications: Data!D:D
+	•	Email: Data!E:E
+	•	WhatsApp Chat Entry: Data!F:F
+	•	Bloomberg IM: Data!G:G
+	•	MS Teams Message: Data!H:H
+	•	(Adjust as per your “Data” sheet)
+
+9. Finalize the Analysis Table:
+
+	•	After entering all formulas, your table should look something like this:
+
+A	B	C	D
+Communication Channel	Date Range 1 Count	Date Range 2 Count	Percentage Change
+Total Communications	[Formula]	[Formula]	[Formula]
+Email	[Formula]	[Formula]	[Formula]
+WhatsApp Chat Entry	[Formula]	[Formula]	[Formula]
+Bloomberg IM	[Formula]	[Formula]	[Formula]
+MS Teams Message	[Formula]	[Formula]	[Formula]
+ICE Chat	[Formula]	[Formula]	[Formula]
+Chat	[Formula]	[Formula]	[Formula]
+…	…	…	…
+
+10. Enhancements (Optional):
+
+A. Conditional Formatting:
+	•	Apply conditional formatting to the “Percentage Change” column to visually highlight significant changes.
+	•	Steps:
+	•	Select the range D9:D (down to the last communication channel).
+	•	Go to the “Home” tab.
+	•	Click “Conditional Formatting” > “Data Bars”, “Color Scales”, or “Icon Sets”.
+	•	Choose a format that suits your preference.
+
+B. Data Validation for Date Inputs:
+	•	To ensure correct date formats, you can set up data validation on the date input cells.
+	•	Steps:
+	•	Select Cells B2:B5.
+	•	Go to “Data” > “Data Validation”.
+	•	Set Allow: Date
+	•	Set the date range if necessary.
+	•	Click “OK”.
+
+C. Freeze Panes for Easier Navigation:
+	•	To keep the headers visible while scrolling:
+	•	Select Cell A9.
+	•	Go to “View” tab.
+	•	Click “Freeze Panes” > “Freeze Panes”.
+
+11. Testing the Analysis Tab:
+
+	•	Change the input values in Cells B2:B6 to test different date ranges and countries.
+	•	Verify that the counts and percentage changes update correctly.
+
+12. Saving Your Work:
+
+	•	Save the Excel file after making changes.
+
+13. Updating Data with the Script:
+
+	•	When you run your script to append new data to the “Data” sheet, the formulas in the “Analysis” sheet will automatically incorporate the new data.
+	•	Important: Ensure that the script only updates the “Data” sheet and does not affect the “Analysis” sheet.
+
+Example with Sample Data:
+
+Let’s say your “Data” sheet has the following simplified data:
+
+A	B	C	D	E	F
+Date Range Start	Date Range End	COUNTRY	Total Communications	Email	Bloomberg IM
+01-01-2024	07-01-2024	UK MEs	100	50	30
+01-01-2024	07-01-2024	US MEs	80	40	20
+08-01-2024	14-01-2024	UK MEs	120	60	35
+08-01-2024	14-01-2024	US MEs	90	45	25
+
+In your “Analysis” sheet, with inputs:
+	•	Date Range 1 Start: 01-01-2024
+	•	Date Range 1 End: 07-01-2024
+	•	Date Range 2 Start: 08-01-2024
+	•	Date Range 2 End: 14-01-2024
+	•	Country: UK MEs
+
+The formulas would calculate:
+	•	Total Communications:
+	•	Date Range 1 Count: 100
+	•	Date Range 2 Count: 120
+	•	Percentage Change: (120 - 100) / 100 = 20%
+	•	Email:
+	•	Date Range 1 Count: 50
+	•	Date Range 2 Count: 60
+	•	Percentage Change: (60 - 50) / 50 = 20%
+	•	Bloomberg IM:
+	•	Date Range 1 Count: 30
+	•	Date Range 2 Count: 35
+	•	Percentage Change: (35 - 30) / 30 ≈ 16.67%
+
+Troubleshooting Tips:
+
+	•	Incorrect Counts: Double-check that the column references in your formulas match the correct columns in the “Data” sheet.
+	•	Formula Errors: Ensure that all cell references are correct and that absolute references (using $) are applied where necessary.
+	•	Data Not Updating: Verify that the “Data” sheet has the latest data and that the script has appended new data correctly.
+	•	Date Formats: Consistency is key. Ensure that dates in both the “Data” and “Analysis” sheets are in the same format.
+
+Conclusion:
+
+By following these instructions, you will have a functional “Analysis” tab that allows you to quickly assess the percentage changes in communication counts between two date ranges for any country. You can easily adjust the input parameters to analyze different periods or regions, and the formulas will automatically update the results.
+
+Feel free to customize the analysis further by adding more communication channels, visualizations, or additional calculations as needed. If you have any questions or need further assistance, don’t hesitate to ask!
