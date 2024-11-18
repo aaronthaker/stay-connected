@@ -3,6 +3,7 @@ import glob
 import os
 import chardet
 from datetime import datetime, timedelta
+from openpyxl import load_workbook
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(os.path.dirname(script_dir), 'Data')
@@ -10,7 +11,6 @@ output_dir = os.path.dirname(script_dir)
 
 # Define a dictionary mapping original column names to desired display names
 # Include only the columns you want in the final output
-# Format: 'Original Column Name': 'Desired Display Name'
 column_name_mapping = {
     'Generated Content': 'Total Communications',
     'EMAIL': 'Email',
@@ -124,15 +124,28 @@ cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + list(renamed_comm_col
 grouped_data = grouped_data[cols]
 
 output_file = os.path.join(output_dir, 'communication_counts_by_territory.xlsx')
+data_sheet_name = 'Data'  # The sheet where data will be stored
 
 if os.path.exists(output_file):
-    existing_data = pd.read_excel(output_file)
-    separator = pd.DataFrame([[''] * len(grouped_data.columns)], columns=grouped_data.columns)
-    combined_data = pd.concat([existing_data, separator, grouped_data], ignore_index=True)
+    # Load the existing workbook
+    book = load_workbook(output_file)
+    # Check if the data sheet exists
+    if data_sheet_name in book.sheetnames:
+        # Load existing data from the data sheet
+        existing_data = pd.read_excel(output_file, sheet_name=data_sheet_name)
+        # Append the new data
+        separator = pd.DataFrame([[''] * len(grouped_data.columns)], columns=grouped_data.columns)
+        combined_data = pd.concat([existing_data, separator, grouped_data], ignore_index=True)
+    else:
+        combined_data = grouped_data
+    # Write back to the same sheet, preserving other sheets
+    with pd.ExcelWriter(output_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+        writer.book = book
+        writer.sheets = {ws.title: ws for ws in book.worksheets}
+        combined_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
 else:
-    combined_data = grouped_data
-
-with pd.ExcelWriter(output_file, engine='openpyxl', mode='w') as writer:
-    combined_data.to_excel(writer, index=False)
+    # Write the data to a new workbook
+    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+        grouped_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
 
 print(f'Communication counts for {date_range_start_str} to {date_range_end_str} have been appended to {output_file}')
