@@ -3,7 +3,6 @@ import glob
 import os
 import chardet
 from datetime import datetime, timedelta
-from openpyxl import load_workbook
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(os.path.dirname(script_dir), 'Data')
@@ -127,10 +126,9 @@ output_file = os.path.join(output_dir, 'communication_counts_by_territory.xlsx')
 data_sheet_name = 'Data'  # The sheet where data will be stored
 
 if os.path.exists(output_file):
-    # Load the existing workbook
-    book = load_workbook(output_file)
     # Check if the data sheet exists
-    if data_sheet_name in book.sheetnames:
+    xl = pd.ExcelFile(output_file)
+    if data_sheet_name in xl.sheet_names:
         # Load existing data from the data sheet
         existing_data = pd.read_excel(output_file, sheet_name=data_sheet_name)
         # Append the new data
@@ -140,8 +138,6 @@ if os.path.exists(output_file):
         combined_data = grouped_data
     # Write back to the same sheet, preserving other sheets
     with pd.ExcelWriter(output_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
-        writer.book = book
-        writer.sheets = {ws.title: ws for ws in book.worksheets}
         combined_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
 else:
     # Write the data to a new workbook
