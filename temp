@@ -8,6 +8,35 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(os.path.dirname(script_dir), 'Data')
 output_dir = os.path.dirname(script_dir)
 
+# Define a dictionary mapping original column names to desired display names
+# Include only the columns you want in the final output
+# Format: 'Original Column Name': 'Desired Display Name'
+column_name_mapping = {
+    'Generated Content': 'Total Communications',
+    'EMAIL': 'Email',
+    'WHATSAPP_CHAT_ROOM_ENTRY': 'WhatsApp Chat Entry',
+    'IMESSAGE_CHAT_ROOM_LEAVE': 'iMessage Chat Leave',
+    'BLM_IM': 'Bloomberg IM',
+    'WHATSAPP_CHAT_ROOM_JOIN': 'WhatsApp Chat Join',
+    'LEAPXPERT_SMS_CHAT_ROOM_JOIN': 'LeapXpert SMS Chat Join',
+    'REFINITIV_CHAT_ROOM_ENTRY': 'Refinitiv Chat Entry',
+    'IMESSAGE_CHAT_ROOM_ENTRY': 'iMessage Chat Entry',
+    'LEAPXPERTSMS_CHAT_ENTRY': 'LeapXpert SMS Chat Entry',
+    'IMESSAGE_CHAT_ROOM_JOIN': 'iMessage Chat Join',
+    'ICE_CHAT': 'ICE Chat',
+    'MS_TEAMS_MESSAGE': 'MS Teams Message',
+    'BLM_MESSAGE': 'Bloomberg Message',
+    'CHAT': 'Chat',
+    # Add or remove entries as needed
+}
+
+# List of columns to omit (original column names without 'Typename ' prefix)
+columns_to_omit = [
+    'WHATSAPP_CHAT_ROOM_LEAVE',
+    'LEAPXPERT_SMS_CHAT_ROOM_LEAVE',
+    # Add any other columns you wish to exclude
+]
+
 def find_latest_file(pattern):
     search_pattern = os.path.join(data_dir, pattern)
     files = glob.glob(search_pattern)
@@ -69,17 +98,29 @@ if 'ME Name' not in report_data.columns:
 merged_data = pd.merge(report_data, hr_data, left_on='ME Name', right_on='DISPLAY_NAME', how='left')
 merged_data['MONITORED_STATUS'] = merged_data['MONITORED_STATUS'].astype(str).str.lower()
 in_scope_data = merged_data[merged_data['MONITORED_STATUS'] == 'in-scope']
+
+# Determine the communication columns (from 'Generated Content' onwards)
 comm_start_idx = report_data.columns.get_loc('Generated Content')
 comm_columns = report_data.columns[comm_start_idx:]
 
+# Filter out the columns to omit
+comm_columns = [col for col in comm_columns if col not in columns_to_omit]
+
+# Apply the column name mappings
+renamed_comm_columns = {col: column_name_mapping.get(col, col) for col in comm_columns}
+
+# Group by 'COUNTRY' and sum the communication counts
 grouped_data = in_scope_data.groupby('COUNTRY')[comm_columns].sum().reset_index()
+
+# Rename the columns according to the mapping
+grouped_data = grouped_data.rename(columns=renamed_comm_columns)
 
 # Add the date range start and end to the dataframe
 grouped_data['Date Range Start'] = date_range_start_str
 grouped_data['Date Range End'] = date_range_end_str
 
-# Reorder columns to have 'Date Range Start', 'Date Range End', 'COUNTRY', then comm_columns
-cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + list(comm_columns)
+# Reorder columns to have 'Date Range Start', 'Date Range End', 'COUNTRY', then communication columns
+cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + list(renamed_comm_columns.values())
 grouped_data = grouped_data[cols]
 
 output_file = os.path.join(output_dir, 'communication_counts_by_territory.xlsx')
