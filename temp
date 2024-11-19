@@ -79,7 +79,6 @@ if not all(col in hr_data.columns for col in required_columns_hr):
     exit()
 
 hr_data = hr_data[required_columns_hr]
-# Filter for in-scope MEs
 hr_data['MONITORED_STATUS'] = hr_data['MONITORED_STATUS'].astype(str).str.lower()
 in_scope_hr_data = hr_data[hr_data['MONITORED_STATUS'] == 'in-scope']
 
@@ -91,25 +90,18 @@ with open(report_file, 'r', encoding='utf-8-sig') as f:
         skiprows = []
 
 report_data = pd.read_csv(report_file, skiprows=skiprows)
-
-# Remove 'Typename ' prefix from column names
 report_data.columns = [col.replace('Typename ', '') for col in report_data.columns]
 
 if 'ME Name' not in report_data.columns:
     print('Error: "ME Name" column missing in Report#28 CSV.')
     exit()
 
-# Create sets of ME Names
 hr_me_names = set(in_scope_hr_data['DISPLAY_NAME'].unique())
 report_me_names = set(report_data['ME Name'].unique())
 
-# MEs in HR but not in Report
 mes_in_hr_not_in_report = hr_me_names - report_me_names
-
-# MEs in Report but not in HR
 mes_in_report_not_in_hr = report_me_names - hr_me_names
 
-# Prepare Errors DataFrame
 errors_list = []
 
 if mes_in_hr_not_in_report:
@@ -134,117 +126,77 @@ if errors_list:
 else:
     errors_data = pd.DataFrame(columns=['Date Range Start', 'Date Range End', 'DISPLAY_NAME', 'COUNTRY', 'Error Type'])
 
-# Now continue with processing as before
 merged_data = pd.merge(report_data, hr_data, left_on='ME Name', right_on='DISPLAY_NAME', how='left')
 merged_data['MONITORED_STATUS'] = merged_data['MONITORED_STATUS'].astype(str).str.lower()
 in_scope_data = merged_data[merged_data['MONITORED_STATUS'] == 'in-scope']
 
-# Get communication columns (from 'Generated Content' onwards)
 comm_start_idx = report_data.columns.get_loc('Generated Content')
 comm_columns = report_data.columns[comm_start_idx:]
-# Filter out cols to omit
 comm_columns = [col for col in comm_columns if col not in columns_to_omit]
-# Apply the column name mappings
 renamed_comm_columns = {col: column_name_mapping.get(col, col) for col in comm_columns}
-# Rename columns in in_scope_data for consistency
 in_scope_data = in_scope_data.rename(columns=renamed_comm_columns)
 
-# Group by COUNTRY and sum the communication counts
 grouped_data = in_scope_data.groupby('COUNTRY')[list(renamed_comm_columns.values())].sum().reset_index()
-# Add date range start and end to the df
 grouped_data['Date Range Start'] = date_range_start_str
 grouped_data['Date Range End'] = date_range_end_str
-# Reorder cols to have 'Date Range Start', 'Date Range End', 'COUNTRY', then comms columns
 cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + list(renamed_comm_columns.values())
 grouped_data = grouped_data[cols]
 
 output_file = os.path.join(output_dir, 'communication_counts_by_territory.xlsx')
-data_sheet_name = 'Data'       # Sheet where data is stored
-breakdown_sheet_name = 'Breakdown'  # Sheet for breakdown analysis
-errors_sheet_name = 'Errors'   # Sheet for errors
+data_sheet_name = 'Data'
+errors_sheet_name = 'Errors'
 
-# Prepare the breakdown data (as before)
-# Total number of in-scope MEs per country
+# Prepare the breakdown data
 total_mes_per_country = in_scope_hr_data.groupby('COUNTRY')['DISPLAY_NAME'].nunique().reset_index()
 total_mes_per_country = total_mes_per_country.rename(columns={'DISPLAY_NAME': 'Total MEs'})
 
-# For each communication channel, determine the number of MEs per country who had at least one communication
 melted_data = in_scope_data[['ME Name', 'COUNTRY'] + list(renamed_comm_columns.values())]
 melted_data = melted_data.melt(id_vars=['ME Name', 'COUNTRY'], value_vars=list(renamed_comm_columns.values()),
                                var_name='Channel', value_name='Count')
-
-# Filter out zero counts
 melted_data = melted_data[melted_data['Count'] > 0]
 
-# Get unique MEs per country per channel
 unique_mes = melted_data.groupby(['COUNTRY', 'Channel'])['ME Name'].nunique().reset_index()
 unique_mes = unique_mes.rename(columns={'ME Name': 'MEs with Activity'})
 
-# Merge with total MEs per country
 breakdown_data = pd.merge(unique_mes, total_mes_per_country, on='COUNTRY', how='left')
-
-# Calculate the percentage
 breakdown_data['Percentage'] = (breakdown_data['MEs with Activity'] / breakdown_data['Total MEs']) * 100
-
-# Add date range columns
 breakdown_data['Date Range Start'] = date_range_start_str
 breakdown_data['Date Range End'] = date_range_end_str
 
-# Reorder columns
 breakdown_cols = ['Date Range Start', 'Date Range End', 'COUNTRY', 'Channel', 'MEs with Activity', 'Total MEs', 'Percentage']
 breakdown_data = breakdown_data[breakdown_cols]
-
-# Round the percentage to 2 decimal places
 breakdown_data['Percentage'] = breakdown_data['Percentage'].round(2)
+
+# Write breakdown data to a .txt file
+breakdown_file = os.path.join(output_dir, 'breakdown.txt')
+with open(breakdown_file, 'a') as f:
+    f.write(f'Date Range: {date_range_start_str} to {date_range_end_str}\n')
+    f.write(breakdown_data.to_string(index=False))
+    f.write('\n\n')
 
 # Write data to Excel file
 if os.path.exists(output_file):
-    # Load existing workbook
     with pd.ExcelWriter(output_file, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-        # Append to 'Data' sheet
         try:
             existing_data = pd.read_excel(output_file, sheet_name=data_sheet_name)
-            # Append new data with separator
             separator = pd.DataFrame([[''] * len(grouped_data.columns)], columns=grouped_data.columns)
             combined_data = pd.concat([existing_data, separator, grouped_data], ignore_index=True)
         except ValueError:
-            # 'Data' sheet does not exist
             combined_data = grouped_data
-        # Overwrite 'Data' sheet
         combined_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
         
-        # Append to 'Breakdown' sheet
-        try:
-            existing_breakdown = pd.read_excel(output_file, sheet_name=breakdown_sheet_name)
-            # Append new data with separator
-            separator_bd = pd.DataFrame([[''] * len(breakdown_data.columns)], columns=breakdown_data.columns)
-            combined_breakdown = pd.concat([existing_breakdown, separator_bd, breakdown_data], ignore_index=True)
-        except ValueError:
-            # 'Breakdown' sheet does not exist
-            combined_breakdown = breakdown_data
-        # Overwrite 'Breakdown' sheet
-        combined_breakdown.to_excel(writer, sheet_name=breakdown_sheet_name, index=False)
-        
-        # Append to 'Errors' sheet
         if not errors_data.empty:
             try:
                 existing_errors = pd.read_excel(output_file, sheet_name=errors_sheet_name)
                 combined_errors = pd.concat([existing_errors, errors_data], ignore_index=True)
             except ValueError:
-                # 'Errors' sheet does not exist
                 combined_errors = errors_data
             combined_errors.to_excel(writer, sheet_name=errors_sheet_name, index=False)
         else:
-            # If there are no new errors, we can choose to leave the existing 'Errors' sheet as is.
             pass
 else:
-    # Write data to a new workbook
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
-        # Write 'Data' sheet
         grouped_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
-        # Write 'Breakdown' sheet
-        breakdown_data.to_excel(writer, sheet_name=breakdown_sheet_name, index=False)
-        # Write 'Errors' sheet if there are errors
         if not errors_data.empty:
             errors_data.to_excel(writer, sheet_name=errors_sheet_name, index=False)
 
