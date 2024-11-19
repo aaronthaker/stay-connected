@@ -199,13 +199,33 @@ breakdown_data['Percentage'] = breakdown_data['Percentage'].round(2)
 
 # Write data to Excel file
 if os.path.exists(output_file):
-    # Open the existing workbook
+    # Load existing workbook
     with pd.ExcelWriter(output_file, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-        # Write the 'Data' sheet
-        grouped_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
-        # Write the 'Breakdown' sheet
-        breakdown_data.to_excel(writer, sheet_name=breakdown_sheet_name, index=False)
-        # Write the 'Errors' sheet
+        # Append to 'Data' sheet
+        try:
+            existing_data = pd.read_excel(output_file, sheet_name=data_sheet_name)
+            # Append new data with separator
+            separator = pd.DataFrame([[''] * len(grouped_data.columns)], columns=grouped_data.columns)
+            combined_data = pd.concat([existing_data, separator, grouped_data], ignore_index=True)
+        except ValueError:
+            # 'Data' sheet does not exist
+            combined_data = grouped_data
+        # Overwrite 'Data' sheet
+        combined_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
+        
+        # Append to 'Breakdown' sheet
+        try:
+            existing_breakdown = pd.read_excel(output_file, sheet_name=breakdown_sheet_name)
+            # Append new data with separator
+            separator_bd = pd.DataFrame([[''] * len(breakdown_data.columns)], columns=breakdown_data.columns)
+            combined_breakdown = pd.concat([existing_breakdown, separator_bd, breakdown_data], ignore_index=True)
+        except ValueError:
+            # 'Breakdown' sheet does not exist
+            combined_breakdown = breakdown_data
+        # Overwrite 'Breakdown' sheet
+        combined_breakdown.to_excel(writer, sheet_name=breakdown_sheet_name, index=False)
+        
+        # Append to 'Errors' sheet
         if not errors_data.empty:
             try:
                 existing_errors = pd.read_excel(output_file, sheet_name=errors_sheet_name)
@@ -215,13 +235,16 @@ if os.path.exists(output_file):
                 combined_errors = errors_data
             combined_errors.to_excel(writer, sheet_name=errors_sheet_name, index=False)
         else:
-            pass  # No new errors to write; preserve existing 'Errors' sheet
+            # If there are no new errors, we can choose to leave the existing 'Errors' sheet as is.
+            pass
 else:
     # Write data to a new workbook
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+        # Write 'Data' sheet
         grouped_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
+        # Write 'Breakdown' sheet
         breakdown_data.to_excel(writer, sheet_name=breakdown_sheet_name, index=False)
-        # Write the 'Errors' sheet if there are errors
+        # Write 'Errors' sheet if there are errors
         if not errors_data.empty:
             errors_data.to_excel(writer, sheet_name=errors_sheet_name, index=False)
 
