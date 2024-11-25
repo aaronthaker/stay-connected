@@ -3,33 +3,33 @@ import glob
 import os
 import chardet
 from datetime import datetime, timedelta
+import re
+from itertools import product
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(os.path.dirname(script_dir), 'Data')
 output_dir = os.path.dirname(script_dir)
 
-# Format: 'Original col name': 'Desired display name'
 column_name_mapping = {
     'Generated Content': 'Total Communications',
     'EMAIL': 'Email',
-    'WHATSAPP_CHAT_ROOM_ENTRY': 'WhatsApp Chat Entry',
-    'IMESSAGE_CHAT_ROOM_LEAVE': 'iMessage Chat Leave',
+    'MS_TEAMS_MESSAGE': 'MS Teams Message',
+    'CHAT': 'Bloomberg Chat',
     'BLM_IM': 'Bloomberg IM',
-    'WHATSAPP_CHAT_ROOM_JOIN': 'WhatsApp Chat Join',
-    'LEAPXPERT_SMS_CHAT_ROOM_JOIN': 'LeapXpert SMS Chat Join',
+    'BLM_MESSAGE': 'Bloomberg Message',
     'REFINITIV_CHAT_ROOM_ENTRY': 'Refinitiv Chat Entry',
+    'ICE_CHAT': 'ICE Chat',
+    'WHATSAPP_CHAT_ROOM_ENTRY': 'WhatsApp Chat Entry',
     'IMESSAGE_CHAT_ROOM_ENTRY': 'iMessage Chat Entry',
     'LEAPXPERTSMS_CHAT_ENTRY': 'LeapXpert SMS Chat Entry',
+    'IMESSAGE_CHAT_ROOM_LEAVE': 'iMessage Chat Leave',
+    'WHATSAPP_CHAT_ROOM_JOIN': 'WhatsApp Chat Join',
+    'LEAPXPERT_SMS_CHAT_ROOM_JOIN': 'LeapXpert SMS Chat Join',
     'IMESSAGE_CHAT_ROOM_JOIN': 'iMessage Chat Join',
-    'ICE_CHAT': 'ICE Chat',
-    'MS_TEAMS_MESSAGE': 'MS Teams Message',
-    'BLM_MESSAGE': 'Bloomberg Message',
-    'CHAT': 'Chat',
     'WHATSAPP_CHAT_ROOM_LEAVE': 'WhatsApp Chat Leave',
     'LEAPXPERT_SMS_CHAT_ROOM_LEAVE': 'LeapXpert SMS Chat Leave',
 }
 
-# Columns to omit (original column names without 'Typename ' prefix)
 columns_to_omit = [
     'IMESSAGE_CHAT_ROOM_LEAVE',
     'WHATSAPP_CHAT_ROOM_JOIN',
@@ -38,6 +38,10 @@ columns_to_omit = [
     'WHATSAPP_CHAT_ROOM_LEAVE',
     'LEAPXPERT_SMS_CHAT_ROOM_LEAVE',
 ]
+
+name_corrections = {
+    r'Francis.*Callaghan': "Francis O’Callaghan"
+}
 
 def find_latest_file(pattern):
     search_pattern = os.path.join(data_dir, pattern)
@@ -57,6 +61,12 @@ def extract_date_from_filename(filename):
         print('Error: Unable to extract date from Report#28 filename.')
         exit()
 
+def replace_names(name):
+    for pattern, replacement in name_corrections.items():
+        if re.match(pattern, name):
+            return replacement
+    return name
+
 report_file = find_latest_file('Report#28*.csv')
 report_date = extract_date_from_filename(report_file)
 week_end_date = report_date - timedelta(days=1)
@@ -73,7 +83,7 @@ with open(hr_file, 'rb') as f:
     print(f'Detected encoding for HR file: {hr_encoding}')
 
 hr_data = pd.read_csv(hr_file, encoding=hr_encoding)
-required_columns_hr = ['DISPLAY_NAME', 'COUNTRY', 'MONITORED_STATUS']
+required_columns_hr = ['DISPLAY_NAME', 'COUNTRY', 'MONITORED_STATUS', 'ICE_ID', 'BLOOMBERG_ID', 'REUTERS_ID']
 if not all(col in hr_data.columns for col in required_columns_hr):
     print('Error: Required columns missing in hr_data_HRIdentities CSV.')
     exit()
@@ -95,6 +105,8 @@ report_data.columns = [col.replace('Typename ', '') for col in report_data.colum
 if 'ME Name' not in report_data.columns:
     print('Error: "ME Name" column missing in Report#28 CSV.')
     exit()
+else:
+    report_data['ME Name'] = report_data['ME Name'].apply(replace_names)
 
 hr_me_names = set(in_scope_hr_data['DISPLAY_NAME'].unique())
 report_me_names = set(report_data['ME Name'].unique())
@@ -136,29 +148,63 @@ comm_columns = [col for col in comm_columns if col not in columns_to_omit]
 renamed_comm_columns = {col: column_name_mapping.get(col, col) for col in comm_columns}
 in_scope_data = in_scope_data.rename(columns=renamed_comm_columns)
 
-grouped_data = in_scope_data.groupby('COUNTRY')[list(renamed_comm_columns.values())].sum().reset_index()
+bloomberg_channels = ['Bloomberg Chat', 'Bloomberg IM', 'Bloomberg Message']
+in_scope_data['Bloomberg'] = in_scope_data[bloomberg_channels].sum(axis=1)
+
+ordered_comm_columns = [column_name_mapping[col] for col in column_name_mapping if col in comm_columns]
+ordered_comm_columns = [col for col in ordered_comm_columns if col not in bloomberg_channels]
+ordered_comm_columns.append('Bloomberg')
+
+grouped_data = in_scope_data.groupby('COUNTRY')[ordered_comm_columns].sum().reset_index()
 grouped_data['Date Range Start'] = date_range_start_str
 grouped_data['Date Range End'] = date_range_end_str
-cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + list(renamed_comm_columns.values())
+cols = ['Date Range Start', 'Date Range End', 'COUNTRY'] + ordered_comm_columns
 grouped_data = grouped_data[cols]
 
 output_file = os.path.join(output_dir, 'communication_counts_by_territory.xlsx')
 data_sheet_name = 'Data'
 errors_sheet_name = 'Errors'
 
-# Prepare the breakdown data
+# Getting breakdown data
 total_mes_per_country = in_scope_hr_data.groupby('COUNTRY')['DISPLAY_NAME'].nunique().reset_index()
 total_mes_per_country = total_mes_per_country.rename(columns={'DISPLAY_NAME': 'Total MEs'})
 
-melted_data = in_scope_data[['ME Name', 'COUNTRY'] + list(renamed_comm_columns.values())]
-melted_data = melted_data.melt(id_vars=['ME Name', 'COUNTRY'], value_vars=list(renamed_comm_columns.values()),
+special_channels = {
+    'Bloomberg': 'BLOOMBERG_ID',
+    'ICE Chat': 'ICE_ID',
+    'Refinitiv Chat Entry': 'REUTERS_ID',
+}
+
+total_mes_per_country_channel_list = []
+
+for channel, id_field in special_channels.items():
+    temp_df = in_scope_hr_data[~in_scope_hr_data[id_field].isna()]
+    total_mes = temp_df.groupby('COUNTRY')['DISPLAY_NAME'].nunique().reset_index()
+    total_mes = total_mes.rename(columns={'DISPLAY_NAME': 'Total MEs'})
+    total_mes['Channel'] = channel
+    total_mes_per_country_channel_list.append(total_mes)
+
+countries = total_mes_per_country['COUNTRY'].unique()
+breakdown_comm_columns = [col for col in ordered_comm_columns if col != 'Bloomberg']
+breakdown_comm_columns.append('Bloomberg')
+other_channels = set(breakdown_comm_columns) - set(special_channels.keys())
+
+other_channels_total_mes = pd.DataFrame(list(product(countries, other_channels)), columns=['COUNTRY', 'Channel'])
+other_channels_total_mes = other_channels_total_mes.merge(total_mes_per_country, on='COUNTRY', how='left')
+
+total_mes_per_country_channel = pd.concat(total_mes_per_country_channel_list + [other_channels_total_mes], ignore_index=True)
+
+melted_data = in_scope_data[['ME Name', 'COUNTRY'] + breakdown_comm_columns]
+melted_data = melted_data.melt(id_vars=['ME Name', 'COUNTRY'],
+                               value_vars=breakdown_comm_columns,
                                var_name='Channel', value_name='Count')
 melted_data = melted_data[melted_data['Count'] > 0]
 
 unique_mes = melted_data.groupby(['COUNTRY', 'Channel'])['ME Name'].nunique().reset_index()
 unique_mes = unique_mes.rename(columns={'ME Name': 'MEs with Activity'})
 
-breakdown_data = pd.merge(unique_mes, total_mes_per_country, on='COUNTRY', how='left')
+breakdown_data = pd.merge(unique_mes, total_mes_per_country_channel, on=['COUNTRY', 'Channel'], how='left')
+
 breakdown_data['Percentage'] = (breakdown_data['MEs with Activity'] / breakdown_data['Total MEs']) * 100
 breakdown_data['Date Range Start'] = date_range_start_str
 breakdown_data['Date Range End'] = date_range_end_str
@@ -167,14 +213,12 @@ breakdown_cols = ['Date Range Start', 'Date Range End', 'COUNTRY', 'Channel', 'M
 breakdown_data = breakdown_data[breakdown_cols]
 breakdown_data['Percentage'] = breakdown_data['Percentage'].round(2)
 
-# Write breakdown data to a .txt file
-breakdown_file = os.path.join(output_dir, 'breakdown.txt')
-with open(breakdown_file, 'a') as f:
-    f.write(f'Date Range: {date_range_start_str} to {date_range_end_str}\n')
-    f.write(breakdown_data.to_string(index=False))
-    f.write('\n\n')
+breakdown_csv_file = os.path.join(output_dir, 'breakdown.csv')
+if os.path.exists(breakdown_csv_file):
+    breakdown_data.to_csv(breakdown_csv_file, mode='a', index=False, header=False)
+else:
+    breakdown_data.to_csv(breakdown_csv_file, mode='w', index=False)
 
-# Write data to Excel file
 if os.path.exists(output_file):
     with pd.ExcelWriter(output_file, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
         try:
@@ -184,7 +228,7 @@ if os.path.exists(output_file):
         except ValueError:
             combined_data = grouped_data
         combined_data.to_excel(writer, sheet_name=data_sheet_name, index=False)
-        
+
         if not errors_data.empty:
             try:
                 existing_errors = pd.read_excel(output_file, sheet_name=errors_sheet_name)
@@ -200,4 +244,4 @@ else:
         if not errors_data.empty:
             errors_data.to_excel(writer, sheet_name=errors_sheet_name, index=False)
 
-print(f'Communication counts for {date_range_start_str} to {date_range_end_str} have been appended to {output_file}')
+print(f'Communication counts for {date_range_start_str} to {date_range_end_str} have been appended to {output_file}")
