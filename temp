@@ -4,3 +4,31 @@
   Data!$B:$B, $C$4,     // Assuming 'Date Range 1 End' is in C4
   Data!$C:$C, $C$6      // Assuming 'COUNTRY' is in C6
 )
+
+def is_increasing(lst):
+    return all(lst[i] < lst[i + 1] for i in range(len(lst) - 1))
+
+def is_decreasing(lst):
+    return all(lst[i] > lst[i + 1] for i in range(len(lst) - 1))
+
+def adjacent_diff_valid(lst):
+    return all(1 <= abs(lst[i] - lst[i + 1]) <= 3 for i in range(len(lst) - 1))
+
+def count_valid_lists(lists):
+    count = 0
+    for lst in lists:
+        if len(lst) > 1 and (is_increasing(lst) or is_decreasing(lst)) and adjacent_diff_valid(lst):
+            count += 1
+    return count
+
+# Example usage
+data = [
+    [1, 3, 5, 7],
+    [10, 8, 6, 4],
+    [2, 5, 9],
+    [1, 2, 3, 8],
+    [3, 1, -1, -4]
+]
+
+result = count_valid_lists(data)
+print(f"Number of valid lists: {
