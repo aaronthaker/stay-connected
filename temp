@@ -4,7 +4,7 @@ import pandas as pd
 import scipy.stats as st
 from math import ceil
 from datetime import datetime
-import re
+import urllib.parse  # For proper URL encoding
 
 # Constants
 API_TOKEN = 'z6XeAVcCz0vsv-GHX_r-SOWRZmPfIhKD0XEQFSEe-Ds'
@@ -60,15 +60,19 @@ def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: i
     return pd.json_normalize(comms) if comms else pd.DataFrame()
 
 def get_comms_by_id(session, c_id: str) -> dict:
-    """Fetch individual communication details using its ID."""
+    """Fetch individual communication details using its ID, ensuring proper encoding."""
+    encoded_c_id = urllib.parse.quote(c_id, safe='')  # Properly encode the ID for URL safety
     url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications"
-    params = {"ids": c_id}
+    params = {"ids": encoded_c_id}
+
     response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
 
     if response.status_code != requests.codes.ok:
+        print(f"Failed to fetch communication {c_id}: {response.content}")
         response.raise_for_status()
 
-    return response.json()[0] if response.json() else {}
+    data = response.json()
+    return data[0] if data else {}
 
 def main(save_file: bool = False):
     """Main function to fetch, sample, and save communication data."""
@@ -100,14 +104,15 @@ def main(save_file: bool = False):
         # Sample unalerted communications
         df_sample = df_unalerted_comms.sample(n=sample_size_needed)
 
-        # Replace "+" in communication IDs with ASCII equivalent "%2B" for API compatibility
-        df_sample['id'] = df_sample['id'].str.replace('+', '%2B')
-
         # Fetch content for each communication
         comms_content = []
         for c_id in df_sample['id']:
-            comm_details = get_comms_by_id(session, c_id)
-            comms_content.append(comm_details.get('content', {}).get('text', ''))
+            try:
+                comm_details = get_comms_by_id(session, c_id)
+                comms_content.append(comm_details.get('content', {}).get('text', ''))
+            except requests.exceptions.HTTPError as e:
+                print(f"Error fetching content for ID {c_id}: {e}")
+                comms_content.append("ERROR: Failed to fetch content")
 
         df_sample['content'] = comms_content
 
