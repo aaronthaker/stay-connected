@@ -61,15 +61,18 @@ def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: i
 
 def get_comms_by_id(session, c_id: str) -> dict:
     """Fetch individual communication details using its ID, ensuring proper encoding."""
-    encoded_c_id = urllib.parse.quote(c_id, safe='')  # Properly encode the ID for URL safety
+    
+    # Properly encode the ID to avoid API rejection
+    encoded_c_id = urllib.parse.quote_plus(c_id)  # Ensures spaces and special chars are correctly encoded
+    
     url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications"
     params = {"ids": encoded_c_id}
 
     response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
 
     if response.status_code != requests.codes.ok:
-        print(f"Failed to fetch communication {c_id}: {response.content}")
-        response.raise_for_status()
+        print(f"❌ Failed to fetch communication {c_id}: {response.content}")
+        return {}
 
     data = response.json()
     return data[0] if data else {}
@@ -84,21 +87,21 @@ def main(save_file: bool = False):
         df_all_comms = get_comms_by_date(session, start_date, end_date)
 
         if df_all_comms.empty:
-            print("No communications found in the given date range.")
+            print("⚠️ No communications found in the given date range.")
             return
 
         # Remove communications that have alert IDs (keeping only unalerted ones)
         df_unalerted_comms = df_all_comms[df_all_comms['alertIds'].apply(len) == 0]
 
         if df_unalerted_comms.empty:
-            print("No unalerted communications found.")
+            print("⚠️ No unalerted communications found.")
             return
 
         # Calculate sample size
         sample_size_needed = sample_size(N=len(df_unalerted_comms), C=0.9, E=0.05)
 
         if sample_size_needed == 0:
-            print("Sample size is zero. No sampling will be done.")
+            print("⚠️ Sample size is zero. No sampling will be done.")
             return
 
         # Sample unalerted communications
@@ -111,7 +114,7 @@ def main(save_file: bool = False):
                 comm_details = get_comms_by_id(session, c_id)
                 comms_content.append(comm_details.get('content', {}).get('text', ''))
             except requests.exceptions.HTTPError as e:
-                print(f"Error fetching content for ID {c_id}: {e}")
+                print(f"❌ Error fetching content for ID {c_id}: {e}")
                 comms_content.append("ERROR: Failed to fetch content")
 
         df_sample['content'] = comms_content
@@ -119,7 +122,7 @@ def main(save_file: bool = False):
     # Save to Excel if required
     if save_file:
         df_sample.to_excel("output_sample.xlsx", index=False)
-        print("Sample data saved to output_sample.xlsx")
+        print("✅ Sample data saved to output_sample.xlsx")
 
 if __name__ == "__main__":
     main(save_file=True)
