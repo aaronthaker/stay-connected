@@ -1,43 +1,135 @@
-def is_safe(report):
-    """Checks if a report is safe without modifications."""
-    differences = [abs(report[i] - report[i + 1]) for i in range(len(report) - 1)]
-    if all(1 <= diff <= 3 for diff in differences):
-        return all(report[i] <= report[i + 1] for i in range(len(report) - 1)) or \
-               all(report[i] >= report[i + 1] for i in range(len(report) - 1))
-    return False
+import time
+import requests
+import pandas as pd
+import scipy.stats as st
+from math import ceil
+from datetime import datetime
+import re
 
-def is_safe_with_dampener(report):
-    """Checks if a report is safe with one level removed."""
-    if is_safe(report):  # Check if already safe
-        return True
-    for i in range(len(report)):
-        modified_report = report[:i] + report[i + 1:]
-        if is_safe(modified_report):
-            return True
-    return False
+# API credentials and configurations
+API_TOKEN = 'z6XeAVcCz0vsv-GHX_r-SOWRZmPfIhKD0XEQFSEe-Ds'
+SSL_CERT_PATH = "./glencore.behavox-saas.crt"
+API_LIMIT = 2000  # API max limit per request
 
-def count_safe_reports(input_data):
-    """Counts safe reports with and without the dampener."""
-    reports = [[int(num) for num in line.split()] for line in input_data.strip().split('\n')]
-    safe_count = sum(1 for report in reports if is_safe(report))
-    safe_with_dampener_count = sum(1 for report in reports if is_safe_with_dampener(report))
-    return safe_count, safe_with_dampener_count
+def sample_size(N: int, C: float, E: float, p: float = 0.5, round_val: bool = True):
+    """Calculate the required sample size."""
+    if N == 0:
+        return 0
+    Z = st.norm.ppf(1 - (1 - C) / 2)
+    size = Z**2 * N * p * (1 - p) / (E**2 * (N - 1) + Z**2 * p * (1 - p))
+    return ceil(size) if round_val else size
 
-# Example input data (replace this with the actual input)
-input_data = """
-16 17 18 21 23 24 27 24
-74 76 79 81 82 85 85
-48 51 53 54 55 59
-29 31 32 34 36 39 41 46
-9 12 9 11 14 16 17 20
-65 68 66 67 69 70 73 72
-56 58 59 58 61 64 64
-21 24 25 27 24 25 29
-83 85 88 91 90 96
-74 77 78 78 81 83 86 87
-"""
+def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: int = API_LIMIT) -> pd.DataFrame:
+    """
+    Fetch all communications for a given date range, handling pagination.
+    """
+    if comms_per_page > API_LIMIT:
+        raise ValueError(f"Comms per page must be ≤ {API_LIMIT}")
 
-# Process and print results
-safe, safe_with_dampener = count_safe_reports(input_data)
-print("Safe reports (without dampener):", safe)
-print("Safe reports (with dampener):", safe_with_dampener)
+    base_url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications/find"
+    params = {
+        "start-date": start_date,
+        "end-date": end_date,
+        "field": "alertIds",
+        "limit": comms_per_page
+    }
+    
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+    comms = []
+    cursor = None
+    page = 1
+
+    while True:
+        if cursor:
+            params["cursor"] = cursor  # Add cursor for pagination
+        
+        response = session.get(base_url, headers=headers, params=params, verify=SSL_CERT_PATH)
+
+        if response.status_code != 200:
+            print(f"[ERROR] Bad response on page {page}. Status Code: {response.status_code}")
+            print(response.content)
+            response.raise_for_status()
+
+        data = response.json()
+        comms.extend(data.get('communications', []))
+        print(f"Page {page}: Retrieved {len(data.get('communications', []))} communications. Total so far: {len(comms)}")
+
+        cursor = data.get('pagination', {}).get('cursor')
+        if not cursor:
+            print(f"Pagination complete. Fetched {len(comms)} communications in total.")
+            break  # Exit loop when there are no more pages
+
+        page += 1
+        time.sleep(0.5)  # Avoiding potential rate limiting
+    
+    return pd.json_normalize(comms) if comms else pd.DataFrame()
+
+def get_comms_by_id(session, comm_id: str) -> dict:
+    """
+    Fetch the content of a specific communication using its ID.
+    """
+    comm_id_encoded = comm_id.replace("+", "%2B")  # Encode '+' symbol
+    url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications?ids={comm_id_encoded}"
+    
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+    response = session.get(url, headers=headers, verify=SSL_CERT_PATH)
+
+    if response.status_code != 200:
+        print(f"[ERROR] Failed to fetch content for ID: {comm_id}. Status: {response.status_code}")
+        response.raise_for_status()
+
+    return response.json()[0] if response.json() else {}
+
+def main(save_file: bool = False):
+    """
+    Main function to fetch communications, filter unalerted ones, take a sample,
+    and retrieve content for each sampled communication.
+    """
+    start_date = "2025-01-06T00:00:00.000Z"
+    end_date = "2025-01-06T11:59:59.999Z"
+
+    with requests.Session() as session:
+        print("\n[INFO] Fetching communications data...")
+        df_all_comms = get_comms_by_date(session, start_date, end_date)
+
+        if df_all_comms.empty:
+            print("[INFO] No communications retrieved. Exiting.")
+            return
+
+        print(f"[INFO] Total communications retrieved: {len(df_all_comms)}")
+        
+        # Filter unalerted communications
+        df_unalerted_comms = df_all_comms[df_all_comms['alertIds'].apply(lambda x: len(x) == 0)]
+        print(f"[INFO] Total unalerted communications: {len(df_unalerted_comms)}")
+
+        # Determine sample size
+        sample_size_required = sample_size(N=len(df_unalerted_comms), C=0.9, E=0.05)
+        if sample_size_required == 0:
+            print("[INFO] Sample size is 0. Exiting.")
+            return
+
+        print(f"[INFO] Sampling {sample_size_required} communications from unalerted set.")
+
+        # Take a random sample
+        df_sample = df_unalerted_comms.sample(n=sample_size_required, random_state=42)
+
+        # Replace "+" symbols for content fetching
+        df_sample['id'] = df_sample['id'].str.replace('+', '%2B', regex=True)
+
+        # Fetch content for each sampled communication
+        comms_content = []
+        for i, c_id in enumerate(df_sample['id'], start=1):
+            print(f"[INFO] Fetching content for communication {i}/{len(df_sample)} (ID: {c_id})...")
+            comm_data = get_comms_by_id(session, c_id)
+            comms_content.append(comm_data.get('content', {}).get('text', ''))
+
+        df_sample['content'] = comms_content
+        print("[INFO] Successfully retrieved all sampled communication content.")
+
+        # Save to Excel if needed
+        if save_file:
+            df_sample.to_excel("output_sample.xlsx", index=False)
+            print(f"[INFO] Sample saved to output_sample.xlsx")
+
+if __name__ == "__main__":
+    main(save_file=True)
