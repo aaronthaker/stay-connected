@@ -1,47 +1,117 @@
+import time
+import requests
+import pandas as pd
+import scipy.stats as st
+from math import ceil
+from datetime import datetime
+import re
 
-def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: int = API_LIMIT) -> pd.DataFrame:
-    if comms_per_page > API_LIMIT:
-        raise ValueError("Comms per page must be less than " + str(API_LIMIT))
-    
-    base_url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications/find?start-date={start_date}&end-date={end_date}&field=alertIds&limit={comms_per_page}"
+# Configuration
+API_TOKEN = 'z6XeAVcCz0vsv-GHX_r-SOWRZmPfIhKD0XEQFSEe-Ds'
+SSL_CERT_PATH = "./glencore.behavox-saas.crt"
+API_LIMIT = 1000  # Change this value to test different limits
+
+# Sample size calculation
+def sample_size(N: int, C: float, E: float, p: float = 0.5, round_up: bool = True):
+    """Calculates the required sample size for statistical confidence."""
+    Z = st.norm.ppf(1 - (1 - C) / 2)
+    size = Z**2 * N * p * (1 - p) / (E**2 * (N - 1) + Z**2 * p * (1 - p))
+    return ceil(size) if round_up else size
+
+# Fetch all communications within a date range
+def get_comms_by_date(session, start_date: str, end_date: str, limit: int = API_LIMIT) -> pd.DataFrame:
+    """Fetches all communications within a date range using cursor-based pagination."""
+    base_url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications/find"
+    params = {
+        "start-date": start_date,
+        "end-date": end_date,
+        "field": "alertIds",
+        "limit": limit
+    }
+
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
     comms = []
-    cursor = None  # Start with no cursor
+    cursor = None
     page = 0
-    url = base_url  # Initial URL without cursor
 
     while True:
-        headers = {"Authorization": "Bearer " + API_TOKEN}
-        response = session.get(url, headers=headers, verify=SSL_CERT_PATH)
+        if cursor:
+            params["cursor"] = cursor  # Add cursor for pagination
+        
+        print(f"\nFetching page {page} with limit={limit}, cursor={cursor}")
+        response = session.get(base_url, headers=headers, params=params, verify=SSL_CERT_PATH)
 
-        if response.status_code != requests.codes.ok:
-            print("Bad response:", response.content)
+        if response.status_code != 200:
+            print(f"Error fetching data: {response.status_code} - {response.content}")
             response.raise_for_status()
 
-        print(f'Good response at {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}')
         data = response.json()
+        fetched_comms = data.get("communications", [])
 
-        # Ensure communications data is available before accessing elements
-        if 'communications' in data and data['communications']:
-            comms += data['communications']
-            print(f'First element ID: {data["communications"][0]["id"]}')
-            print(f'Last element ID: {data["communications"][-1]["id"]}')
-            print(f'Comms length: {len(comms)}')
-        else:
-            print(f"Page {page}: No communications found. Stopping pagination.")
-            break  # No more data
+        if not fetched_comms:
+            print(f"No more communications found at page {page}. Stopping.")
+            break
 
-        # Get cursor from response
-        cursor = data.get('pagination', {}).get('cursor')
+        comms.extend(fetched_comms)
+        print(f"Page {page}: Retrieved {len(fetched_comms)} communications. Total so far: {len(comms)}")
 
-        if cursor:
-            url = base_url + f"&cursor={cursor}"
-            print(f"Page {page}: +{len(data['communications'])} communications.\n")
-        else:
-            print(f"Page {page}: +{len(data['communications'])} communications.\n\nNo more pages, {len(comms)} comms in total.\n")
-            break  # No more pages
+        # Get next cursor
+        cursor = data.get("pagination", {}).get("cursor")
+        if not cursor:
+            print(f"All pages retrieved. Total communications: {len(comms)}")
+            break
 
-        print(f'Cursor is {cursor}')
-        print("-" * 80)
         page += 1
 
-    return pd.json_normalize(comms)
+    return pd.DataFrame(comms)
+
+# Fetch communication content by ID
+def get_comms_by_id(session, c_id: str) -> dict:
+    """Fetches the full content for a communication by ID."""
+    url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications"
+    params = {"ids": c_id}
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
+    response = session.get(url, headers=headers, params=params, verify=SSL_CERT_PATH)
+    if response.status_code != 200:
+        print(f"Error fetching content for ID {c_id}: {response.status_code}")
+        return {}
+
+    return response.json()[0]
+
+# Main function
+def main(save_file: bool = False):
+    """Main execution function to fetch and process communications."""
+    start_date = "2025-01-06T00:00:00.000Z"
+    end_date = "2025-01-06T03:59:59.999Z"
+
+    with requests.Session() as session:
+        # Fetch all communications
+        df_all_comms = get_comms_by_date(session, start_date, end_date)
+
+        if df_all_comms.empty:
+            print("No communications retrieved.")
+            return
+
+        print(f"\nTotal communications retrieved: {len(df_all_comms)}")
+
+        # Remove communications with no alert IDs
+        df_unalerted_comms = df_all_comms[df_all_comms["alertIds"].apply(lambda x: len(x) == 0)]
+
+        # Sampling unalerted communications
+        sample_size_value = sample_size(N=len(df_unalerted_comms), C=0.9, E=0.05)
+        df_sample = df_unalerted_comms.sample(n=min(sample_size_value, len(df_unalerted_comms)))
+
+        # Replace "+" symbols in content IDs for proper API encoding
+        df_sample["id"] = df_sample["id"].str.replace("+", "%2B", regex=True)
+
+        # Fetch content for each communication
+        print(f"\nFetching content for {len(df_sample)} sampled communications...")
+        df_sample["content"] = df_sample["id"].apply(lambda c_id: get_comms_by_id(session, c_id).get("content", {}).get("text", ""))
+
+        if save_file:
+            df_sample.to_excel("output_sample.xlsx", index=False)
+            print("\nSampled communications saved to 'output_sample.xlsx'.")
+
+if __name__ == "__main__":
+    main(save_file=True)
