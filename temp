@@ -6,14 +6,13 @@ from math import ceil
 from datetime import datetime
 import re
 
-# API credentials
+# Constants
 API_TOKEN = 'z6XeAVcCz0vsv-GHX_r-SOWRZmPfIhKD0XEQFSEe-Ds'
-SSL_CERT_PATH = "./glencore.behavox-saas.crt"  # Ensure correct certificate is available
+SSL_CERT_PATH = "./glencore.behavox-saas.crt"  # Ensure the correct SSL certificate path
+API_LIMIT = 2000  # API limit per request
 
-API_LIMIT = 2000  # Max number of communications per request
-
-def sample_size(N: int, C: float, E: float, p: float = 0.5, round: bool = True) -> int:
-    """Calculate sample size based on confidence interval and margin of error."""
+def sample_size(N: int, C: float, E: float, p: float = 0.5, round: bool = True):
+    """Calculate sample size needed for a given confidence level and error margin."""
     if N == 0:
         return 0
     Z = st.norm.ppf(1 - (1 - C) / 2)
@@ -21,7 +20,7 @@ def sample_size(N: int, C: float, E: float, p: float = 0.5, round: bool = True) 
     return ceil(size) if round else size
 
 def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: int = API_LIMIT) -> pd.DataFrame:
-    """Retrieve all communications within a given date range, handling pagination correctly."""
+    """Fetch all communications from the API within the specified date range, handling pagination correctly."""
     if comms_per_page > API_LIMIT:
         raise ValueError(f"Comms per page must be less than {API_LIMIT}")
 
@@ -34,92 +33,88 @@ def get_comms_by_date(session, start_date: str, end_date: str, comms_per_page: i
     }
 
     comms = []
-    cursor = None
+    cursor = None  # Start without a cursor
     page = 0
 
     while True:
         if cursor:
-            params["cursor"] = cursor  # Update cursor for pagination
+            params["cursor"] = cursor  # Use cursor for pagination
         response = session.get(base_url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
-        
+
         if response.status_code != requests.codes.ok:
-            print(f"Error: Received {response.status_code} - {response.text}")
+            print("Bad response:", response.content)
             response.raise_for_status()
 
         data = response.json()
-        new_comms = data.get('communications', [])
-        comms.extend(new_comms)
-        
-        if new_comms:
-            last_id = new_comms[-1]['id']
-            first_id = new_comms[0]['id']
-            print(f"Page {page}: Retrieved {len(new_comms)} communications.")
-            print(f"  - First comm ID: {first_id}")
-            print(f"  - Last comm ID: {last_id}")
+        comms.extend(data.get('communications', []))
+        print(f"Page {page}: +{len(data.get('communications', []))} communications.")
 
+        # Update cursor for next request
         cursor = data.get('pagination', {}).get('cursor')
-
-        if not cursor:
-            print(f"Pagination ended at page {page}. Retrieved {len(comms)} total communications.")
+        if not cursor:  # If there's no cursor, we've reached the last page
             break
-        
-        print(f"  - Next cursor: {cursor}\n")
-        page += 1
-        time.sleep(1)  # Avoid hitting API limits
 
-    return pd.json_normalize(comms)
+        page += 1
+
+    print(f"Total communications fetched: {len(comms)}")
+    return pd.json_normalize(comms) if comms else pd.DataFrame()
 
 def get_comms_by_id(session, c_id: str) -> dict:
-    """Retrieve detailed communication data by ID."""
+    """Fetch individual communication details using its ID."""
     url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications"
     params = {"ids": c_id}
-
     response = session.get(url, headers={"Authorization": f"Bearer {API_TOKEN}"}, params=params, verify=SSL_CERT_PATH)
-    
+
     if response.status_code != requests.codes.ok:
-        print(f"Failed to retrieve comm ID {c_id}: {response.text}")
         response.raise_for_status()
 
-    return response.json()[0]  # Return the first (and only) communication object
+    return response.json()[0] if response.json() else {}
 
 def main(save_file: bool = False):
+    """Main function to fetch, sample, and save communication data."""
     start_date = "2025-01-06T00:00:00.000Z"
     end_date = "2025-01-06T11:59:59.999Z"
 
     with requests.Session() as session:
-        # Get all comms within the period
+        # Fetch all communications within the date range
         df_all_comms = get_comms_by_date(session, start_date, end_date)
 
-        # Filter out communications with alert IDs (keeping only unalerted ones)
+        if df_all_comms.empty:
+            print("No communications found in the given date range.")
+            return
+
+        # Remove communications that have alert IDs (keeping only unalerted ones)
         df_unalerted_comms = df_all_comms[df_all_comms['alertIds'].apply(len) == 0]
-        
-        # Calculate the required sample size
-        size = sample_size(N=len(df_unalerted_comms), C=0.9, E=0.05)
-        print(f"Sampling {size} communications from {len(df_unalerted_comms)} unalerted communications.")
 
-        # Sample the data
-        df_sample = df_unalerted_comms.sample(n=size) if size > 0 else pd.DataFrame()
+        if df_unalerted_comms.empty:
+            print("No unalerted communications found.")
+            return
 
-        # Replace "+" symbol in content IDs with ASCII code %2B
-        df_sample['id'] = df_sample['id'].str.replace('+', '%2B', regex=True)
+        # Calculate sample size
+        sample_size_needed = sample_size(N=len(df_unalerted_comms), C=0.9, E=0.05)
 
-        # Retrieve content for each sampled communication
+        if sample_size_needed == 0:
+            print("Sample size is zero. No sampling will be done.")
+            return
+
+        # Sample unalerted communications
+        df_sample = df_unalerted_comms.sample(n=sample_size_needed)
+
+        # Replace "+" in communication IDs with ASCII equivalent "%2B" for API compatibility
+        df_sample['id'] = df_sample['id'].str.replace('+', '%2B')
+
+        # Fetch content for each communication
         comms_content = []
         for c_id in df_sample['id']:
-            comm_data = get_comms_by_id(session, c_id)
-            content_text = comm_data.get('content', {}).get('text', '')
-            comms_content.append(content_text)
-            print(f"Retrieved content for comm ID {c_id}")
+            comm_details = get_comms_by_id(session, c_id)
+            comms_content.append(comm_details.get('content', {}).get('text', ''))
 
         df_sample['content'] = comms_content
 
-    # Save output to an Excel file
-    if save_file and not df_sample.empty:
-        filename = "output_sample.xlsx"
-        df_sample.to_excel(filename, index=False)
-        print(f"Sampled data saved to {filename}")
-    elif df_sample.empty:
-        print("No unalerted communications found. No file generated.")
+    # Save to Excel if required
+    if save_file:
+        df_sample.to_excel("output_sample.xlsx", index=False)
+        print("Sample data saved to output_sample.xlsx")
 
 if __name__ == "__main__":
     main(save_file=True)
