@@ -1,53 +1,58 @@
-def calculate_arbitrage():
-    print("=== Arbitrage Betting Calculator ===")
-    
-    # Get user input
-    sell_price_exchange = float(input("Enter the sell (lay) price on the exchange (e.g., 2.25): "))
-    liquidity = float(input("Enter the available liquidity at that price on the exchange: "))
-    back_price_bookmaker = float(input("Enter the back price available on the bookmaker (e.g., 2.30): "))
-    commission_rate = 0.02  # Smarkets standard commission rate on net winnings
+def calculate_stakes(exchange_sell_price, exchange_liquidity, bookmaker_back_price, commission_rate=0.02):
+    """
+    Calculate the optimal stakes to place on the exchange and the bookmaker.
 
-    # Calculate the amount to lay on the exchange (based on available liquidity)
-    lay_stake = liquidity  # You will lay this amount on the exchange
-    liability = (sell_price_exchange - 1) * lay_stake  # Liability of the lay bet
+    Parameters:
+    exchange_sell_price (float): The price at which you can sell (lay) on the exchange.
+    exchange_liquidity (float): The maximum amount available to sell at the exchange price.
+    bookmaker_back_price (float): The price at which you can back on the bookmaker.
+    commission_rate (float): The commission rate charged by the exchange on net winnings (default is 2%).
 
-    # Calculate the amount to back on the bookmaker to cover the liability
-    back_stake = liability / (back_price_bookmaker - 1)
+    Returns:
+    dict: A dictionary containing the optimal stakes and expected profit.
+    """
+    # Calculate the optimal stake to place on the exchange
+    exchange_stake = exchange_liquidity
 
-    # Calculate potential profits for each outcome
-    if back_stake > lay_stake:
-        print("\n⚠️ Insufficient liquidity on the exchange to cover the required back stake.")
-        print("   Consider reducing your lay stake or finding additional liquidity.")
+    # Calculate the corresponding stake to place on the bookmaker
+    bookmaker_stake = exchange_stake * (exchange_sell_price - 1) / (bookmaker_back_price - 1)
+
+    # Calculate potential profit scenarios
+    profit_if_win = bookmaker_stake * (bookmaker_back_price - 1) - exchange_stake * (exchange_sell_price - 1) * (1 + commission_rate)
+    profit_if_lose = exchange_stake * (1 - commission_rate) - bookmaker_stake
+
+    return {
+        'exchange_stake': exchange_stake,
+        'bookmaker_stake': bookmaker_stake,
+        'profit_if_win': profit_if_win,
+        'profit_if_lose': profit_if_lose
+    }
+
+def main():
+    print("Welcome to the Betting Arbitrage Calculator!")
+    try:
+        exchange_sell_price = float(input("Enter the sell price on the exchange: "))
+        exchange_liquidity = float(input("Enter the available liquidity at that price on the exchange: "))
+        bookmaker_back_price = float(input("Enter the back price on the bookmaker: "))
+    except ValueError:
+        print("Invalid input. Please enter numeric values.")
         return
 
-    # Scenario 1: The selection wins
-    profit_bookmaker_win = (back_stake * (back_price_bookmaker - 1)) - liability
-    net_profit_win = profit_bookmaker_win - (profit_bookmaker_win * commission_rate)
+    # Ensure that the exchange sell price is lower than the bookmaker back price
+    if exchange_sell_price >= bookmaker_back_price:
+        print("No arbitrage opportunity: The exchange sell price must be lower than the bookmaker back price.")
+        return
 
-    # Scenario 2: The selection loses
-    profit_exchange_win = lay_stake - (back_stake * (back_price_bookmaker - 1))
-    net_profit_lose = profit_exchange_win - (profit_exchange_win * commission_rate)
+    # Calculate the optimal stakes and potential profits
+    result = calculate_stakes(exchange_sell_price, exchange_liquidity, bookmaker_back_price)
 
-    # Output the instructions
-    print("\n=== Bet Placement Instructions ===")
-    print(f"1️⃣ Place a LAY bet on the exchange for £{lay_stake:.2f} at odds of {sell_price_exchange}.")
-    print(f"   - This will create a liability of £{liability:.2f}.")
-    print(f"2️⃣ Place a BACK bet on the bookmaker for £{back_stake:.2f} at odds of {back_price_bookmaker}.")
+    # Display the results to the user
+    print("\nOptimal Betting Strategy:")
+    print(f"1. Place a lay bet on the exchange with a stake of £{result['exchange_stake']:.2f} at odds of {exchange_sell_price}.")
+    print(f"2. Place a back bet on the bookmaker with a stake of £{result['bookmaker_stake']:.2f} at odds of {bookmaker_back_price}.\n")
+    print("Expected Profit:")
+    print(f"- If the selection wins: £{result['profit_if_win']:.2f}")
+    print(f"- If the selection loses: £{result['profit_if_lose']:.2f}")
 
-    # Display potential profits
-    print("\n=== Potential Profit Analysis ===")
-    print(f"📈 If the selection WINS:")
-    print(f"   - Profit from bookmaker: £{profit_bookmaker_win:.2f}")
-    print(f"   - Net profit after commission: £{net_profit_win:.2f}")
-    print(f"📉 If the selection LOSES:")
-    print(f"   - Profit from exchange: £{profit_exchange_win:.2f}")
-    print(f"   - Net profit after commission: £{net_profit_lose:.2f}")
-
-    # Determine if the arbitrage is profitable
-    if net_profit_win > 0 and net_profit_lose > 0:
-        print("\n✅ This arbitrage opportunity is profitable.")
-    else:
-        print("\n❌ This arbitrage opportunity is not profitable. Re-evaluate your stakes or odds.")
-
-# Run the calculator
-calculate_arbitrage()
+if __name__ == "__main__":
+    main()
