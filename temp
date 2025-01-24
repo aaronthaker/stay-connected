@@ -1,58 +1,54 @@
-def calculate_arbitrage(bookmaker_odds, bookmaker_stake, exchange_odds, exchange_liquidity, commission):
+def calculate_optimal_arbitrage(exchange_odds, exchange_liquidity, commission, bookmaker_odds):
     """
-    Calculate the optimal stake on the exchange to secure an arbitrage profit.
+    Calculate the optimal bookmaker stake based on exchange lay odds and liquidity.
     
-    :param bookmaker_odds: The odds available at the bookmaker for backing the bet.
-    :param bookmaker_stake: The amount you plan to stake at the bookmaker.
-    :param exchange_odds: The lay odds available at the betting exchange.
+    :param exchange_odds: The lay odds available at the exchange.
     :param exchange_liquidity: The maximum amount that can be matched on the exchange.
-    :param commission: The exchange commission percentage (e.g., 2% -> input 2).
-    :return: Recommended lay stake, net profit, and risk analysis.
+    :param commission: The exchange commission percentage (e.g., 2% for Betfair -> input 2).
+    :param bookmaker_odds: The odds available at the bookmaker for backing the bet.
+    :return: Recommended bookmaker stake, lay stake, net profit, and risk analysis.
     """
 
-    # Calculate potential payout from bookmaker
+    # Adjust for exchange commission
+    commission_multiplier = (1 - (commission / 100))
+
+    # Maximum lay stake we can place based on exchange liquidity
+    max_lay_stake = exchange_liquidity
+
+    # Calculate the bookmaker stake required to match this lay stake
+    bookmaker_stake = (max_lay_stake * exchange_odds) / bookmaker_odds
+
+    # Calculate the payout from the bookmaker bet
     bookmaker_payout = bookmaker_stake * bookmaker_odds
 
-    # Calculate lay stake required to cover payout
-    lay_stake = bookmaker_payout / exchange_odds
+    # Calculate lay liability
+    lay_liability = max_lay_stake * (exchange_odds - 1)
 
-    # Adjust lay stake for commission
-    commission_multiplier = (1 - (commission / 100))
-    adjusted_lay_stake = lay_stake / commission_multiplier
-
-    # Ensure lay stake does not exceed exchange liquidity
-    if adjusted_lay_stake > exchange_liquidity:
-        print("Warning: Lay stake exceeds exchange liquidity. Adjusting to available amount.")
-        adjusted_lay_stake = exchange_liquidity
-
-    # Calculate total risk
-    lay_liability = adjusted_lay_stake * (exchange_odds - 1)
-
-    # Calculate profit in each scenario
+    # Calculate profit in both scenarios
     profit_if_win = bookmaker_payout - bookmaker_stake - lay_liability
-    profit_if_lose = adjusted_lay_stake * commission_multiplier - bookmaker_stake
+    profit_if_lose = max_lay_stake * commission_multiplier - bookmaker_stake
 
-    # Determine net profit
+    # Determine guaranteed profit
     guaranteed_profit = min(profit_if_win, profit_if_lose)
 
     # Print Results
     print("\n--- Arbitrage Betting Breakdown ---")
-    print(f"✅ Bookmaker Stake: ${bookmaker_stake:.2f} at {bookmaker_odds:.2f} odds")
-    print(f"✅ Exchange Lay Stake: ${adjusted_lay_stake:.2f} at {exchange_odds:.2f} odds")
+    print(f"✅ Recommended Bookmaker Stake: ${bookmaker_stake:.2f} at {bookmaker_odds:.2f} odds")
+    print(f"✅ Exchange Lay Stake: ${max_lay_stake:.2f} at {exchange_odds:.2f} odds")
     print(f"📉 Lay Liability: ${lay_liability:.2f}")
     print(f"💰 Profit if Bet Wins: ${profit_if_win:.2f}")
     print(f"💰 Profit if Bet Loses: ${profit_if_lose:.2f}")
-    
+
     if guaranteed_profit > 0:
         print(f"🎯 Guaranteed Arbitrage Profit: ${guaranteed_profit:.2f}")
     else:
         print("⚠ No guaranteed profit available.")
 
-# Example input values
-bookmaker_odds = float(input("Enter bookmaker odds: "))
-bookmaker_stake = float(input("Enter bookmaker stake ($): "))
+# User Inputs
 exchange_odds = float(input("Enter exchange lay odds: "))
 exchange_liquidity = float(input("Enter available exchange liquidity ($): "))
 commission = float(input("Enter exchange commission percentage (e.g., 2 for 2%): "))
+bookmaker_odds = float(input("Enter bookmaker odds: "))
 
-calculate_arbitrage(bookmaker_odds, bookmaker_stake, exchange_odds, exchange_liquidity, commission)
+# Calculate optimal betting strategy
+calculate_optimal_arbitrage(exchange_odds, exchange_liquidity, commission, bookmaker_odds)
