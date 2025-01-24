@@ -1,86 +1,24 @@
-import time
-import requests
-import pandas as pd
-import scipy.stats as st
-from math import ceil
-from datetime import datetime
-import re
+def calculate_arbitrage():
+    print("=== Arbitrage Betting Calculator ===")
+    
+    # Get user input
+    sell_price_exchange = float(input("Enter the sell price on the exchange (e.g. 2.25): "))
+    liquidity = float(input("Enter the available liquidity at that price on the exchange: "))
+    back_price_bookmaker = float(input("Enter the back price available on the bookmaker (e.g. 2.30): "))
 
-API_TOKEN = 'z6XeAVcCz0vsv-GHX_r-SOWRZmPfIhKD0XEQFSEe-Ds'
-SSL_CERT_PATH = "./glencore.behavox-saas.crt"
+    # Calculate the amount to lay on the exchange (based on available liquidity)
+    stake_exchange = liquidity  # You will lay this amount on the exchange
+    liability = (sell_price_exchange - 1) * stake_exchange  # Liability of the lay bet
 
-def sample_size(N: int, C: float, E: float, p: float = 0.5, round: bool = True):
-    Z = st.norm.ppf(1 - (1 - C) / 2)
-    size = Z ** 2 * N * p * (1 - p) / (E ** 2 * (N - 1) + Z ** 2 * p * (1 - p))
-    return ceil(size) if round else size
+    # Calculate the amount to back on the bookmaker to cover the liability
+    stake_bookmaker = liability / (back_price_bookmaker - 1)
 
-def get_comms_by_date(session, start_date: str, end_date: str) -> pd.DataFrame:
-    base_url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications/find?start-date={start_date}&end-date={end_date}&field=alertIds"
-    comms = []
-    cursor = None
-    page = 0
-    url = base_url
-
-    while True:
-        headers = {"Authorization": "Bearer " + API_TOKEN}
-        response = session.get(url, headers=headers, verify=SSL_CERT_PATH)
-
-        if response.status_code != requests.codes.ok:
-            print("Bad response:", response.content)
-            response.raise_for_status()
-
-        print(f'Good response at {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}')
-        data = response.json()
-
-        if 'communications' in data and data['communications']:
-            for comm in data['communications']:
-                comm['page'] = page  # Add page number to each communication
-            comms += data['communications']
-            print(f'Page {page}: +{len(data["communications"])} communications.')
-        else:
-            print(f"Page {page}: No communications found. Stopping pagination.")
-            break
-
-        cursor = data.get('pagination', {}).get('cursor')
-        if cursor:
-            url = base_url + f"&cursor={cursor}"
-        else:
-            print(f"No more pages, {len(comms)} comms in total.")
-            break
-
-        page += 1
-
-    df = pd.json_normalize(comms)
-    return df
-
-def get_comms_by_id(session, c_id: str) -> dict:
-    url = f"https://glencore.behavox-saas.com/dashboard/api/3/communications?ids={c_id}"
-    response = session.get(url, headers={"Authorization": "Bearer " + API_TOKEN}, verify=SSL_CERT_PATH)
-    if response.status_code != requests.codes.ok:
-        response.raise_for_status()
-    return response.json()[0]
-
-def main(save_file: bool = False):
-    start_date = "2025-01-06T00:00:00.000Z"
-    end_date = "2025-01-06T05:59:59.999Z"
-
-    with requests.Session() as s:
-        df_all_comms = get_comms_by_date(s, start_date, end_date)
-        df_all_comms.to_excel("all_comms_output_sample.xlsx", index=False)
-
-        df_unalerted_comms = df_all_comms[df_all_comms['alertIds'].apply(lambda x: len(x)) == 0]
-        size = sample_size(N=len(df_unalerted_comms), C=0.9, E=0.05)
-        df_sample = df_unalerted_comms.sample(n=size)
-
-        df_sample['id'] = df_sample['id'].str.replace('+', '%2B')
-
-        comms_content = []
-        for c_id in df_sample['id']:
-            comms_content.append(get_comms_by_id(s, c_id).get('content', {}).get('text', ''))
-        df_sample['content'] = comms_content
-
-    if save_file:
-        df_sample.to_excel("output_sample.xlsx", index=False)
-
-if __name__ == "__main__":
-    main(save_file=True)
+    # Output the instructions
+    print("\n=== Bet Placement Instructions ===")
+    print(f"1️⃣ Place a LAY bet on the exchange for £{stake_exchange:.2f} at odds of {sell_price_exchange}.")
+    print(f"   - This will create a liability of £{liability:.2f}.")
+    print(f"2️⃣ Place a BACK bet on the bookmaker for £{stake_bookmaker:.2f} at odds of {back_price_bookmaker}.")
+    print("\n✅ You have now locked in a risk-free profit!")
+    
+# Run the calculator
+calculate_arbitrage()
