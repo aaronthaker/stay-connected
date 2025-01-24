@@ -1,56 +1,58 @@
-def calculate_arbitrage_bets(odds_list, total_stake):
+def calculate_arbitrage(bookmaker_odds, bookmaker_stake, exchange_odds, exchange_liquidity, commission):
     """
-    Calculates the optimal bets for an arbitrage opportunity.
+    Calculate the optimal stake on the exchange to secure an arbitrage profit.
     
-    :param odds_list: A list of decimal odds for all possible outcomes.
-    :param total_stake: The total amount of money to bet across all outcomes.
-    :return: A dictionary with the amounts to bet on each outcome and the guaranteed profit.
+    :param bookmaker_odds: The odds available at the bookmaker for backing the bet.
+    :param bookmaker_stake: The amount you plan to stake at the bookmaker.
+    :param exchange_odds: The lay odds available at the betting exchange.
+    :param exchange_liquidity: The maximum amount that can be matched on the exchange.
+    :param commission: The exchange commission percentage (e.g., 2% -> input 2).
+    :return: Recommended lay stake, net profit, and risk analysis.
     """
-    
-    # Convert odds into implied probabilities
-    implied_probs = [1 / odd for odd in odds_list]
-    
-    # Check if an arbitrage opportunity exists
-    total_implied_prob = sum(implied_probs)
-    
-    if total_implied_prob >= 1:
-        return {"error": "No arbitrage opportunity available."}
-    
-    # Calculate individual bets
-    stakes = [total_stake * prob / total_implied_prob for prob in implied_probs]
-    
-    # Calculate guaranteed profit
-    guaranteed_profit = (total_stake / total_implied_prob) - total_stake
-    
-    # Prepare results
-    results = {
-        "Total Stake": total_stake,
-        "Bets": {f"Outcome {i+1}": round(stakes[i], 2) for i in range(len(odds_list))},
-        "Guaranteed Profit": round(guaranteed_profit, 2)
-    }
-    
-    return results
 
+    # Calculate potential payout from bookmaker
+    bookmaker_payout = bookmaker_stake * bookmaker_odds
 
-if __name__ == "__main__":
-    # Get user input
-    num_outcomes = int(input("Enter the number of possible outcomes: "))
-    odds = []
-    
-    for i in range(num_outcomes):
-        odd = float(input(f"Enter the decimal odds for outcome {i+1}: "))
-        odds.append(odd)
-    
-    total_stake = float(input("Enter your total stake: "))
+    # Calculate lay stake required to cover payout
+    lay_stake = bookmaker_payout / exchange_odds
 
-    # Calculate arbitrage bets
-    result = calculate_arbitrage_bets(odds, total_stake)
+    # Adjust lay stake for commission
+    commission_multiplier = (1 - (commission / 100))
+    adjusted_lay_stake = lay_stake / commission_multiplier
+
+    # Ensure lay stake does not exceed exchange liquidity
+    if adjusted_lay_stake > exchange_liquidity:
+        print("Warning: Lay stake exceeds exchange liquidity. Adjusting to available amount.")
+        adjusted_lay_stake = exchange_liquidity
+
+    # Calculate total risk
+    lay_liability = adjusted_lay_stake * (exchange_odds - 1)
+
+    # Calculate profit in each scenario
+    profit_if_win = bookmaker_payout - bookmaker_stake - lay_liability
+    profit_if_lose = adjusted_lay_stake * commission_multiplier - bookmaker_stake
+
+    # Determine net profit
+    guaranteed_profit = min(profit_if_win, profit_if_lose)
+
+    # Print Results
+    print("\n--- Arbitrage Betting Breakdown ---")
+    print(f"✅ Bookmaker Stake: ${bookmaker_stake:.2f} at {bookmaker_odds:.2f} odds")
+    print(f"✅ Exchange Lay Stake: ${adjusted_lay_stake:.2f} at {exchange_odds:.2f} odds")
+    print(f"📉 Lay Liability: ${lay_liability:.2f}")
+    print(f"💰 Profit if Bet Wins: ${profit_if_win:.2f}")
+    print(f"💰 Profit if Bet Loses: ${profit_if_lose:.2f}")
     
-    # Display results
-    if "error" in result:
-        print(result["error"])
+    if guaranteed_profit > 0:
+        print(f"🎯 Guaranteed Arbitrage Profit: ${guaranteed_profit:.2f}")
     else:
-        print("\nOptimal Betting Strategy:")
-        for key, value in result["Bets"].items():
-            print(f"{key}: ${value}")
-        print(f"\nGuaranteed Profit: ${result['Guaranteed Profit']}")
+        print("⚠ No guaranteed profit available.")
+
+# Example input values
+bookmaker_odds = float(input("Enter bookmaker odds: "))
+bookmaker_stake = float(input("Enter bookmaker stake ($): "))
+exchange_odds = float(input("Enter exchange lay odds: "))
+exchange_liquidity = float(input("Enter available exchange liquidity ($): "))
+commission = float(input("Enter exchange commission percentage (e.g., 2 for 2%): "))
+
+calculate_arbitrage(bookmaker_odds, bookmaker_stake, exchange_odds, exchange_liquidity, commission)
