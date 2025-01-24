@@ -1,56 +1,74 @@
-def calculate_balanced_arbitrage(exchange_odds, exchange_liquidity, commission, bookmaker_odds):
+def explain_arbitrage(exchange_odds, exchange_liquidity, commission, bookmaker_odds):
     """
-    Calculate the optimal bookmaker stake that ensures the same profit regardless of the outcome.
+    Explain the arbitrage calculation process, detailing why the profit differs due to commission
+    and how to adjust for equal profit regardless of the outcome.
     
-    :param exchange_odds: The lay odds available at the exchange.
-    :param exchange_liquidity: The maximum amount that can be matched on the exchange.
-    :param commission: The exchange commission percentage (e.g., 2 for Betfair -> input 2).
-    :param bookmaker_odds: The odds available at the bookmaker for backing the bet.
-    :return: Recommended bookmaker stake, lay stake, and guaranteed profit.
+    :param exchange_odds: Lay odds on the betting exchange.
+    :param exchange_liquidity: Maximum amount that can be matched on the exchange.
+    :param commission: Exchange commission percentage (e.g., 2 for 2%).
+    :param bookmaker_odds: Odds available at the bookmaker.
     """
 
-    # Adjust for exchange commission
+    # Calculate commission multiplier
     commission_multiplier = (1 - (commission / 100))
 
-    # Maximum lay stake we can place based on exchange liquidity
+    # Calculate the maximum lay stake based on liquidity
     max_lay_stake = exchange_liquidity
 
-    # Initial bookmaker stake calculation (before profit equalization)
+    # Initial bookmaker stake calculation
     bookmaker_stake = (max_lay_stake * exchange_odds) / bookmaker_odds
 
-    # Calculate lay liability
+    # Calculate the payout from the bookmaker bet
+    bookmaker_payout = bookmaker_stake * bookmaker_odds
+
+    # Calculate the lay liability
     lay_liability = max_lay_stake * (exchange_odds - 1)
 
     # Calculate profit if bookmaker bet wins
-    bookmaker_payout = bookmaker_stake * bookmaker_odds
     profit_if_win = bookmaker_payout - bookmaker_stake - lay_liability
 
     # Calculate profit if bookmaker bet loses (winning the lay bet)
-    profit_if_lose = max_lay_stake * commission_multiplier - bookmaker_stake
+    commission_fee = max_lay_stake * (1 - commission_multiplier)  # Fee amount deducted
+    profit_if_lose = (max_lay_stake * commission_multiplier) - bookmaker_stake
 
-    # Adjust bookmaker stake to equalize profits
-    if commission > 0:
+    print("\n--- Step-by-Step Arbitrage Explanation ---")
+    print(f"1️⃣ Bookmaker Stake: Calculated as (Lay Stake × Lay Odds) ÷ Bookmaker Odds")
+    print(f"   = ({max_lay_stake:.2f} × {exchange_odds:.2f}) ÷ {bookmaker_odds:.2f} = ${bookmaker_stake:.2f}")
+    
+    print(f"\n2️⃣ If the bookmaker bet wins:")
+    print(f"   - You receive ${bookmaker_payout:.2f} from the bookmaker.")
+    print(f"   - You lose ${lay_liability:.2f} on the exchange.")
+    print(f"   - Profit = ${bookmaker_payout:.2f} - ${bookmaker_stake:.2f} - ${lay_liability:.2f} = ${profit_if_win:.2f}")
+    
+    print(f"\n3️⃣ If the bookmaker bet loses:")
+    print(f"   - You win ${max_lay_stake:.2f} on the exchange, but a {commission}% commission applies.")
+    print(f"   - The commission fee is {commission}% of ${max_lay_stake:.2f}, which is ${commission_fee:.2f}.")
+    print(f"   - After commission, your exchange win is ${profit_if_lose + bookmaker_stake:.2f}.")
+    print(f"   - Profit = ${profit_if_lose + bookmaker_stake:.2f} - ${bookmaker_stake:.2f} = ${profit_if_lose:.2f}")
+    
+    if profit_if_win != profit_if_lose:
+        print("\n⚠ The profits are not equal due to the exchange commission! Adjusting bookmaker stake...\n")
+
+        # Adjust bookmaker stake to equalize profit
         bookmaker_stake *= (1 / commission_multiplier)
 
-        # Recalculate profits with adjusted stake
+        # Recalculate values with adjusted bookmaker stake
         bookmaker_payout = bookmaker_stake * bookmaker_odds
         lay_stake = bookmaker_payout / exchange_odds
         lay_liability = lay_stake * (exchange_odds - 1)
 
+        # Recalculate profits
         profit_if_win = bookmaker_payout - bookmaker_stake - lay_liability
         profit_if_lose = lay_stake * commission_multiplier - bookmaker_stake
 
-    # Guaranteed Equal Profit
-    guaranteed_profit = min(profit_if_win, profit_if_lose)
+        print(f"✅ Adjusted bookmaker stake: ${bookmaker_stake:.2f} to balance profits.")
+        print(f"✅ Now both profit scenarios are equal at ${profit_if_win:.2f}.")
 
-    # Print Results
-    print("\n--- Adjusted Arbitrage Betting Breakdown ---")
+    print("\n🎯 Final Results:")
     print(f"✅ Adjusted Bookmaker Stake: ${bookmaker_stake:.2f} at {bookmaker_odds:.2f} odds")
     print(f"✅ Exchange Lay Stake: ${max_lay_stake:.2f} at {exchange_odds:.2f} odds")
     print(f"📉 Lay Liability: ${lay_liability:.2f}")
-    print(f"💰 Profit if Bet Wins: ${profit_if_win:.2f}")
-    print(f"💰 Profit if Bet Loses: ${profit_if_lose:.2f}")
-    print(f"🎯 Guaranteed Equal Profit: ${guaranteed_profit:.2f}")
+    print(f"💰 Guaranteed Profit: ${profit_if_win:.2f} (Same regardless of outcome)")
 
 # User Inputs
 exchange_odds = float(input("Enter exchange lay odds: "))
@@ -58,5 +76,5 @@ exchange_liquidity = float(input("Enter available exchange liquidity ($): "))
 commission = float(input("Enter exchange commission percentage (e.g., 2 for 2%): "))
 bookmaker_odds = float(input("Enter bookmaker odds: "))
 
-# Calculate balanced arbitrage strategy
-calculate_balanced_arbitrage(exchange_odds, exchange_liquidity, commission, bookmaker_odds)
+# Run the arbitrage explanation
+explain_arbitrage(exchange_odds, exchange_liquidity, commission, bookmaker_odds)
