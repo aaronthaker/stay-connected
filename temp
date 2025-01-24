@@ -2,9 +2,10 @@ def calculate_arbitrage():
     print("=== Arbitrage Betting Calculator ===")
     
     # Get user input
-    sell_price_exchange = float(input("Enter the sell price on the exchange (e.g. 2.25): "))
-    liquidity = float(input("Enter the available liquidity at that price on the exchange: "))
-    back_price_bookmaker = float(input("Enter the back price available on the bookmaker (e.g. 2.30): "))
+    sell_price_exchange = float(input("Enter the sell price on the exchange (e.g., 2.25): "))
+    liquidity = float(input("Enter the available liquidity at that price on the exchange (£): "))
+    back_price_bookmaker = float(input("Enter the back price available on the bookmaker (e.g., 2.30): "))
+    commission_rate = 0.02  # Smarkets standard commission rate
 
     # Calculate the amount to lay on the exchange (based on available liquidity)
     stake_exchange = liquidity  # You will lay this amount on the exchange
@@ -13,12 +14,35 @@ def calculate_arbitrage():
     # Calculate the amount to back on the bookmaker to cover the liability
     stake_bookmaker = liability / (back_price_bookmaker - 1)
 
+    # Calculate potential outcomes
+    # If the selection wins:
+    profit_bookmaker_win = (stake_bookmaker * (back_price_bookmaker - 1)) - liability
+    commission_exchange_loss = liability * commission_rate
+    net_profit_win = profit_bookmaker_win - commission_exchange_loss
+
+    # If the selection loses:
+    profit_exchange_win = stake_exchange  # Profit from the lay bet
+    commission_exchange_win = profit_exchange_win * commission_rate
+    net_profit_loss = profit_exchange_win - stake_bookmaker - commission_exchange_win
+
     # Output the instructions
     print("\n=== Bet Placement Instructions ===")
     print(f"1️⃣ Place a LAY bet on the exchange for £{stake_exchange:.2f} at odds of {sell_price_exchange}.")
     print(f"   - This will create a liability of £{liability:.2f}.")
     print(f"2️⃣ Place a BACK bet on the bookmaker for £{stake_bookmaker:.2f} at odds of {back_price_bookmaker}.")
-    print("\n✅ You have now locked in a risk-free profit!")
     
+    # Output the potential profits
+    print("\n=== Potential Profit Breakdown ===")
+    print(f"📈 If the selection WINS:")
+    print(f"   - Profit from bookmaker: £{profit_bookmaker_win:.2f}")
+    print(f"   - Commission on exchange loss: £{commission_exchange_loss:.2f}")
+    print(f"   - Net Profit: £{net_profit_win:.2f}")
+    print(f"📉 If the selection LOSES:")
+    print(f"   - Profit from exchange: £{profit_exchange_win:.2f}")
+    print(f"   - Commission on exchange win: £{commission_exchange_win:.2f}")
+    print(f"   - Net Profit: £{net_profit_loss:.2f}")
+    
+    print("\n✅ You have now locked in a risk-free profit!")
+
 # Run the calculator
 calculate_arbitrage()
