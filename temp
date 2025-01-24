@@ -3,48 +3,51 @@ def calculate_arbitrage():
     
     # Get user input
     sell_price_exchange = float(input("Enter the sell (lay) price on the exchange (e.g., 2.25): "))
-    liquidity = float(input("Enter the available liquidity at that price on the exchange (£): "))
+    liquidity = float(input("Enter the available liquidity at that price on the exchange: "))
     back_price_bookmaker = float(input("Enter the back price available on the bookmaker (e.g., 2.30): "))
     commission_rate = 0.02  # Smarkets standard commission rate on net winnings
 
     # Calculate the amount to lay on the exchange (based on available liquidity)
     lay_stake = liquidity  # You will lay this amount on the exchange
-    lay_liability = (sell_price_exchange - 1) * lay_stake  # Liability of the lay bet
+    liability = (sell_price_exchange - 1) * lay_stake  # Liability of the lay bet
 
     # Calculate the amount to back on the bookmaker to cover the liability
-    back_stake = lay_liability / (back_price_bookmaker - 1)
+    back_stake = liability / (back_price_bookmaker - 1)
 
     # Calculate potential profits for each outcome
     if back_stake > lay_stake:
-        # If the back stake is greater than the lay stake, adjust the lay stake to match the back stake
-        lay_stake = back_stake
-        lay_liability = (sell_price_exchange - 1) * lay_stake
+        print("\n⚠️ Insufficient liquidity on the exchange to cover the required back stake.")
+        print("   Consider reducing your lay stake or finding additional liquidity.")
+        return
 
-    profit_if_selection_wins = (back_stake * (back_price_bookmaker - 1)) - lay_liability
-    profit_if_selection_loses = lay_stake - (back_stake * (back_price_bookmaker - 1))
+    # Scenario 1: The selection wins
+    profit_bookmaker_win = (back_stake * (back_price_bookmaker - 1)) - liability
+    net_profit_win = profit_bookmaker_win - (profit_bookmaker_win * commission_rate)
 
-    # Deduct Smarkets commission from the profit if the selection loses
-    if profit_if_selection_loses > 0:
-        profit_if_selection_loses -= profit_if_selection_loses * commission_rate
+    # Scenario 2: The selection loses
+    profit_exchange_win = lay_stake - (back_stake * (back_price_bookmaker - 1))
+    net_profit_lose = profit_exchange_win - (profit_exchange_win * commission_rate)
 
     # Output the instructions
     print("\n=== Bet Placement Instructions ===")
     print(f"1️⃣ Place a LAY bet on the exchange for £{lay_stake:.2f} at odds of {sell_price_exchange}.")
-    print(f"   - This will create a liability of £{lay_liability:.2f}.")
+    print(f"   - This will create a liability of £{liability:.2f}.")
     print(f"2️⃣ Place a BACK bet on the bookmaker for £{back_stake:.2f} at odds of {back_price_bookmaker}.")
 
-    # Output the potential profits
+    # Display potential profits
     print("\n=== Potential Profit Analysis ===")
-    print(f"💷 If the selection WINS:")
-    print(f"   - Profit: £{profit_if_selection_wins:.2f}")
-    print(f"💷 If the selection LOSES:")
-    print(f"   - Profit after Smarkets commission: £{profit_if_selection_loses:.2f}")
+    print(f"📈 If the selection WINS:")
+    print(f"   - Profit from bookmaker: £{profit_bookmaker_win:.2f}")
+    print(f"   - Net profit after commission: £{net_profit_win:.2f}")
+    print(f"📉 If the selection LOSES:")
+    print(f"   - Profit from exchange: £{profit_exchange_win:.2f}")
+    print(f"   - Net profit after commission: £{net_profit_lose:.2f}")
 
-    # Determine if the arbitrage opportunity is profitable
-    if profit_if_selection_wins > 0 and profit_if_selection_loses > 0:
-        print("\n✅ This arbitrage opportunity is profitable in all outcomes.")
+    # Determine if the arbitrage is profitable
+    if net_profit_win > 0 and net_profit_lose > 0:
+        print("\n✅ This arbitrage opportunity is profitable.")
     else:
-        print("\n❌ This arbitrage opportunity is NOT profitable in all outcomes. Proceed with caution.")
+        print("\n❌ This arbitrage opportunity is not profitable. Re-evaluate your stakes or odds.")
 
 # Run the calculator
 calculate_arbitrage()
