@@ -9,22 +9,14 @@ Sub GenerateReports()
     Dim dict As Object
     Dim sampleSize As Integer
     Dim i As Integer, rowNum As Integer
-    Dim rng As Range, cell As Range
+    Dim rowDate As Date
     
     ' Set worksheets
-    On Error Resume Next
     Set wsRaw = ThisWorkbook.Sheets("Raw Data")
     Set wsPwC = ThisWorkbook.Sheets("Closed by PwC")
     Set wsPwC7Days = ThisWorkbook.Sheets("Closed by PwC Last 7 Days")
     Set wsSample = ThisWorkbook.Sheets("Random Sample")
     Set wsParams = ThisWorkbook.Sheets("Params")
-    On Error GoTo 0
-
-    ' Ensure sheets exist
-    If wsRaw Is Nothing Or wsPwC Is Nothing Or wsPwC7Days Is Nothing Or wsSample Is Nothing Or wsParams Is Nothing Then
-        MsgBox "One or more sheets are missing. Please check the sheet names.", vbCritical
-        Exit Sub
-    End If
 
     ' Find last row in Raw Data
     lastRow = wsRaw.Cells(wsRaw.Rows.Count, 1).End(xlUp).Row
@@ -45,7 +37,7 @@ Sub GenerateReports()
 
     ' Get date from Params C3 and sample percentage from C4
     On Error Resume Next
-    closingDate = wsParams.Range("C3").Value
+    closingDate = CDate(wsParams.Range("C3").Value) ' Ensure it's stored as a Date
     samplePercent = wsParams.Range("C4").Value
     On Error GoTo 0
 
@@ -77,10 +69,10 @@ Sub GenerateReports()
     outputRow = 2
     For i = 2 To lastRowPwC
         If wsPwC.Cells(i, 15).Value <> "" Then
-            Dim rowDate As Date
             On Error Resume Next
-            rowDate = DateValue(Left(wsPwC.Cells(i, 15).Value, 10))
+            rowDate = CDate(wsPwC.Cells(i, 15).Value) ' Convert column data to Date format
             On Error GoTo 0
+
             If rowDate >= closingDate - 7 And rowDate <= closingDate Then
                 wsPwC.Rows(i).Copy wsPwC7Days.Rows(outputRow)
                 outputRow = outputRow + 1
