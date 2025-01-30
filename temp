@@ -1,83 +1,114 @@
 Sub GenerateReports()
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+
     Dim wsRaw As Worksheet, wsPwC As Worksheet, wsPwC7Days As Worksheet, wsSample As Worksheet, wsParams As Worksheet
     Dim lastRow As Long, lastRowPwC As Long, lastRowPwC7Days As Long
     Dim closingDate As Date, samplePercent As Double
-    Dim rng As Range, cell As Range
     Dim dict As Object
     Dim sampleSize As Integer
     Dim i As Integer, rowNum As Integer
-    Dim filteredData As Range
-
+    Dim rng As Range, cell As Range
+    
     ' Set worksheets
+    On Error Resume Next
     Set wsRaw = ThisWorkbook.Sheets("Raw Data")
     Set wsPwC = ThisWorkbook.Sheets("Closed by PwC")
     Set wsPwC7Days = ThisWorkbook.Sheets("Closed by PwC Last 7 Days")
     Set wsSample = ThisWorkbook.Sheets("Random Sample")
     Set wsParams = ThisWorkbook.Sheets("Params")
+    On Error GoTo 0
+
+    ' Ensure sheets exist
+    If wsRaw Is Nothing Or wsPwC Is Nothing Or wsPwC7Days Is Nothing Or wsSample Is Nothing Or wsParams Is Nothing Then
+        MsgBox "One or more sheets are missing. Please check the sheet names.", vbCritical
+        Exit Sub
+    End If
 
     ' Find last row in Raw Data
     lastRow = wsRaw.Cells(wsRaw.Rows.Count, 1).End(xlUp).Row
+    If lastRow < 2 Then
+        MsgBox "Raw Data is empty!", vbExclamation
+        Exit Sub
+    End If
 
-    ' Clear previous data
-    wsPwC.Cells.Clear
-    wsPwC7Days.Cells.Clear
-    wsSample.Cells.Clear
+    ' Clear previous data efficiently
+    wsPwC.Cells.ClearContents
+    wsPwC7Days.Cells.ClearContents
+    wsSample.Cells.ClearContents
 
     ' Copy headers to new sheets
     wsRaw.Rows(1).Copy wsPwC.Rows(1)
     wsRaw.Rows(1).Copy wsPwC7Days.Rows(1)
     wsRaw.Rows(1).Copy wsSample.Rows(1)
 
+    ' Get date from Params C3 and sample percentage from C4
+    On Error Resume Next
+    closingDate = wsParams.Range("C3").Value
+    samplePercent = wsParams.Range("C4").Value
+    On Error GoTo 0
+
+    If closingDate = 0 Then
+        MsgBox "Invalid date in Params!C3.", vbExclamation
+        Exit Sub
+    End If
+    If samplePercent <= 0 Or samplePercent > 1 Then
+        MsgBox "Invalid sample percentage in Params!C4. Use a value between 0 and 1.", vbExclamation
+        Exit Sub
+    End If
+
     ' Filter for "Closed by PwC"
-    Dim row As Integer
-    row = 2
+    Dim outputRow As Integer
+    outputRow = 2
     For i = 2 To lastRow
-        If (wsRaw.Cells(i, 9).Value = "Closed") And _
-           ((wsRaw.Cells(i, 10).Value = "Initial Analysis") Or (wsRaw.Cells(i, 10).Value = "Enhanced Analysis")) And _
-           (InStr(wsRaw.Cells(i, 8).Value, "Joseph Goldstein") > 0 Or InStr(wsRaw.Cells(i, 8).Value, "Sam Lodge") > 0) Then
+        If wsRaw.Cells(i, 9).Value = "Closed" And _
+           (wsRaw.Cells(i, 10).Value = "Initial Analysis" Or wsRaw.Cells(i, 10).Value = "Enhanced Analysis") And _
+           (InStr(1, wsRaw.Cells(i, 8).Value, "Joseph Goldstein", vbTextCompare) > 0 Or _
+            InStr(1, wsRaw.Cells(i, 8).Value, "Sam Lodge", vbTextCompare) > 0) Then
            
-            wsRaw.Rows(i).Copy wsPwC.Rows(row)
-            row = row + 1
+            wsRaw.Rows(i).Copy wsPwC.Rows(outputRow)
+            outputRow = outputRow + 1
         End If
     Next i
     lastRowPwC = wsPwC.Cells(wsPwC.Rows.Count, 1).End(xlUp).Row
 
-    ' Get date from Params C3
-    closingDate = wsParams.Range("C3").Value
-
     ' Filter for "Closed by PwC Last 7 Days"
-    row = 2
+    outputRow = 2
     For i = 2 To lastRowPwC
         If wsPwC.Cells(i, 15).Value <> "" Then
-            If DateValue(Left(wsPwC.Cells(i, 15).Value, 10)) >= closingDate - 7 Then
-                wsPwC.Rows(i).Copy wsPwC7Days.Rows(row)
-                row = row + 1
+            Dim rowDate As Date
+            On Error Resume Next
+            rowDate = DateValue(Left(wsPwC.Cells(i, 15).Value, 10))
+            On Error GoTo 0
+            If rowDate >= closingDate - 7 And rowDate <= closingDate Then
+                wsPwC.Rows(i).Copy wsPwC7Days.Rows(outputRow)
+                outputRow = outputRow + 1
             End If
         End If
     Next i
     lastRowPwC7Days = wsPwC7Days.Cells(wsPwC7Days.Rows.Count, 1).End(xlUp).Row
 
-    ' Get sample percentage from Params C4
-    samplePercent = wsParams.Range("C4").Value
-    sampleSize = Application.WorksheetFunction.RoundDown((lastRowPwC7Days - 1) * samplePercent, 0)
-
     ' Random Sampling
-    Set dict = CreateObject("Scripting.Dictionary")
-    Do While dict.Count < sampleSize
-        rowNum = Application.WorksheetFunction.RandBetween(2, lastRowPwC7Days)
-        If Not dict.exists(rowNum) Then
-            dict.Add rowNum, Nothing
-            wsPwC7Days.Rows(rowNum).Copy wsSample.Rows(dict.Count + 1)
-        End If
-    Loop
+    If lastRowPwC7Days > 1 Then
+        sampleSize = Application.WorksheetFunction.RoundDown((lastRowPwC7Days - 1) * samplePercent, 0)
+        Set dict = CreateObject("Scripting.Dictionary")
 
-    ' Cleanup
-    Set wsRaw = Nothing
-    Set wsPwC = Nothing
-    Set wsPwC7Days = Nothing
-    Set wsSample = Nothing
-    Set wsParams = Nothing
-    Set dict = Nothing
+        Do While dict.Count < sampleSize
+            rowNum = Application.WorksheetFunction.RandBetween(2, lastRowPwC7Days)
+            If Not dict.exists(rowNum) Then
+                dict.Add rowNum, Nothing
+                wsPwC7Days.Rows(rowNum).Copy wsSample.Rows(dict.Count + 1)
+            End If
+        Loop
+    Else
+        MsgBox "No data available for sampling in 'Closed by PwC Last 7 Days'.", vbInformation
+    End If
+
+    ' Restore Excel settings
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
 
     MsgBox "Report Generation Complete!", vbInformation
 End Sub
