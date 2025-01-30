@@ -9,7 +9,8 @@ Sub GenerateReports()
     Dim dict As Object
     Dim sampleSize As Integer
     Dim i As Integer, rowNum As Integer
-    Dim rowDate As Variant
+    Dim rng As Range, cell As Range
+    Dim rawClosingDate As String, formattedClosingDate As Date
 
     ' Set worksheets
     Set wsRaw = ThisWorkbook.Sheets("Raw Data")
@@ -37,12 +38,12 @@ Sub GenerateReports()
 
     ' Get date from Params C3 and sample percentage from C4
     On Error Resume Next
-    closingDate = CDate(wsParams.Range("C3").Value) ' Ensure C3 is a DateTime
+    closingDate = wsParams.Range("C3").Value
     samplePercent = wsParams.Range("C4").Value
     On Error GoTo 0
 
     If closingDate = 0 Then
-        MsgBox "Invalid date in Params!C3. Please enter a valid date.", vbExclamation
+        MsgBox "Invalid date in Params!C3.", vbExclamation
         Exit Sub
     End If
     If samplePercent <= 0 Or samplePercent > 1 Then
@@ -69,17 +70,18 @@ Sub GenerateReports()
     outputRow = 2
     For i = 2 To lastRowPwC
         If wsPwC.Cells(i, 15).Value <> "" Then
-            rowDate = wsPwC.Cells(i, 15).Value
+            ' Extract and format the Closing Date properly
+            rawClosingDate = wsPwC.Cells(i, 15).Value
+            rawClosingDate = Trim(Replace(rawClosingDate, " UTC", "")) ' Remove " UTC"
+            
+            On Error Resume Next
+            formattedClosingDate = CDate(rawClosingDate) ' Convert to Date/Time
+            On Error GoTo 0
 
-            ' Convert text dates to Date type if necessary
-            If IsDate(rowDate) Then
-                rowDate = CDate(rowDate)
-                
-                ' Check if the date is within the last 7 days
-                If rowDate >= closingDate - 7 And rowDate <= closingDate Then
-                    wsPwC.Rows(i).Copy wsPwC7Days.Rows(outputRow)
-                    outputRow = outputRow + 1
-                End If
+            ' Ensure the date is within the last 7 days from Params!C3
+            If formattedClosingDate >= closingDate - 7 And formattedClosingDate <= closingDate Then
+                wsPwC.Rows(i).Copy wsPwC7Days.Rows(outputRow)
+                outputRow = outputRow + 1
             End If
         End If
     Next i
