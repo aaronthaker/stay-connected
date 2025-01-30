@@ -9,8 +9,8 @@ Sub GenerateReports()
     Dim dict As Object
     Dim sampleSize As Integer
     Dim i As Integer, rowNum As Integer
-    Dim rowDate As Date
-    
+    Dim rowDate As Variant
+
     ' Set worksheets
     Set wsRaw = ThisWorkbook.Sheets("Raw Data")
     Set wsPwC = ThisWorkbook.Sheets("Closed by PwC")
@@ -37,12 +37,12 @@ Sub GenerateReports()
 
     ' Get date from Params C3 and sample percentage from C4
     On Error Resume Next
-    closingDate = CDate(wsParams.Range("C3").Value) ' Ensure it's stored as a Date
+    closingDate = CDate(wsParams.Range("C3").Value) ' Ensure C3 is a DateTime
     samplePercent = wsParams.Range("C4").Value
     On Error GoTo 0
 
     If closingDate = 0 Then
-        MsgBox "Invalid date in Params!C3.", vbExclamation
+        MsgBox "Invalid date in Params!C3. Please enter a valid date.", vbExclamation
         Exit Sub
     End If
     If samplePercent <= 0 Or samplePercent > 1 Then
@@ -69,13 +69,17 @@ Sub GenerateReports()
     outputRow = 2
     For i = 2 To lastRowPwC
         If wsPwC.Cells(i, 15).Value <> "" Then
-            On Error Resume Next
-            rowDate = CDate(wsPwC.Cells(i, 15).Value) ' Convert column data to Date format
-            On Error GoTo 0
+            rowDate = wsPwC.Cells(i, 15).Value
 
-            If rowDate >= closingDate - 7 And rowDate <= closingDate Then
-                wsPwC.Rows(i).Copy wsPwC7Days.Rows(outputRow)
-                outputRow = outputRow + 1
+            ' Convert text dates to Date type if necessary
+            If IsDate(rowDate) Then
+                rowDate = CDate(rowDate)
+                
+                ' Check if the date is within the last 7 days
+                If rowDate >= closingDate - 7 And rowDate <= closingDate Then
+                    wsPwC.Rows(i).Copy wsPwC7Days.Rows(outputRow)
+                    outputRow = outputRow + 1
+                End If
             End If
         End If
     Next i
