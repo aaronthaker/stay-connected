@@ -3,6 +3,8 @@ Sub FilterAndCreateSheet()
     Dim lastRow As Long, headerRow As Long
     Dim rng As Range, filteredRng As Range
     Dim newSheetName As String
+    Dim tempSheet As Worksheet
+    Dim cell As Range, copyRange As Range
     
     ' Define worksheet names
     Set wsRaw = ThisWorkbook.Sheets("Raw Data")
@@ -26,22 +28,61 @@ Sub FilterAndCreateSheet()
     ' Set data range including headers
     Set rng = wsRaw.Range("A" & headerRow & ":Z" & lastRow) ' Adjust column range as needed
     
-    ' Apply AutoFilter to Raw Data
+    ' Apply AutoFilter to Raw Data for Resolution Status = "Closed"
     rng.AutoFilter Field:=9, Criteria1:="Closed" ' Resolution status (column I)
-    rng.AutoFilter Field:=10, Criteria1:=Array("Initial Analysis", "Enhanced Analysis"), Operator:=xlFilterValues ' Resolution level (column J)
-    rng.AutoFilter Field:=8, Criteria1:="*Joseph Goldstein*", Operator:=xlFilterValues ' All owners (column H)
-    rng.AutoFilter Field:=8, Criteria1:="*Sam Lodge*", Operator:=xlOr ' All owners (column H)
-
-    ' Copy filtered data to the new sheet
-    Set filteredRng = rng.SpecialCells(xlCellTypeVisible)
     
-    If Not filteredRng Is Nothing Then
-        filteredRng.Copy
-        wsFiltered.Range("A1").PasteSpecial Paste:=xlPasteValues
+    ' Apply AutoFilter for Resolution Level = "Initial Analysis" or "Enhanced Analysis"
+    rng.AutoFilter Field:=10, Criteria1:=Array("Initial Analysis", "Enhanced Analysis"), Operator:=xlFilterValues ' Resolution level (column J)
+    
+    ' Copy visible data after first two filters
+    Set tempSheet = ThisWorkbook.Sheets.Add
+    rng.SpecialCells(xlCellTypeVisible).Copy
+    tempSheet.Range("A1").PasteSpecial Paste:=xlPasteValues
+    
+    ' Remove AutoFilter from Raw Data to reset the view
+    wsRaw.AutoFilterMode = False
+    
+    ' Find "All Owners" column index in tempSheet
+    Dim allOwnersCol As Integer
+    Dim headers As Range
+    Set headers = tempSheet.Rows(1)
+    
+    allOwnersCol = 0
+    For Each cell In headers.Cells
+        If Trim(LCase(cell.Value)) = "all owners" Then
+            allOwnersCol = cell.Column
+            Exit For
+        End If
+    Next cell
+
+    If allOwnersCol = 0 Then
+        MsgBox "Error: 'All owners' column not found.", vbExclamation
+        Exit Sub
     End If
 
-    ' Clear filters on Raw Data to reset view
-    wsRaw.AutoFilterMode = False
+    ' Apply manual filter for All Owners containing "Joseph Goldstein" OR "Sam Lodge"
+    For Each cell In tempSheet.Range(tempSheet.Cells(2, allOwnersCol), tempSheet.Cells(lastRow, allOwnersCol))
+        If InStr(1, cell.Value, "Joseph Goldstein", vbTextCompare) > 0 Or _
+           InStr(1, cell.Value, "Sam Lodge", vbTextCompare) > 0 Then
+            If copyRange Is Nothing Then
+                Set copyRange = cell.EntireRow
+            Else
+                Set copyRange = Union(copyRange, cell.EntireRow)
+            End If
+        End If
+    Next cell
+
+    ' Copy filtered results to "Filtered Data" sheet
+    If Not copyRange Is Nothing Then
+        headers.Copy wsFiltered.Range("A1")
+        copyRange.Copy
+        wsFiltered.Range("A2").PasteSpecial Paste:=xlPasteValues
+    End If
+    
+    ' Delete temp sheet
+    Application.DisplayAlerts = False
+    tempSheet.Delete
+    Application.DisplayAlerts = True
 
     ' Notify user
     MsgBox "Filtered data has been copied to 'Filtered Data' sheet.", vbInformation
