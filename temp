@@ -1,80 +1,48 @@
-def explain_arbitrage(exchange_odds, exchange_liquidity, commission, bookmaker_odds):
-    """
-    Explain the arbitrage calculation process, detailing why the profit differs due to commission
-    and how to adjust for equal profit regardless of the outcome.
+Sub FilterAndCreateSheet()
+    Dim wsRaw As Worksheet, wsFiltered As Worksheet
+    Dim lastRow As Long, headerRow As Long
+    Dim rng As Range, filteredRng As Range
+    Dim newSheetName As String
     
-    :param exchange_odds: Lay odds on the betting exchange.
-    :param exchange_liquidity: Maximum amount that can be matched on the exchange.
-    :param commission: Exchange commission percentage (e.g., 2 for 2%).
-    :param bookmaker_odds: Odds available at the bookmaker.
-    """
-
-    # Calculate commission multiplier
-    commission_multiplier = (1 - (commission / 100))
-
-    # Calculate the maximum lay stake based on liquidity
-    max_lay_stake = exchange_liquidity
-
-    # Initial bookmaker stake calculation
-    bookmaker_stake = (max_lay_stake * exchange_odds) / bookmaker_odds
-
-    # Calculate the payout from the bookmaker bet
-    bookmaker_payout = bookmaker_stake * bookmaker_odds
-
-    # Calculate the lay liability
-    lay_liability = max_lay_stake * (exchange_odds - 1)
-
-    # Calculate profit if bookmaker bet wins
-    profit_if_win = bookmaker_payout - bookmaker_stake - lay_liability
-
-    # Calculate profit if bookmaker bet loses (winning the lay bet)
-    commission_fee = max_lay_stake * (1 - commission_multiplier)  # Fee amount deducted
-    profit_if_lose = (max_lay_stake * commission_multiplier) - bookmaker_stake
-
-    print("\n--- Step-by-Step Arbitrage Explanation ---")
-    print(f"1️⃣ Bookmaker Stake: Calculated as (Lay Stake × Lay Odds) ÷ Bookmaker Odds")
-    print(f"   = ({max_lay_stake:.2f} × {exchange_odds:.2f}) ÷ {bookmaker_odds:.2f} = ${bookmaker_stake:.2f}")
+    ' Define worksheet names
+    Set wsRaw = ThisWorkbook.Sheets("Raw Data")
+    newSheetName = "Filtered Data"
     
-    print(f"\n2️⃣ If the bookmaker bet wins:")
-    print(f"   - You receive ${bookmaker_payout:.2f} from the bookmaker.")
-    print(f"   - You lose ${lay_liability:.2f} on the exchange.")
-    print(f"   - Profit = ${bookmaker_payout:.2f} - ${bookmaker_stake:.2f} - ${lay_liability:.2f} = ${profit_if_win:.2f}")
+    ' Check if "Filtered Data" already exists, delete if it does
+    On Error Resume Next
+    Application.DisplayAlerts = False
+    Sheets(newSheetName).Delete
+    Application.DisplayAlerts = True
+    On Error GoTo 0
     
-    print(f"\n3️⃣ If the bookmaker bet loses:")
-    print(f"   - You win ${max_lay_stake:.2f} on the exchange, but a {commission}% commission applies.")
-    print(f"   - The commission fee is {commission}% of ${max_lay_stake:.2f}, which is ${commission_fee:.2f}.")
-    print(f"   - After commission, your exchange win is ${profit_if_lose + bookmaker_stake:.2f}.")
-    print(f"   - Profit = ${profit_if_lose + bookmaker_stake:.2f} - ${bookmaker_stake:.2f} = ${profit_if_lose:.2f}")
+    ' Create the new sheet
+    Set wsFiltered = ThisWorkbook.Sheets.Add(After:=wsRaw)
+    wsFiltered.Name = newSheetName
     
-    if profit_if_win != profit_if_lose:
-        print("\n⚠ The profits are not equal due to the exchange commission! Adjusting bookmaker stake...\n")
+    ' Find the last row with data
+    lastRow = wsRaw.Cells(wsRaw.Rows.Count, "A").End(xlUp).Row
+    headerRow = 1 ' Assuming headers are in the first row
+    
+    ' Set data range including headers
+    Set rng = wsRaw.Range("A" & headerRow & ":Z" & lastRow) ' Adjust column range as needed
+    
+    ' Apply AutoFilter to Raw Data
+    rng.AutoFilter Field:=9, Criteria1:="Closed" ' Resolution status (column I)
+    rng.AutoFilter Field:=10, Criteria1:=Array("Initial Analysis", "Enhanced Analysis"), Operator:=xlFilterValues ' Resolution level (column J)
+    rng.AutoFilter Field:=8, Criteria1:="*Joseph Goldstein*", Operator:=xlFilterValues ' All owners (column H)
+    rng.AutoFilter Field:=8, Criteria1:="*Sam Lodge*", Operator:=xlOr ' All owners (column H)
 
-        # Adjust bookmaker stake to equalize profit
-        bookmaker_stake *= (1 / commission_multiplier)
+    ' Copy filtered data to the new sheet
+    Set filteredRng = rng.SpecialCells(xlCellTypeVisible)
+    
+    If Not filteredRng Is Nothing Then
+        filteredRng.Copy
+        wsFiltered.Range("A1").PasteSpecial Paste:=xlPasteValues
+    End If
 
-        # Recalculate values with adjusted bookmaker stake
-        bookmaker_payout = bookmaker_stake * bookmaker_odds
-        lay_stake = bookmaker_payout / exchange_odds
-        lay_liability = lay_stake * (exchange_odds - 1)
+    ' Clear filters on Raw Data to reset view
+    wsRaw.AutoFilterMode = False
 
-        # Recalculate profits
-        profit_if_win = bookmaker_payout - bookmaker_stake - lay_liability
-        profit_if_lose = lay_stake * commission_multiplier - bookmaker_stake
-
-        print(f"✅ Adjusted bookmaker stake: ${bookmaker_stake:.2f} to balance profits.")
-        print(f"✅ Now both profit scenarios are equal at ${profit_if_win:.2f}.")
-
-    print("\n🎯 Final Results:")
-    print(f"✅ Adjusted Bookmaker Stake: ${bookmaker_stake:.2f} at {bookmaker_odds:.2f} odds")
-    print(f"✅ Exchange Lay Stake: ${max_lay_stake:.2f} at {exchange_odds:.2f} odds")
-    print(f"📉 Lay Liability: ${lay_liability:.2f}")
-    print(f"💰 Guaranteed Profit: ${profit_if_win:.2f} (Same regardless of outcome)")
-
-# User Inputs
-exchange_odds = float(input("Enter exchange lay odds: "))
-exchange_liquidity = float(input("Enter available exchange liquidity ($): "))
-commission = float(input("Enter exchange commission percentage (e.g., 2 for 2%): "))
-bookmaker_odds = float(input("Enter bookmaker odds: "))
-
-# Run the arbitrage explanation
-explain_arbitrage(exchange_odds, exchange_liquidity, commission, bookmaker_odds)
+    ' Notify user
+    MsgBox "Filtered data has been copied to 'Filtered Data' sheet.", vbInformation
+End Sub
