@@ -1,89 +1,83 @@
-Sub FilterAndCreateSheet()
-    Dim wsRaw As Worksheet, wsFiltered As Worksheet
-    Dim lastRow As Long, headerRow As Long
-    Dim rng As Range, filteredRng As Range
-    Dim newSheetName As String
-    Dim tempSheet As Worksheet
-    Dim cell As Range, copyRange As Range
-    
-    ' Define worksheet names
+Sub GenerateReports()
+    Dim wsRaw As Worksheet, wsPwC As Worksheet, wsPwC7Days As Worksheet, wsSample As Worksheet, wsParams As Worksheet
+    Dim lastRow As Long, lastRowPwC As Long, lastRowPwC7Days As Long
+    Dim closingDate As Date, samplePercent As Double
+    Dim rng As Range, cell As Range
+    Dim dict As Object
+    Dim sampleSize As Integer
+    Dim i As Integer, rowNum As Integer
+    Dim filteredData As Range
+
+    ' Set worksheets
     Set wsRaw = ThisWorkbook.Sheets("Raw Data")
-    newSheetName = "Filtered Data"
-    
-    ' Check if "Filtered Data" already exists, delete if it does
-    On Error Resume Next
-    Application.DisplayAlerts = False
-    Sheets(newSheetName).Delete
-    Application.DisplayAlerts = True
-    On Error GoTo 0
-    
-    ' Create the new sheet
-    Set wsFiltered = ThisWorkbook.Sheets.Add(After:=wsRaw)
-    wsFiltered.Name = newSheetName
-    
-    ' Find the last row with data
-    lastRow = wsRaw.Cells(wsRaw.Rows.Count, "A").End(xlUp).Row
-    headerRow = 1 ' Assuming headers are in the first row
-    
-    ' Set data range including headers
-    Set rng = wsRaw.Range("A" & headerRow & ":Z" & lastRow) ' Adjust column range as needed
-    
-    ' Apply AutoFilter to Raw Data for Resolution Status = "Closed"
-    rng.AutoFilter Field:=9, Criteria1:="Closed" ' Resolution status (column I)
-    
-    ' Apply AutoFilter for Resolution Level = "Initial Analysis" or "Enhanced Analysis"
-    rng.AutoFilter Field:=10, Criteria1:=Array("Initial Analysis", "Enhanced Analysis"), Operator:=xlFilterValues ' Resolution level (column J)
-    
-    ' Copy visible data after first two filters
-    Set tempSheet = ThisWorkbook.Sheets.Add
-    rng.SpecialCells(xlCellTypeVisible).Copy
-    tempSheet.Range("A1").PasteSpecial Paste:=xlPasteValues
-    
-    ' Remove AutoFilter from Raw Data to reset the view
-    wsRaw.AutoFilterMode = False
-    
-    ' Find "All Owners" column index in tempSheet
-    Dim allOwnersCol As Integer
-    Dim headers As Range
-    Set headers = tempSheet.Rows(1)
-    
-    allOwnersCol = 0
-    For Each cell In headers.Cells
-        If Trim(LCase(cell.Value)) = "all owners" Then
-            allOwnersCol = cell.Column
-            Exit For
+    Set wsPwC = ThisWorkbook.Sheets("Closed by PwC")
+    Set wsPwC7Days = ThisWorkbook.Sheets("Closed by PwC Last 7 Days")
+    Set wsSample = ThisWorkbook.Sheets("Random Sample")
+    Set wsParams = ThisWorkbook.Sheets("Params")
+
+    ' Find last row in Raw Data
+    lastRow = wsRaw.Cells(wsRaw.Rows.Count, 1).End(xlUp).Row
+
+    ' Clear previous data
+    wsPwC.Cells.Clear
+    wsPwC7Days.Cells.Clear
+    wsSample.Cells.Clear
+
+    ' Copy headers to new sheets
+    wsRaw.Rows(1).Copy wsPwC.Rows(1)
+    wsRaw.Rows(1).Copy wsPwC7Days.Rows(1)
+    wsRaw.Rows(1).Copy wsSample.Rows(1)
+
+    ' Filter for "Closed by PwC"
+    Dim row As Integer
+    row = 2
+    For i = 2 To lastRow
+        If (wsRaw.Cells(i, 9).Value = "Closed") And _
+           ((wsRaw.Cells(i, 10).Value = "Initial Analysis") Or (wsRaw.Cells(i, 10).Value = "Enhanced Analysis")) And _
+           (InStr(wsRaw.Cells(i, 8).Value, "Joseph Goldstein") > 0 Or InStr(wsRaw.Cells(i, 8).Value, "Sam Lodge") > 0) Then
+           
+            wsRaw.Rows(i).Copy wsPwC.Rows(row)
+            row = row + 1
         End If
-    Next cell
+    Next i
+    lastRowPwC = wsPwC.Cells(wsPwC.Rows.Count, 1).End(xlUp).Row
 
-    If allOwnersCol = 0 Then
-        MsgBox "Error: 'All owners' column not found.", vbExclamation
-        Exit Sub
-    End If
+    ' Get date from Params C3
+    closingDate = wsParams.Range("C3").Value
 
-    ' Apply manual filter for All Owners containing "Joseph Goldstein" OR "Sam Lodge"
-    For Each cell In tempSheet.Range(tempSheet.Cells(2, allOwnersCol), tempSheet.Cells(lastRow, allOwnersCol))
-        If InStr(1, cell.Value, "Joseph Goldstein", vbTextCompare) > 0 Or _
-           InStr(1, cell.Value, "Sam Lodge", vbTextCompare) > 0 Then
-            If copyRange Is Nothing Then
-                Set copyRange = cell.EntireRow
-            Else
-                Set copyRange = Union(copyRange, cell.EntireRow)
+    ' Filter for "Closed by PwC Last 7 Days"
+    row = 2
+    For i = 2 To lastRowPwC
+        If wsPwC.Cells(i, 15).Value <> "" Then
+            If DateValue(Left(wsPwC.Cells(i, 15).Value, 10)) >= closingDate - 7 Then
+                wsPwC.Rows(i).Copy wsPwC7Days.Rows(row)
+                row = row + 1
             End If
         End If
-    Next cell
+    Next i
+    lastRowPwC7Days = wsPwC7Days.Cells(wsPwC7Days.Rows.Count, 1).End(xlUp).Row
 
-    ' Copy filtered results to "Filtered Data" sheet
-    If Not copyRange Is Nothing Then
-        headers.Copy wsFiltered.Range("A1")
-        copyRange.Copy
-        wsFiltered.Range("A2").PasteSpecial Paste:=xlPasteValues
-    End If
-    
-    ' Delete temp sheet
-    Application.DisplayAlerts = False
-    tempSheet.Delete
-    Application.DisplayAlerts = True
+    ' Get sample percentage from Params C4
+    samplePercent = wsParams.Range("C4").Value
+    sampleSize = Application.WorksheetFunction.RoundDown((lastRowPwC7Days - 1) * samplePercent, 0)
 
-    ' Notify user
-    MsgBox "Filtered data has been copied to 'Filtered Data' sheet.", vbInformation
+    ' Random Sampling
+    Set dict = CreateObject("Scripting.Dictionary")
+    Do While dict.Count < sampleSize
+        rowNum = Application.WorksheetFunction.RandBetween(2, lastRowPwC7Days)
+        If Not dict.exists(rowNum) Then
+            dict.Add rowNum, Nothing
+            wsPwC7Days.Rows(rowNum).Copy wsSample.Rows(dict.Count + 1)
+        End If
+    Loop
+
+    ' Cleanup
+    Set wsRaw = Nothing
+    Set wsPwC = Nothing
+    Set wsPwC7Days = Nothing
+    Set wsSample = Nothing
+    Set wsParams = Nothing
+    Set dict = Nothing
+
+    MsgBox "Report Generation Complete!", vbInformation
 End Sub
