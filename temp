@@ -1,125 +1,24 @@
-Sub GenerateReports()
-    Application.ScreenUpdating = False
-    Application.Calculation = xlCalculationManual
-    Application.EnableEvents = False
-
-    Dim wsRaw As Worksheet, wsPwC As Worksheet, wsPwC7Days As Worksheet, wsSample As Worksheet, wsParams As Worksheet
-    Dim lastRow As Long, lastRowPwC As Long, lastRowPwC7Days As Long
-    Dim closingDate As Date, samplePercent As Double
-    Dim dict As Object
-    Dim sampleSize As Integer
-    Dim i As Integer, rowNum As Integer
-    Dim extractedDate As String
-    Dim outputRow As Integer
+let
+    Source = Excel.CurrentWorkbook(){[Name="Closed_By_PwC_Last_7_Days"]}[Content],
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Alert ID", Int64.Type}, {"Name", type text}, {"Status", type text}, {"Escalation level", type text}, {"Comments", type text}, {"Justification", type text}, {"Current owner", type text}, {"All owners", type text}, {"Resolution status", type text}, {"Resolution level", type text}, {"Content date", type text}, {"Content IDs", type any}, {"Content types", type text}, {"Age in days", Int64.Type}, {"Closing date", type datetime}, {"Creation date", type text}, {"Date of first ownership", type text}, {"Total investigation time", Int64.Type}, {"Last update", type text}, {"QA creation date", type any}, {"QA assignment rules", type any}, {"QA owner", type any}, {"QA status", type any}, {"QA last update", type any}, {"Actions taken", type text}, {"Escalated from", type any}, {"Escalated to", type any}, {"Escalation date", type any}, {"Within7Days", type logical}}),
     
-    ' Set worksheets
-    On Error Resume Next
-    Set wsRaw = ThisWorkbook.Sheets("Raw Data")
-    Set wsPwC = ThisWorkbook.Sheets("Closed by PwC")
-    Set wsPwC7Days = ThisWorkbook.Sheets("Closed by PwC Last 7 Days")
-    Set wsSample = ThisWorkbook.Sheets("Random Sample")
-    Set wsParams = ThisWorkbook.Sheets("Params")
-    On Error GoTo 0
+    // Add a column with a random number between 0 and 1
+    #"Added Custom" = Table.AddColumn(#"Changed Type", "RandomValue", each Number.RandomBetween(0, 1)),
+    
+    // Sort the table based on the RandomValue column
+    #"Sorted Rows" = Table.Sort(#"Added Custom",{{"RandomValue", Order.Ascending}}),
+    
+    // Add an index column
+    #"Added Index" = Table.AddIndexColumn(#"Sorted Rows", "Index", 0, 1, Int64.Type),
+    
+    // Calculate the number of rows to keep (30% of the total rows)
+    TotalRows = Table.RowCount(#"Added Index"),
+    SampleSize = Number.Round(TotalRows * 0.3), // 30% of the total rows
+    
+    // Keep only the top SampleSize rows
+    #"Filtered Rows" = Table.FirstN(#"Added Index", SampleSize),
 
-    ' Ensure sheets exist
-    If wsRaw Is Nothing Or wsPwC Is Nothing Or wsPwC7Days Is Nothing Or wsSample Is Nothing Or wsParams Is Nothing Then
-        MsgBox "One or more sheets are missing. Please check the sheet names.", vbCritical
-        Exit Sub
-    End If
-
-    ' Find last row in Raw Data
-    lastRow = wsRaw.Cells(wsRaw.Rows.Count, 1).End(xlUp).Row
-    If lastRow < 2 Then
-        MsgBox "Raw Data is empty!", vbExclamation
-        Exit Sub
-    End If
-
-    ' Extract the first 10 characters from Closing Date and store in column AC
-    wsRaw.Cells(1, 29).Value = "Closing Date Extracted" ' Column AC header
-    For i = 2 To lastRow
-        If wsRaw.Cells(i, 15).Value <> "" Then
-            extractedDate = Left(wsRaw.Cells(i, 15).Value, 10) ' Extracts "dd/mm/yyyy"
-            On Error Resume Next
-            wsRaw.Cells(i, 29).Value = DateValue(extractedDate) ' Converts it to a date
-            On Error GoTo 0
-        End If
-    Next i
-
-    ' Clear previous reports efficiently
-    wsPwC.Cells.ClearContents
-    wsPwC7Days.Cells.ClearContents
-    wsSample.Cells.ClearContents
-
-    ' Copy headers to new sheets
-    wsRaw.Rows(1).Copy wsPwC.Rows(1)
-    wsRaw.Rows(1).Copy wsPwC7Days.Rows(1)
-    wsRaw.Rows(1).Copy wsSample.Rows(1)
-
-    ' Get date from Params C3 and sample percentage from C4
-    On Error Resume Next
-    closingDate = wsParams.Range("C3").Value
-    samplePercent = wsParams.Range("C4").Value
-    On Error GoTo 0
-
-    If closingDate = 0 Then
-        MsgBox "Invalid date in Params!C3.", vbExclamation
-        Exit Sub
-    End If
-    If samplePercent <= 0 Or samplePercent > 1 Then
-        MsgBox "Invalid sample percentage in Params!C4. Use a value between 0 and 1.", vbExclamation
-        Exit Sub
-    End If
-
-    ' Filter for "Closed by PwC"
-    outputRow = 2
-    For i = 2 To lastRow
-        If wsRaw.Cells(i, 9).Value = "Closed" And _
-           (wsRaw.Cells(i, 10).Value = "Initial Analysis" Or wsRaw.Cells(i, 10).Value = "Enhanced Analysis") And _
-           (InStr(1, wsRaw.Cells(i, 8).Value, "Joseph Goldstein", vbTextCompare) > 0 Or _
-            InStr(1, wsRaw.Cells(i, 8).Value, "Sam Lodge", vbTextCompare) > 0) Then
-            
-            wsRaw.Rows(i).Copy wsPwC.Rows(outputRow)
-            outputRow = outputRow + 1
-        End If
-    Next i
-    lastRowPwC = wsPwC.Cells(wsPwC.Rows.Count, 1).End(xlUp).Row
-
-    ' Filter for "Closed by PwC Last 7 Days" using extracted column AC
-    outputRow = 2
-    For i = 2 To lastRowPwC
-        If wsPwC.Cells(i, 29).Value <> "" Then
-            Dim rowDate As Date
-            On Error Resume Next
-            rowDate = wsPwC.Cells(i, 29).Value ' Extracted Closing Date
-            On Error GoTo 0
-            If rowDate >= closingDate - 7 And rowDate <= closingDate Then
-                wsPwC.Rows(i).Copy wsPwC7Days.Rows(outputRow)
-                outputRow = outputRow + 1
-            End If
-        End If
-    Next i
-    lastRowPwC7Days = wsPwC7Days.Cells(wsPwC7Days.Rows.Count, 1).End(xlUp).Row
-
-    ' Random Sampling
-    If lastRowPwC7Days > 1 Then
-        sampleSize = Application.WorksheetFunction.RoundDown((lastRowPwC7Days - 1) * samplePercent, 0)
-        Set dict = CreateObject("Scripting.Dictionary")
-
-        Do While dict.Count < sampleSize
-            rowNum = Application.WorksheetFunction.RandBetween(2, lastRowPwC7Days)
-            If Not dict.exists(rowNum) Then
-                dict.Add rowNum, Nothing
-                wsPwC7Days.Rows(rowNum).Copy wsSample.Rows(dict.Count + 1)
-            End If
-        Loop
-    Else
-        MsgBox "No data available for sampling in 'Closed by PwC Last 7 Days'.", vbInformation
-    End If
-
-    ' Restore Excel settings
-    Application.ScreenUpdating = True
-    Application.Calculation = xlCalculationAutomatic
-    Application.EnableEvents = True
-
-    MsgBox "Report Generation Complete!", vbInformation
-End Sub
+    // Remove unnecessary columns if needed
+    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows",{"RandomValue", "Index"})
+in
+    #"Removed Columns"
