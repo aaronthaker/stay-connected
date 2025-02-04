@@ -1,1 +1,1 @@
-=COUNTIFS(Raw_Alerts!P:P,"<="&B9, Raw_Alerts!Q:Q,">"&B9)
+=COUNTIFS(Raw_Alerts!P:P,"<="&B9, Raw_Alerts!Q:Q,">"&B9) + COUNTIFS(Raw_Alerts!P:P,"<="&B9, Raw_Alerts!Q:Q,"")
