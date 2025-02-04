@@ -1,1 +1,1 @@
-=COUNTIFS(Raw_Alerts!H:H,"*Joseph Goldstein*", Raw_Alerts!Q:Q,">="&C9, Raw_Alerts!Q:Q,"<"&C9+7)
+=COUNTIFS(Raw_Alerts!Q:Q,">="&C9, Raw_Alerts!Q:Q,"<"&C9+7, Raw_Alerts!H:H,"<>*Joseph Goldstein*", Raw_Alerts!H:H,"<>*Sam Lodge*")
