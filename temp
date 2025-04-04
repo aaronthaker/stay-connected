@@ -1,1 +1,23 @@
-=COUNTIFS(Raw_Alerts!O:O,">="&C9, Raw_Alerts!O:O,"<"&C9+7, Raw_Alerts!H:H,"<>*Joseph Goldstein*", Raw_Alerts!H:H,"<>*Sam Lodge*")
+import json
+
+# Load the wrapped JSON file
+with open("GlencoreGCSOutput.txt", "r", encoding="utf-8") as f:
+    raw = f.read()
+
+# Fix malformed JSON (replace smart quotes etc.)
+raw = raw.replace("“", "\"").replace("”", "\"").replace("’", "'").replace("\n", "")
+
+# Parse outer JSON
+parsed = json.loads(raw)
+
+# Get the inner JSON string
+inner_str = parsed["data"]["data"]["value"]
+
+# Decode the inner string
+clean_json_str = json.loads(inner_str)
+
+# Save as a clean service account JSON key
+with open("glencore-key.json", "w", encoding="utf-8") as f:
+    json.dump(clean_json_str, f, indent=2)
+
+print("Clean service account key saved as glencore-key.json")
