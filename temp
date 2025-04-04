@@ -1,23 +1,29 @@
-import json
+from google.cloud import storage
+import os
 
-# Load the wrapped JSON file
-with open("GlencoreGCSOutput.txt", "r", encoding="utf-8") as f:
-    raw = f.read()
+# Path to your clean service account key
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "glencore-key.json"
 
-# Fix malformed JSON (replace smart quotes etc.)
-raw = raw.replace("“", "\"").replace("”", "\"").replace("’", "'").replace("\n", "")
+# Initialize GCS client
+client = storage.Client()
 
-# Parse outer JSON
-parsed = json.loads(raw)
+# Define the bucket and prefix
+bucket_name = "behavox-glencore-surv-input"
+prefix = "HR/"
 
-# Get the inner JSON string
-inner_str = parsed["data"]["data"]["value"]
+try:
+    bucket = client.get_bucket(bucket_name)
+    blobs = bucket.list_blobs(prefix=prefix)
 
-# Decode the inner string
-clean_json_str = json.loads(inner_str)
+    print(f"Listing contents of gs://{bucket_name}/{prefix}:\n")
+    found = False
+    for blob in blobs:
+        print(f"- {blob.name}")
+        found = True
 
-# Save as a clean service account JSON key
-with open("glencore-key.json", "w", encoding="utf-8") as f:
-    json.dump(clean_json_str, f, indent=2)
+    if not found:
+        print("Bucket is accessible, but no files found under HR/.")
 
-print("Clean service account key saved as glencore-key.json")
+except Exception as e:
+    print("Access failed or bucket not reachable:")
+    print(e)
