@@ -1,119 +1,33 @@
-import pandas as pd
-from rich.console import Console
-from rich.text import Text
-from rich.panel import Panel
 import re
 
-console = Console()
-
-# Load Excel sheets
-file_path = input("Enter Excel file path: ").strip()
-current_df = pd.read_excel(file_path, sheet_name='CurrentGen', usecols=['Alert ID', 'Justification']).fillna('')
-next_df = pd.read_excel(file_path, sheet_name='NextGen', usecols=['Alert ID', 'Justification']).fillna('')
-
-matches = []
-
-console.print(Panel("[bold green]Interactive Alert Matching Started[/bold green]"))
-
-# Helper function to extract a clean substring that actually appears in the justification
-
 def get_suggested_phrase(justification):
-    # If there's a colon, use the part after it as it's likely more descriptive
-    if ':' in justification:
-        _, justification = justification.split(':', 1)
     justification = justification.strip()
 
-    # Extract all substrings of 5–10 words that are clean and punctuation-balanced
-    words = justification.split()
-    for i in range(len(words)):
-        for length in range(10, 4, -1):  # Try from 10-word phrases down to 5
-            if i + length <= len(words):
-                phrase = ' '.join(words[i:i+length])
-                original_phrase = justification[justification.find(phrase):justification.find(phrase)+len(phrase)]
-                if phrase in justification:
-                    return justification[justification.find(phrase):justification.find(phrase)+len(phrase)]
-
-    # Fallback: return the whole justification (up to 100 chars)
-    return justification[:100]
-
-for _, row in current_df.iterrows():
-    alert_id = row['Alert ID']
-    justification = row['Justification']
-
-    # Format justification with colors (colon-based split)
+    # Remove leading label if colon exists
     if ':' in justification:
-        prefix, suffix = justification.split(':', 1)
-        just_text = Text(prefix + ':', style="bold cyan") + Text(suffix, style="white")
-    else:
-        just_text = Text(justification, style="white")
+        _, justification = justification.split(':', 1)
+    words = justification.split()
 
-    console.print(Panel(just_text, title=f"CurrentGen Alert ID: [bold yellow]{alert_id}[/bold yellow]", expand=False))
+    stopwords = set(['the', 'and', 'but', 'with', 'from', 'that', 'this', 'for', 'are', 'was', 'have', 'has'])
 
-    suggested_phrase = get_suggested_phrase(justification)
+    # 1. Try phrases with only clean alphanumeric + select punctuation
+    allowed_pattern = re.compile(r"^[\w',()\\-]+$")  # allows letters, numbers, comma, apostrophe, hyphen, brackets
+    for i in range(len(words)):
+        for length in range(5, 1, -1):  # try 5 down to 2 word phrases
+            if i + length <= len(words):
+                phrase_words = words[i:i + length]
+                if all(allowed_pattern.match(w) for w in phrase_words):
+                    phrase = ' '.join(phrase_words)
+                    return phrase
 
-    while True:
-        console.print(f"Suggested search phrase: [bold green]{suggested_phrase}[/bold green]")
-        keyword_input = input("Enter keywords to search [Enter to use suggested / s = skip / e = exit]: ").strip()
+    # 2. Fallback to original logic: any decent-looking phrase
+    for i in range(len(words)):
+        for length in range(5, 1, -1):
+            if i + length <= len(words):
+                phrase_words = words[i:i + length]
+                if any(w.lower() not in stopwords for w in phrase_words):
+                    phrase = ' '.join(phrase_words)
+                    return phrase
 
-        if keyword_input.lower() in ('s', 'skip'):
-            break
-        if keyword_input.lower() in ('e', 'exit', 'quit', 'q'):
-            exit()
-
-        if keyword_input == '':
-            keyword_input = suggested_phrase
-
-        results = next_df[next_df['Justification'].str.contains(re.escape(keyword_input), case=False, regex=True)]
-
-        if results.empty:
-            console.print("[red]No matches found.[/red]")
-            retry_input = input("Try again [r] / Skip [s] / Exit [e]: ").strip().lower()
-            if retry_input == 'r':
-                continue
-            elif retry_input == 's':
-                break
-            elif retry_input == 'e':
-                exit()
-            else:
-                console.print("[yellow]Invalid input. Skipping this alert.[/yellow]")
-                break
-
-        else:
-            console.print("\n[bold green]Matching results:[/bold green]")
-            for i, (_, match) in enumerate(results.iterrows(), start=1):
-                match_id = match['Alert ID']
-                match_just = match['Justification']
-                console.print(f"[bold]{i}.[/bold] [yellow]{match_id}[/yellow] - {match_just}")
-
-            selected = input("Select matching number(s) (e.g. 1 or 1,2), or press Enter to skip: ").strip()
-            if not selected:
-                break
-
-            try:
-                indices = [int(i.strip()) for i in selected.replace(',', ' ').split() if i.strip().isdigit()]
-                selected_ids = []
-                selected_justs = []
-                for idx in indices:
-                    matched_row = results.iloc[idx - 1]
-                    selected_ids.append(str(matched_row['Alert ID']))
-                    selected_justs.append(matched_row['Justification'])
-
-                matches.append({
-                    'Alert ID CG': alert_id,
-                    'Justification CG': justification,
-                    'Alert ID NG': ', '.join(selected_ids),
-                    'Justification NG': ', '.join(selected_justs)
-                })
-                console.print("[green]Match recorded.[/green]")
-                break
-            except Exception as e:
-                console.print(f"[red]Error:[/red] {e}")
-                break
-
-# Output matched results
-if matches:
-    output_df = pd.DataFrame(matches)
-    output_df.to_excel("matched_results.xlsx", index=False)
-    console.print(Panel("[bold green]Matches saved to matched_results.xlsx[/bold green]"))
-else:
-    console.print("[bold red]No matches recorded.[/bold red]")
+    # 3. Final fallback
+    return ' '.join(words[:5])
