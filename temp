@@ -38,13 +38,15 @@ for _, row in current_df.iterrows():
 
         if results.empty:
             console.print("[red]No matches found.[/red]")
-            choice = input("Try again [r] or skip [s]: ").strip().lower()
-            if choice == 's':
-                break
-            elif choice == 'r':
+            retry_input = input("Try again [r] / Skip [s] / Exit [e]: ").strip().lower()
+            if retry_input == 'r':
                 continue
+            elif retry_input == 's':
+                break
+            elif retry_input == 'e':
+                exit()
             else:
-                console.print("[yellow]Invalid choice. Skipping alert.[/yellow]")
+                console.print("[yellow]Invalid input. Skipping this alert.[/yellow]")
                 break
 
         else:
