@@ -1,29 +1,53 @@
-from google.cloud import storage
-import os
+import pandas as pd
+from rapidfuzz import process, fuzz
 
-# Path to your clean service account key
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "glencore-key.json"
+# Load the Excel file
+file_path = 'your_excel_file.xlsx'  # Replace with your file
+current_df = pd.read_excel(file_path, sheet_name='CurrentGen')
+next_df = pd.read_excel(file_path, sheet_name='NextGen')
 
-# Initialize GCS client
-client = storage.Client()
+# Choose the column that contains the alerting communication
+current_justifications = current_df['Justification']
+next_justifications = next_df['Justification']
 
-# Define the bucket and prefix
-bucket_name = "behavox-glencore-surv-input"
-prefix = "HR/"
+# Optional: clean text function (basic version)
+def clean_text(text):
+    if pd.isna(text):
+        return ""
+    return ''.join(e for e in str(text) if e.isalnum() or e.isspace()).lower()
 
-try:
-    bucket = client.get_bucket(bucket_name)
-    blobs = bucket.list_blobs(prefix=prefix)
+# Preprocess NextGen justifications
+next_cleaned = next_justifications.apply(clean_text).tolist()
 
-    print(f"Listing contents of gs://{bucket_name}/{prefix}:\n")
-    found = False
-    for blob in blobs:
-        print(f"- {blob.name}")
-        found = True
+# Result list
+matches = []
 
-    if not found:
-        print("Bucket is accessible, but no files found under HR/.")
+# Loop through CurrentGen and find best match
+for idx, current in enumerate(current_justifications):
+    cleaned_current = clean_text(current)
 
-except Exception as e:
-    print("Access failed or bucket not reachable:")
-    print(e)
+    # Choose a snippet to match (e.g., first 8 words or 60 characters)
+    snippet = ' '.join(cleaned_current.split()[:8])
+
+    # Find best match in NextGen
+    match, score, match_index = process.extractOne(
+        snippet, next_cleaned, scorer=fuzz.partial_ratio
+    )
+
+    # Save the match info
+    matches.append({
+        'CurrentGen_Index': idx,
+        'CurrentGen_Justification': current,
+        'NextGen_Index': match_index,
+        'NextGen_Justification': next_justifications.iloc[match_index],
+        'Match_Score': score
+    })
+
+# Create a dataframe with the matches
+matches_df = pd.DataFrame(matches)
+
+# Optional: filter out low-confidence matches
+filtered_matches = matches_df[matches_df['Match_Score'] > 70]  # adjust as needed
+
+# Save to Excel
+filtered_matches.to_excel('matched_alerts.xlsx', index=False)
