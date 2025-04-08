@@ -1,7 +1,9 @@
 import pandas as pd
+from collections import Counter
 from rich.console import Console
 from rich.text import Text
 from rich.panel import Panel
+import re
 
 console = Console()
 
@@ -11,6 +13,10 @@ current_df = pd.read_excel(file_path, sheet_name='CurrentGen', usecols=['Alert I
 next_df = pd.read_excel(file_path, sheet_name='NextGen', usecols=['Alert ID', 'Justification']).fillna('')
 
 matches = []
+
+# Preprocess common words in NextGen justifications for scoring
+all_nextgen_text = ' '.join(next_df['Justification'].astype(str)).lower()
+word_freq = Counter(re.findall(r'\b\w{4,}\b', all_nextgen_text))  # only words with length >= 4
 
 console.print(Panel("[bold green]Interactive Alert Matching Started[/bold green]"))
 
@@ -27,12 +33,22 @@ for _, row in current_df.iterrows():
 
     console.print(Panel(just_text, title=f"CurrentGen Alert ID: [bold yellow]{alert_id}[/bold yellow]", expand=False))
 
+    # Intelligent keyword suggestion: find rare-but-meaningful words from justification
+    justification_words = re.findall(r'\b\w{4,}\b', justification.lower())
+    ranked_words = sorted(justification_words, key=lambda w: word_freq.get(w, 0))
+    suggested_words = ranked_words[:3]  # pick 3 least common meaningful words
+
     while True:
-        keyword_input = input("Enter keyword(s) to search in NextGen (or type 's' to skip, 'e' to exit): ").strip()
+        console.print(f"Suggested search words: [bold green]{', '.join(suggested_words)}[/bold green]")
+        keyword_input = input("Enter keywords to search [Enter to use suggested / s = skip / e = exit]: ").strip()
+
         if keyword_input.lower() in ('s', 'skip'):
             break
         if keyword_input.lower() in ('e', 'exit', 'quit', 'q'):
             exit()
+
+        if keyword_input == '':
+            keyword_input = ' '.join(suggested_words)
 
         results = next_df[next_df['Justification'].str.contains(keyword_input, case=False, regex=False)]
 
