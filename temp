@@ -1,7 +1,4 @@
 import pandas as pd
-from prompt_toolkit import prompt
-from prompt_toolkit.completion import WordCompleter
-from prompt_toolkit.shortcuts import checkboxlist_dialog, radiolist_dialog
 from rich.console import Console
 from rich.text import Text
 from rich.panel import Panel
@@ -9,7 +6,7 @@ from rich.panel import Panel
 console = Console()
 
 # Load Excel sheets
-file_path = prompt("Enter Excel file path: ")
+file_path = input("Enter Excel file path: ").strip()
 current_df = pd.read_excel(file_path, sheet_name='CurrentGen', usecols=['Alert ID', 'Justification']).fillna('')
 next_df = pd.read_excel(file_path, sheet_name='NextGen', usecols=['Alert ID', 'Justification']).fillna('')
 
@@ -30,39 +27,46 @@ for _, row in current_df.iterrows():
 
     console.print(Panel(just_text, title=f"CurrentGen Alert ID: [bold yellow]{alert_id}[/bold yellow]", expand=False))
 
-    words = [w.strip(',.') for w in justification.split() if len(w.strip(',.')) > 2]
-    word_selector = checkboxlist_dialog(
-        title="Select Search Keywords",
-        text="Choose words for NextGen search:",
-        values=[(word, word) for word in words]
-    ).run()
+    keyword_input = input("Enter keyword(s) to search in NextGen (or type 'skip' to skip): ").strip()
+    if keyword_input.lower() in ('skip', 's'):
+        continue
+    if keyword_input.lower() in ('exit', 'quit', 'q'):
+        break
 
-    if not word_selector:
-        continue  # Skip if no selection
-
-    search_term = ' '.join(word_selector)
-    results = next_df[next_df['Justification'].str.contains(search_term, case=False, regex=False)]
+    results = next_df[next_df['Justification'].str.contains(keyword_input, case=False, regex=False)]
 
     if results.empty:
         console.print("[red]No matches found.[/red]")
         continue
 
-    options = [(str(idx), f"{r['Alert ID']} - {r['Justification']}") for idx, r in results.iterrows()]
-    selected = radiolist_dialog(
-        title="Select Matching NextGen Alert",
-        text="Choose the matching NextGen alert:",
-        values=options
-    ).run()
+    console.print("\n[bold green]Matching results:[/bold green]")
+    for i, (_, match) in enumerate(results.iterrows(), start=1):
+        match_id = match['Alert ID']
+        match_just = match['Justification']
+        console.print(f"[bold]{i}.[/bold] [yellow]{match_id}[/yellow] - {match_just}")
 
-    if selected is not None:
-        matched_row = results.loc[int(selected)]
+    selected = input("Select matching number(s) (e.g. 1 or 1,2), or press Enter to skip: ").strip()
+    if not selected:
+        continue
+
+    try:
+        indices = [int(i.strip()) for i in selected.replace(',', ' ').split() if i.strip().isdigit()]
+        selected_ids = []
+        selected_justs = []
+        for idx in indices:
+            matched_row = results.iloc[idx - 1]
+            selected_ids.append(str(matched_row['Alert ID']))
+            selected_justs.append(matched_row['Justification'])
+
         matches.append({
             'Alert ID CG': alert_id,
             'Justification CG': justification,
-            'Alert ID NG': matched_row['Alert ID'],
-            'Justification NG': matched_row['Justification']
+            'Alert ID NG': ', '.join(selected_ids),
+            'Justification NG': ', '.join(selected_justs)
         })
         console.print("[green]Match recorded.[/green]")
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
 
 # Output matched results
 if matches:
