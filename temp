@@ -1,5 +1,4 @@
 import pandas as pd
-from collections import Counter
 from rich.console import Console
 from rich.text import Text
 from rich.panel import Panel
@@ -14,11 +13,21 @@ next_df = pd.read_excel(file_path, sheet_name='NextGen', usecols=['Alert ID', 'J
 
 matches = []
 
-# Preprocess common words in NextGen justifications for scoring
-all_nextgen_text = ' '.join(next_df['Justification'].astype(str)).lower()
-word_freq = Counter(re.findall(r'\b\w{4,}\b', all_nextgen_text))  # only words with length >= 4
-
 console.print(Panel("[bold green]Interactive Alert Matching Started[/bold green]"))
+
+# Helper function to extract a clean substring from a justification
+
+def get_suggested_phrase(justification):
+    justification = justification.strip()
+    # Try to extract a substring of 5-10 words that doesn't have numbers or special characters
+    words = justification.split()
+    for i in range(len(words)):
+        for length in range(10, 4, -1):  # try phrases from 10 down to 5 words
+            if i + length <= len(words):
+                phrase = ' '.join(words[i:i+length])
+                if re.match(r'^[a-zA-Z\s\'\"-]+$', phrase) and not re.search(r'\b(?:the|and|in|of|to|a|for)\b', phrase.lower()):
+                    return phrase
+    return justification[:40]  # fallback to first 40 characters if nothing found
 
 for _, row in current_df.iterrows():
     alert_id = row['Alert ID']
@@ -33,13 +42,10 @@ for _, row in current_df.iterrows():
 
     console.print(Panel(just_text, title=f"CurrentGen Alert ID: [bold yellow]{alert_id}[/bold yellow]", expand=False))
 
-    # Intelligent keyword suggestion: find rare-but-meaningful words from justification
-    justification_words = re.findall(r'\b\w{4,}\b', justification.lower())
-    ranked_words = sorted(justification_words, key=lambda w: word_freq.get(w, 0))
-    suggested_words = ranked_words[:3]  # pick 3 least common meaningful words
+    suggested_phrase = get_suggested_phrase(justification)
 
     while True:
-        console.print(f"Suggested search words: [bold green]{', '.join(suggested_words)}[/bold green]")
+        console.print(f"Suggested search phrase: [bold green]{suggested_phrase}[/bold green]")
         keyword_input = input("Enter keywords to search [Enter to use suggested / s = skip / e = exit]: ").strip()
 
         if keyword_input.lower() in ('s', 'skip'):
@@ -48,7 +54,7 @@ for _, row in current_df.iterrows():
             exit()
 
         if keyword_input == '':
-            keyword_input = ' '.join(suggested_words)
+            keyword_input = suggested_phrase
 
         results = next_df[next_df['Justification'].str.contains(keyword_input, case=False, regex=False)]
 
