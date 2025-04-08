@@ -15,19 +15,31 @@ matches = []
 
 console.print(Panel("[bold green]Interactive Alert Matching Started[/bold green]"))
 
-# Helper function to extract a clean substring from a justification
+# Helper function to extract a clean phrase from justification
 
 def get_suggested_phrase(justification):
     justification = justification.strip()
-    # Try to extract a substring of 5-10 words that doesn't have numbers or special characters
+    # Remove prefix if colon exists
+    if ':' in justification:
+        _, justification = justification.split(':', 1)
+
+    # Normalize whitespace and strip punctuation
+    justification = re.sub(r'[^a-zA-Z\s\'-]', '', justification)
     words = justification.split()
+
+    # Define stopwords to avoid short generic phrases
+    stopwords = set(['the', 'and', 'but', 'with', 'from', 'that', 'this', 'for', 'are', 'was', 'have', 'has'])
+
+    # Try to find a phrase of 5-10 consecutive meaningful words
     for i in range(len(words)):
-        for length in range(10, 4, -1):  # try phrases from 10 down to 5 words
+        for length in range(10, 4, -1):
             if i + length <= len(words):
-                phrase = ' '.join(words[i:i+length])
-                if re.match(r'^[a-zA-Z\s\'\"-]+$', phrase) and not re.search(r'\b(?:the|and|in|of|to|a|for)\b', phrase.lower()):
+                phrase_words = words[i:i+length]
+                if any(w.lower() not in stopwords for w in phrase_words):
+                    phrase = ' '.join(phrase_words)
                     return phrase
-    return justification[:40]  # fallback to first 40 characters if nothing found
+
+    return ' '.join(words[:6])  # fallback
 
 for _, row in current_df.iterrows():
     alert_id = row['Alert ID']
