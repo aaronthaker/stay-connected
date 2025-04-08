@@ -1,148 +1,73 @@
 import pandas as pd
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.prompt import Prompt
 from prompt_toolkit import prompt
-from prompt_toolkit.shortcuts import checkboxlist_dialog
-from prompt_toolkit.styles import Style
-from colorama import init as colorama_init, Fore, Style as ColoramaStyle
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit.shortcuts import checkboxlist_dialog, radiolist_dialog
+from rich.console import Console
+from rich.text import Text
+from rich.panel import Panel
 
-colorama_init()
 console = Console()
 
-# --- Helper function to display styled justification ---
-def display_justification(alert_id, justification):
-    colon_index = justification.find(':')
-    if colon_index != -1:
-        prefix = justification[:colon_index + 1]
-        message = justification[colon_index + 1:]
+# Load Excel sheets
+file_path = prompt("Enter Excel file path: ")
+current_df = pd.read_excel(file_path, sheet_name='CurrentGen', usecols=['Alert ID', 'Justification']).fillna('')
+next_df = pd.read_excel(file_path, sheet_name='NextGen', usecols=['Alert ID', 'Justification']).fillna('')
+
+matches = []
+
+console.print(Panel("[bold green]Interactive Alert Matching Started[/bold green]"))
+
+for _, row in current_df.iterrows():
+    alert_id = row['Alert ID']
+    justification = row['Justification']
+
+    # Format justification with colors (colon-based split)
+    if ':' in justification:
+        prefix, suffix = justification.split(':', 1)
+        just_text = Text(prefix + ':', style="bold cyan") + Text(suffix, style="white")
     else:
-        prefix = ""
-        message = justification
+        just_text = Text(justification, style="white")
 
-    formatted = (
-        f"{Fore.CYAN}{ColoramaStyle.BRIGHT}CurrentGen Alert ID:{ColoramaStyle.RESET_ALL} {alert_id}\n"
-        f"{Fore.YELLOW}{prefix}{Fore.RESET}{message}"
-    )
-    console.print(Panel.fit(formatted, title="Justification", subtitle_align="right"))
+    console.print(Panel(just_text, title=f"CurrentGen Alert ID: [bold yellow]{alert_id}[/bold yellow]", expand=False))
 
-# --- Function to select words using prompt_toolkit ---
-def select_words(justification):
-    words = justification.split()
-    options = [(word, word) for word in words]
-    result = checkboxlist_dialog(
-        title="Keyword Selector",
-        text="Use arrow keys to select keywords (press Space to toggle, Enter to confirm):",
-        values=options,
-        style=Style.from_dict({
-            "dialog": "bg:#222222",
-            "dialog.body": "bg:#222222",
-            "checkbox": "#00ffcc",
-            "dialog frame.label": "bg:#00aaaa #ffffff",
-        }),
+    words = [w.strip(',.') for w in justification.split() if len(w.strip(',.')) > 2]
+    word_selector = checkboxlist_dialog(
+        title="Select Search Keywords",
+        text="Choose words for NextGen search:",
+        values=[(word, word) for word in words]
     ).run()
 
-    if result:
-        return " ".join(result)
-    return None
+    if not word_selector:
+        continue  # Skip if no selection
 
-# --- Load Excel file and sheets ---
-file_path = input("Enter path to Excel file with 'CurrentGen' and 'NextGen' sheets: ").strip()
-current_df = pd.read_excel(file_path, sheet_name='CurrentGen', usecols=['Alert ID', 'Justification'])
-next_df = pd.read_excel(file_path, sheet_name='NextGen', usecols=['Alert ID', 'Justification'])
-current_df['Justification'] = current_df['Justification'].fillna('').astype(str)
-next_df['Justification'] = next_df['Justification'].fillna('').astype(str)
+    search_term = ' '.join(word_selector)
+    results = next_df[next_df['Justification'].str.contains(search_term, case=False, regex=False)]
 
-confirmed_matches = []
+    if results.empty:
+        console.print("[red]No matches found.[/red]")
+        continue
 
-console.rule("[bold green]Interactive Matching Started")
+    options = [(str(idx), f"{r['Alert ID']} - {r['Justification']}") for idx, r in results.iterrows()]
+    selected = radiolist_dialog(
+        title="Select Matching NextGen Alert",
+        text="Choose the matching NextGen alert:",
+        values=options
+    ).run()
 
-for _, cg_row in current_df.iterrows():
-    cg_id = cg_row['Alert ID']
-    cg_just = cg_row['Justification']
+    if selected is not None:
+        matched_row = results.loc[int(selected)]
+        matches.append({
+            'Alert ID CG': alert_id,
+            'Justification CG': justification,
+            'Alert ID NG': matched_row['Alert ID'],
+            'Justification NG': matched_row['Justification']
+        })
+        console.print("[green]Match recorded.[/green]")
 
-    display_justification(cg_id, cg_just)
-
-    while True:
-        console.print("\n[bold]Select keywords from the justification sentence to search in NextGen:[/bold]")
-        keywords = select_words(cg_just)
-
-        if not keywords:
-            choice = Prompt.ask("No keywords selected. Type 'retry', 'skip', or 'exit'", choices=["retry", "skip", "exit"], default="retry")
-            if choice == 'skip':
-                break
-            elif choice == 'exit':
-                console.print("\n[bold red]Exiting process...[/bold red]")
-                exit()
-            continue
-
-        # Search in NextGen
-        matches = next_df[next_df['Justification'].str.contains(keywords, case=False, na=False, regex=False)]
-
-        if matches.empty:
-            console.print(f"[red]No matches found for:[/red] '{keywords}'")
-            choice = Prompt.ask("Type 'retry', 'skip', or 'exit'", choices=["retry", "skip", "exit"], default="retry")
-            if choice == 'skip':
-                break
-            elif choice == 'exit':
-                console.print("\n[bold red]Exiting process...[/bold red]")
-                exit()
-            continue
-
-        # Display matches in table
-        table = Table(title="NextGen Matches")
-        table.add_column("No.", style="cyan", width=5)
-        table.add_column("Alert ID", style="green", width=15)
-        table.add_column("Justification", style="white")
-
-        match_list = []
-        for idx, (_, ng_row) in enumerate(matches.iterrows(), start=1):
-            match_list.append((ng_row['Alert ID'], ng_row['Justification']))
-            table.add_row(str(idx), str(ng_row['Alert ID']), ng_row['Justification'])
-
-        console.print(table)
-
-        # Ask for selection
-        selection_input = Prompt.ask("Select match numbers (e.g., 1 or 1,2,3), or type 'retry', 'skip', or 'exit'").strip().lower()
-        if selection_input in ('retry', 'r'):
-            continue
-        elif selection_input in ('skip', 's'):
-            break
-        elif selection_input in ('exit', 'quit'):
-            console.print("\n[bold red]Exiting process...[/bold red]")
-            exit()
-
-        try:
-            selected_nums = [int(i.strip()) for i in selection_input.replace(',', ' ').split()]
-            selected_ids = []
-            selected_justs = []
-            for num in selected_nums:
-                alert_id, just = match_list[num - 1]
-                selected_ids.append(str(alert_id))
-                selected_justs.append(just)
-
-            confirmed_matches.append([
-                cg_id,
-                cg_just,
-                ", ".join(selected_ids),
-                ", ".join(selected_justs)
-            ])
-            console.print(f"[green]Match recorded for Alert ID {cg_id}.[/green]")
-            break
-        except (ValueError, IndexError):
-            console.print("[red]Invalid selection. Please try again.[/red]")
-            continue
-
-# Output the results
-if confirmed_matches:
-    output_df = pd.DataFrame(confirmed_matches, columns=[
-        "Alert ID (CurrentGen)",
-        "Justification (CurrentGen)",
-        "Alert ID(s) (NextGen)",
-        "Justification(s) (NextGen)"
-    ])
+# Output matched results
+if matches:
+    output_df = pd.DataFrame(matches)
     output_df.to_excel("matched_results.xlsx", index=False)
-    console.print("\n[bold green]Matching complete. Results saved to 'matched_results.xlsx'.[/bold green]")
+    console.print(Panel("[bold green]Matches saved to matched_results.xlsx[/bold green]"))
 else:
-    console.print("\n[bold yellow]No matches recorded. No output file created.[/bold yellow]")
+    console.print("[bold red]No matches recorded.[/bold red]")
