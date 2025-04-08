@@ -1,58 +1,200 @@
 import pandas as pd
 
-# Load Excel file
-file_path = 'your_file.xlsx'  # Replace with your Excel file path
-df_current = pd.read_excel(file_path, sheet_name='CurrentGen')
-df_next = pd.read_excel(file_path, sheet_name='NextGen')
-
-# Columns to use
-current_just_col = 'Justification'  # Adjust this if your column has a slightly different name
-next_just_col = 'Justification'     # Same here
-
-# Output matches
-matches = []
-
-for index, row in df_current.iterrows():
-    current_just = row[current_just_col]
-    print(f"\n[{index}] CurrentGen Justification:\n{current_just}\n")
-
-    while True:
-        search_input = input("Enter keywords to search in NextGen (or type 'skip' to skip this alert): ").strip()
-        if search_input.lower() == 'skip':
-            print("Skipped.")
-            break
-
-        search_words = search_input.lower().split()
-        filtered = df_next[df_next[next_just_col].str.lower().apply(
-            lambda x: all(word in x for word in search_words)
-        )]
-
-        if filtered.empty:
-            print("No matches found. Try again.")
-            continue
-
-        print("\nMatches found:")
-        for i, match_row in filtered.iterrows():
-            print(f"[{i}] {match_row[next_just_col]}\n")
-
-        selected = input("Enter the number of the correct match (or 'retry' or 'skip'): ").strip()
-        if selected.lower() == 'retry':
-            continue
-        elif selected.lower() == 'skip':
-            print("Skipped.")
-            break
-        elif selected.isdigit() and int(selected) in filtered.index:
-            matched_row = filtered.loc[int(selected)]
-            matches.append({
-                'CurrentGen_Justification': current_just,
-                'NextGen_Justification': matched_row[next_just_col]
-            })
-            print("Match recorded.")
-            break
+# --- 1. Load the Excel sheets into DataFrames ---
+file_path = input("Enter the path to the Excel file (with 'CurrentGen' and 'NextGen' sheets): ").strip()
+current_df = None
+next_df = None
+while True:
+    if file_path.lower() in ('exit', 'quit'):
+        print("Exiting without loading any file.")
+        exit(0)
+    try:
+        # Read only the necessary columns for efficiency
+        current_df = pd.read_excel(file_path, sheet_name='CurrentGen', usecols=['Alert ID', 'Justification'])
+        next_df    = pd.read_excel(file_path, sheet_name='NextGen', usecols=['Alert ID', 'Justification'])
+        break  # exit loop if read is successful
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+    except ValueError as e:
+        # This may catch missing sheet or other value errors
+        if 'Worksheet' in str(e) or 'Sheet' in str(e):
+            print("Error: Could not find 'CurrentGen' or 'NextGen' sheet in the file.")
         else:
-            print("Invalid input. Try again.")
+            print(f"Error reading file: {e}")
+    # Prompt again if error occurred
+    file_path = input("Please enter a valid Excel file path (or type 'exit' to quit): ").strip()
 
-# Save matches
-match_df = pd.DataFrame(matches)
-match_df.to_excel('matched_alerts.xlsx', index=False)
-print("\nAll done. Matches saved to matched_alerts.xlsx.")
+# Ensure the justification columns are text (handle NaN or non-string values)
+current_df['Justification'] = current_df['Justification'].fillna('').astype(str)
+next_df['Justification']    = next_df['Justification'].fillna('').astype(str)
+
+# Prepare a list to collect confirmed match records
+confirmed_matches = []
+
+print("\nStarting interactive matching process...")
+exit_flag = False  # flag to break out early if user types 'exit'
+
+# --- 2. Iterate through each CurrentGen row ---
+for _, cg_row in current_df.iterrows():
+    if exit_flag:
+        break  # break out of outer loop if exit requested
+    cg_id = cg_row['Alert ID']
+    cg_just = cg_row['Justification']
+    # Display the CurrentGen justification to the user
+    print(f"\nCurrentGen Alert ID: {cg_id}")
+    print(f"Justification: {cg_just}")
+
+    # Loop to allow keyword re-entry (retry) for the same CurrentGen justification
+    while True:
+        # 3. Prompt user for keywords to search
+        keyword_input = input("Enter keyword(s) to search in NextGen justifications (or type 'skip' to skip this alert): ").strip()
+        # Allow immediate skip or global exit at keyword prompt
+        if keyword_input.lower() in ('skip', 's'):
+            print("Skipped this alert.")
+            break  # skip this CurrentGen (no match recorded, go to next)
+        if keyword_input.lower() in ('exit', 'quit', 'q'):
+            exit_flag = True
+            print("Exiting the matching process.")
+            break  # break inner loop; exit_flag will break outer loop as well
+        if keyword_input == "":
+            # Empty input, reprompt
+            print("No keyword entered. Please try again.")
+            continue
+
+        # 4. Search NextGen justifications (case-insensitive substring search)
+        matches = next_df[next_df['Justification'].str.contains(keyword_input, case=False, na=False, regex=False)]
+        # 5. Display results or handle no results
+        if matches.empty:
+            print("No matches found for the given keyword(s).")
+            # Ask whether to retry with new keywords or skip this alert
+            choice = input("Type 'retry' to try different keywords, or 'skip' to skip this alert: ").strip().lower()
+            if choice in ('exit', 'quit', 'q'):
+                exit_flag = True
+                print("Exiting the matching process.")
+                break  # break inner loop
+            if choice in ('skip', 's'):
+                print("Skipped this alert.")
+                break  # break inner loop, move to next CurrentGen
+            # If choice is 'retry', continue the while loop to prompt for new keywords
+            if choice in ('retry', 'r', 'again', 'new'):
+                continue
+            else:
+                # If an unrecognized input is given, default to retrying
+                print("Unrecognized input. Returning to keyword prompt for this alert.")
+                continue
+
+        else:
+            # We have one or more matches in NextGen
+            print(f"\nFound {len(matches)} matching justification(s) in NextGen:")
+            # Display each match with a number, NextGen Alert ID, and justification
+            match_list = []  # will store tuples of (NextGen ID, NextGen Justification)
+            for num, (_, ng_row) in enumerate(matches.iterrows(), start=1):
+                ng_id = ng_row['Alert ID']
+                ng_just = ng_row['Justification']
+                match_list.append((ng_id, ng_just))
+                print(f"  {num}. {ng_id} – {ng_just}")
+
+            # 6. Prompt user to select matches or refine/skip
+            while True:
+                selection = input("Select matching number(s) (e.g. 1 or 1,2) or type 'retry' to search again, 'skip' to skip, 'exit' to quit: ").strip().lower()
+                if selection in ('exit', 'quit', 'q'):
+                    exit_flag = True
+                    print("Exiting the matching process.")
+                    break
+                if selection in ('skip', 's'):
+                    print("Skipped this alert.")
+                    break
+                if selection in ('retry', 'r', 'again', 'new'):
+                    # Go back to keyword entry for this same CurrentGen alert
+                    print("Retrying with new keywords for this alert...")
+                    break  # break out of selection loop to retry search
+
+                if selection == "":
+                    print("No selection made. Please enter a number, or 'retry/skip/exit'.")
+                    continue
+
+                # Parse the selection input (expecting numbers separated by commas/spaces)
+                parts = selection.replace(',', ' ').split()
+                chosen_indices = []
+                valid_input = True
+                for part in parts:
+                    if part.isdigit():
+                        chosen_indices.append(int(part))
+                    else:
+                        valid_input = False
+                        break
+                if not valid_input or not chosen_indices:
+                    print("Invalid input. Please enter one or more numbers, or a command ('retry', 'skip', 'exit').")
+                    continue
+
+                # Remove duplicates and sort the chosen indices (to avoid duplicate entries)
+                # We will preserve the order of first occurrence
+                unique_choices = []
+                seen = set()
+                for idx in chosen_indices:
+                    if idx not in seen:
+                        unique_choices.append(idx)
+                        seen.add(idx)
+
+                # Validate that each selected number is within the range of match_list
+                max_index = len(match_list)
+                if any(idx < 1 or idx > max_index for idx in unique_choices):
+                    print(f"One or more selected numbers are out of range (1–{max_index}). Please try again.")
+                    continue
+
+                # If we reach here, we have a valid selection of one or more matches
+                # Gather the corresponding NextGen IDs and Justifications
+                selected_ids = []
+                selected_justifications = []
+                for idx in unique_choices:
+                    ng_id, ng_just = match_list[idx - 1]  # idx is 1-based in list display
+                    selected_ids.append(str(ng_id))
+                    selected_justifications.append(str(ng_just))
+                # Record the confirmed match for this CurrentGen alert
+                confirmed_matches.append([
+                    cg_id,
+                    cg_just,
+                    ", ".join(selected_ids),
+                    ", ".join(selected_justifications)
+                ])
+                print(f"Recorded match: CurrentGen ID {cg_id} -> NextGen ID(s) {', '.join(selected_ids)}")
+                break  # exit selection loop (matches confirmed for this alert)
+
+            # End of selection loop handling:
+            if exit_flag:
+                break  # break out of selection loop due to exit
+            if selection in ('skip', 's'):
+                # User decided to skip after seeing results (no matches recorded)
+                break  # break search loop for this alert
+            if selection in ('retry', 'r', 'again', 'new'):
+                # User wants to try new keywords for the same alert
+                continue  # continue the outer while loop (keyword prompt) for this same CurrentGen alert
+
+            # If a match was recorded, move to the next CurrentGen alert
+            if confirmed_matches and confirmed_matches[-1][0] == cg_id:
+                # A match for this alert was just added, so we conclude this alert's processing
+                break
+
+        # If we didn't break from the loop, it will iterate (for retry scenarios)
+    # End of while loop for the current CurrentGen alert
+
+    # Break outer loop if exit_flag was set inside
+    if exit_flag:
+        break
+
+# End of for loop over CurrentGen rows
+
+# --- 7. Save confirmed matches to a new Excel file ---
+output_df = pd.DataFrame(confirmed_matches, columns=[
+    "Alert ID (CurrentGen)",
+    "Justification (CurrentGen)",
+    "Alert ID(s) (NextGen)",
+    "Justification(s) (NextGen)"
+])
+if output_df.empty:
+    print("\nNo matches were confirmed. No output file was created.")
+else:
+    output_file = "matched_results.xlsx"
+    # Write to Excel without including the pandas index column [oai_citation_attribution:4‡stackoverflow.com](https://stackoverflow.com/questions/22089317/export-from-pandas-to-excel-without-row-names-index#:~:text=You%20need%20to%20set%20,docs%2Fstable%2Fio.html)
+    output_df.to_excel(output_file, index=False)
+    print(f"\nMatching process complete. {len(output_df)} matched record(s) saved to '{output_file}'.")
