@@ -27,46 +27,57 @@ for _, row in current_df.iterrows():
 
     console.print(Panel(just_text, title=f"CurrentGen Alert ID: [bold yellow]{alert_id}[/bold yellow]", expand=False))
 
-    keyword_input = input("Enter keyword(s) to search in NextGen (or type 'skip' to skip): ").strip()
-    if keyword_input.lower() in ('skip', 's'):
-        continue
-    if keyword_input.lower() in ('exit', 'quit', 'q'):
-        break
+    while True:
+        keyword_input = input("Enter keyword(s) to search in NextGen (or type 's' to skip, 'e' to exit): ").strip()
+        if keyword_input.lower() in ('s', 'skip'):
+            break
+        if keyword_input.lower() in ('e', 'exit', 'quit', 'q'):
+            exit()
 
-    results = next_df[next_df['Justification'].str.contains(keyword_input, case=False, regex=False)]
+        results = next_df[next_df['Justification'].str.contains(keyword_input, case=False, regex=False)]
 
-    if results.empty:
-        console.print("[red]No matches found.[/red]")
-        continue
+        if results.empty:
+            console.print("[red]No matches found.[/red]")
+            choice = input("Try again [r] or skip [s]: ").strip().lower()
+            if choice == 's':
+                break
+            elif choice == 'r':
+                continue
+            else:
+                console.print("[yellow]Invalid choice. Skipping alert.[/yellow]")
+                break
 
-    console.print("\n[bold green]Matching results:[/bold green]")
-    for i, (_, match) in enumerate(results.iterrows(), start=1):
-        match_id = match['Alert ID']
-        match_just = match['Justification']
-        console.print(f"[bold]{i}.[/bold] [yellow]{match_id}[/yellow] - {match_just}")
+        else:
+            console.print("\n[bold green]Matching results:[/bold green]")
+            for i, (_, match) in enumerate(results.iterrows(), start=1):
+                match_id = match['Alert ID']
+                match_just = match['Justification']
+                console.print(f"[bold]{i}.[/bold] [yellow]{match_id}[/yellow] - {match_just}")
 
-    selected = input("Select matching number(s) (e.g. 1 or 1,2), or press Enter to skip: ").strip()
-    if not selected:
-        continue
+            selected = input("Select matching number(s) (e.g. 1 or 1,2), or press Enter to skip: ").strip()
+            if not selected:
+                break
 
-    try:
-        indices = [int(i.strip()) for i in selected.replace(',', ' ').split() if i.strip().isdigit()]
-        selected_ids = []
-        selected_justs = []
-        for idx in indices:
-            matched_row = results.iloc[idx - 1]
-            selected_ids.append(str(matched_row['Alert ID']))
-            selected_justs.append(matched_row['Justification'])
+            try:
+                indices = [int(i.strip()) for i in selected.replace(',', ' ').split() if i.strip().isdigit()]
+                selected_ids = []
+                selected_justs = []
+                for idx in indices:
+                    matched_row = results.iloc[idx - 1]
+                    selected_ids.append(str(matched_row['Alert ID']))
+                    selected_justs.append(matched_row['Justification'])
 
-        matches.append({
-            'Alert ID CG': alert_id,
-            'Justification CG': justification,
-            'Alert ID NG': ', '.join(selected_ids),
-            'Justification NG': ', '.join(selected_justs)
-        })
-        console.print("[green]Match recorded.[/green]")
-    except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+                matches.append({
+                    'Alert ID CG': alert_id,
+                    'Justification CG': justification,
+                    'Alert ID NG': ', '.join(selected_ids),
+                    'Justification NG': ', '.join(selected_justs)
+                })
+                console.print("[green]Match recorded.[/green]")
+                break
+            except Exception as e:
+                console.print(f"[red]Error:[/red] {e}")
+                break
 
 # Output matched results
 if matches:
