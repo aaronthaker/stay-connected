@@ -1,56 +1,58 @@
 import pandas as pd
-from rapidfuzz import process, fuzz
-import re
-import unicodedata
 
-# Load the Excel file
-file_path = "your_file.xlsx"  # Change this to your file path
-df_current = pd.read_excel(file_path, sheet_name="CurrentGen")
-df_next = pd.read_excel(file_path, sheet_name="NextGen")
+# Load Excel file
+file_path = 'your_file.xlsx'  # Replace with your Excel file path
+df_current = pd.read_excel(file_path, sheet_name='CurrentGen')
+df_next = pd.read_excel(file_path, sheet_name='NextGen')
 
-# Utility to clean and normalize text
-def clean_text(text):
-    if pd.isnull(text):
-        return ""
-    text = str(text)
-    text = unicodedata.normalize("NFKD", text)  # Normalize unicode
-    text = re.sub(r'[^\x00-\x7F]+', '', text)  # Remove non-ASCII chars
-    return text.strip()
+# Columns to use
+current_just_col = 'Justification'  # Adjust this if your column has a slightly different name
+next_just_col = 'Justification'     # Same here
 
-# Function to extract the main sentence (after "):")
-def extract_core_sentence(text):
-    text = clean_text(text)
-    match = re.search(r'\):\s*(.*)', text)
-    return match.group(1).strip() if match else ""
-
-# Clean and extract from CurrentGen
-df_current['CoreJustification'] = df_current['Justification'].apply(extract_core_sentence)
-
-# Clean and extract from NextGen
-df_next['CoreJustification'] = df_next['Justification'].apply(extract_core_sentence)
-
-# Prepare list of candidate sentences from NextGen
-next_sentences = df_next['CoreJustification'].tolist()
-
-# Go through each CurrentGen row and find the best match in NextGen
+# Output matches
 matches = []
 
-for idx, row in df_current.iterrows():
-    current_sentence = row['CoreJustification']
-    
-    # Try to find the best match
-    best_match = process.extractOne(current_sentence, next_sentences, scorer=fuzz.partial_ratio)
-    
-    matches.append({
-        'CurrentGen_Idx': idx,
-        'CurrentGen_Justification': row['Justification'],
-        'CurrentGen_Core': current_sentence,
-        'BestMatch_Score': best_match[1] if best_match else None,
-        'NextGen_Match': best_match[0] if best_match else None
-    })
+for index, row in df_current.iterrows():
+    current_just = row[current_just_col]
+    print(f"\n[{index}] CurrentGen Justification:\n{current_just}\n")
 
-# Create a DataFrame with results
-results_df = pd.DataFrame(matches)
+    while True:
+        search_input = input("Enter keywords to search in NextGen (or type 'skip' to skip this alert): ").strip()
+        if search_input.lower() == 'skip':
+            print("Skipped.")
+            break
 
-# Display or save results
-import ace_tools as tools; tools.display_dataframe_to_user(name="Matching Results", dataframe=results_df)
+        search_words = search_input.lower().split()
+        filtered = df_next[df_next[next_just_col].str.lower().apply(
+            lambda x: all(word in x for word in search_words)
+        )]
+
+        if filtered.empty:
+            print("No matches found. Try again.")
+            continue
+
+        print("\nMatches found:")
+        for i, match_row in filtered.iterrows():
+            print(f"[{i}] {match_row[next_just_col]}\n")
+
+        selected = input("Enter the number of the correct match (or 'retry' or 'skip'): ").strip()
+        if selected.lower() == 'retry':
+            continue
+        elif selected.lower() == 'skip':
+            print("Skipped.")
+            break
+        elif selected.isdigit() and int(selected) in filtered.index:
+            matched_row = filtered.loc[int(selected)]
+            matches.append({
+                'CurrentGen_Justification': current_just,
+                'NextGen_Justification': matched_row[next_just_col]
+            })
+            print("Match recorded.")
+            break
+        else:
+            print("Invalid input. Try again.")
+
+# Save matches
+match_df = pd.DataFrame(matches)
+match_df.to_excel('matched_alerts.xlsx', index=False)
+print("\nAll done. Matches saved to matched_alerts.xlsx.")
