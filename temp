@@ -15,31 +15,26 @@ matches = []
 
 console.print(Panel("[bold green]Interactive Alert Matching Started[/bold green]"))
 
-# Helper function to extract a clean phrase from justification
+# Helper function to extract a clean substring that actually appears in the justification
 
 def get_suggested_phrase(justification):
-    justification = justification.strip()
-    # Remove prefix if colon exists
+    # If there's a colon, use the part after it as it's likely more descriptive
     if ':' in justification:
         _, justification = justification.split(':', 1)
+    justification = justification.strip()
 
-    # Normalize whitespace and strip punctuation
-    justification = re.sub(r'[^a-zA-Z\s\'-]', '', justification)
+    # Extract all substrings of 5–10 words that are clean and punctuation-balanced
     words = justification.split()
-
-    # Define stopwords to avoid short generic phrases
-    stopwords = set(['the', 'and', 'but', 'with', 'from', 'that', 'this', 'for', 'are', 'was', 'have', 'has'])
-
-    # Try to find a phrase of 5-10 consecutive meaningful words
     for i in range(len(words)):
-        for length in range(10, 4, -1):
+        for length in range(10, 4, -1):  # Try from 10-word phrases down to 5
             if i + length <= len(words):
-                phrase_words = words[i:i+length]
-                if any(w.lower() not in stopwords for w in phrase_words):
-                    phrase = ' '.join(phrase_words)
-                    return phrase
+                phrase = ' '.join(words[i:i+length])
+                original_phrase = justification[justification.find(phrase):justification.find(phrase)+len(phrase)]
+                if phrase in justification:
+                    return justification[justification.find(phrase):justification.find(phrase)+len(phrase)]
 
-    return ' '.join(words[:6])  # fallback
+    # Fallback: return the whole justification (up to 100 chars)
+    return justification[:100]
 
 for _, row in current_df.iterrows():
     alert_id = row['Alert ID']
@@ -68,7 +63,7 @@ for _, row in current_df.iterrows():
         if keyword_input == '':
             keyword_input = suggested_phrase
 
-        results = next_df[next_df['Justification'].str.contains(keyword_input, case=False, regex=False)]
+        results = next_df[next_df['Justification'].str.contains(re.escape(keyword_input), case=False, regex=True)]
 
         if results.empty:
             console.print("[red]No matches found.[/red]")
