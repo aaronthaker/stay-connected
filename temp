@@ -1,53 +1,56 @@
 import pandas as pd
 from rapidfuzz import process, fuzz
+import re
+import unicodedata
 
 # Load the Excel file
-file_path = 'your_excel_file.xlsx'  # Replace with your file
-current_df = pd.read_excel(file_path, sheet_name='CurrentGen')
-next_df = pd.read_excel(file_path, sheet_name='NextGen')
+file_path = "your_file.xlsx"  # Change this to your file path
+df_current = pd.read_excel(file_path, sheet_name="CurrentGen")
+df_next = pd.read_excel(file_path, sheet_name="NextGen")
 
-# Choose the column that contains the alerting communication
-current_justifications = current_df['Justification']
-next_justifications = next_df['Justification']
-
-# Optional: clean text function (basic version)
+# Utility to clean and normalize text
 def clean_text(text):
-    if pd.isna(text):
+    if pd.isnull(text):
         return ""
-    return ''.join(e for e in str(text) if e.isalnum() or e.isspace()).lower()
+    text = str(text)
+    text = unicodedata.normalize("NFKD", text)  # Normalize unicode
+    text = re.sub(r'[^\x00-\x7F]+', '', text)  # Remove non-ASCII chars
+    return text.strip()
 
-# Preprocess NextGen justifications
-next_cleaned = next_justifications.apply(clean_text).tolist()
+# Function to extract the main sentence (after "):")
+def extract_core_sentence(text):
+    text = clean_text(text)
+    match = re.search(r'\):\s*(.*)', text)
+    return match.group(1).strip() if match else ""
 
-# Result list
+# Clean and extract from CurrentGen
+df_current['CoreJustification'] = df_current['Justification'].apply(extract_core_sentence)
+
+# Clean and extract from NextGen
+df_next['CoreJustification'] = df_next['Justification'].apply(extract_core_sentence)
+
+# Prepare list of candidate sentences from NextGen
+next_sentences = df_next['CoreJustification'].tolist()
+
+# Go through each CurrentGen row and find the best match in NextGen
 matches = []
 
-# Loop through CurrentGen and find best match
-for idx, current in enumerate(current_justifications):
-    cleaned_current = clean_text(current)
-
-    # Choose a snippet to match (e.g., first 8 words or 60 characters)
-    snippet = ' '.join(cleaned_current.split()[:8])
-
-    # Find best match in NextGen
-    match, score, match_index = process.extractOne(
-        snippet, next_cleaned, scorer=fuzz.partial_ratio
-    )
-
-    # Save the match info
+for idx, row in df_current.iterrows():
+    current_sentence = row['CoreJustification']
+    
+    # Try to find the best match
+    best_match = process.extractOne(current_sentence, next_sentences, scorer=fuzz.partial_ratio)
+    
     matches.append({
-        'CurrentGen_Index': idx,
-        'CurrentGen_Justification': current,
-        'NextGen_Index': match_index,
-        'NextGen_Justification': next_justifications.iloc[match_index],
-        'Match_Score': score
+        'CurrentGen_Idx': idx,
+        'CurrentGen_Justification': row['Justification'],
+        'CurrentGen_Core': current_sentence,
+        'BestMatch_Score': best_match[1] if best_match else None,
+        'NextGen_Match': best_match[0] if best_match else None
     })
 
-# Create a dataframe with the matches
-matches_df = pd.DataFrame(matches)
+# Create a DataFrame with results
+results_df = pd.DataFrame(matches)
 
-# Optional: filter out low-confidence matches
-filtered_matches = matches_df[matches_df['Match_Score'] > 70]  # adjust as needed
-
-# Save to Excel
-filtered_matches.to_excel('matched_alerts.xlsx', index=False)
+# Display or save results
+import ace_tools as tools; tools.display_dataframe_to_user(name="Matching Results", dataframe=results_df)
