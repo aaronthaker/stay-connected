@@ -1,152 +1,25 @@
-import pandas as pd
-from rich.console import Console
-from rich.text import Text
-from rich.panel import Panel
-from rich.table import Table
-import re
+import csv
 
-console = Console()
+# File name
+filename = "dummy_data.csv"
 
-# Load Excel sheets
-file_path = input("Enter Excel file path: ").strip()
+# Total number of rows
+total_rows = 1_500_000
+split_point = 1_100_000
 
-# Load all columns, not just justification
-current_df = pd.read_excel(file_path, sheet_name='CurrentGen').fillna('')
-next_df = pd.read_excel(file_path, sheet_name='NextGen').fillna('')
+# Open the file and write data
+with open(filename, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    
+    # Write header
+    writer.writerow(["category", "value1", "value2"])
+    
+    # Write 'a' rows
+    for i in range(split_point):
+        writer.writerow(['a', f"val{i % 100}", i % 50])
+    
+    # Write 'b' rows
+    for i in range(total_rows - split_point):
+        writer.writerow(['b', f"val{i % 200}", (i + 10) % 75])
 
-matches = []
-
-console.print(Panel("[bold green]Interactive Alert Matching Started[/bold green]"))
-
-# Helper function to extract a clean suggested phrase
-
-def get_suggested_phrase(justification):
-    justification = justification.strip()
-
-    if ':' in justification:
-        _, justification = justification.split(':', 1)
-
-    words = justification.split()
-
-    # Step 1: Try to find phrase with only clean words (alphanumeric or simple punctuation)
-    allowed_pattern = re.compile(r"^[\w',()\-]+$")
-    for i in range(len(words)):
-        for length in range(5, 1, -1):
-            if i + length <= len(words):
-                phrase_words = words[i:i + length]
-                if all(allowed_pattern.match(w) for w in phrase_words):
-                    phrase = ' '.join(phrase_words)
-                    if phrase in justification:
-                        return phrase
-
-    # Step 2: Fallback - allow common words but require at least one non-stopword
-    stopwords = set(['the', 'and', 'but', 'with', 'from', 'that', 'this', 'for', 'are', 'was', 'have', 'has'])
-    for i in range(len(words)):
-        for length in range(5, 1, -1):
-            if i + length <= len(words):
-                phrase_words = words[i:i + length]
-                if any(w.lower() not in stopwords for w in phrase_words):
-                    phrase = ' '.join(phrase_words)
-                    if phrase in justification:
-                        return phrase
-
-    # Step 3: Final fallback
-    return ' '.join(words[:5])
-
-for _, row in current_df.iterrows():
-    alert_id = row.get('Alert ID', '')
-    justification = row.get('Justification', '')
-    content_type = row.get('Content type', '[no content type]')
-
-    if ':' in justification:
-        prefix, suffix = justification.split(':', 1)
-        just_text = Text(prefix + ':', style="bold cyan") + Text(suffix, style="white")
-    else:
-        just_text = Text(justification, style="white")
-
-    console.print(Panel(just_text, title=f"CurrentGen Alert ID: [bold yellow]{alert_id}[/bold yellow]", expand=False))
-    console.print(f"[bold]Content type:[/bold] {content_type}\n")
-
-    suggested_phrase = get_suggested_phrase(justification)
-
-    while True:
-        console.print(f"Suggested search phrase: [bold green]{suggested_phrase}[/bold green]")
-        keyword_input = input("Enter keywords to search [Enter = suggested / s = skip / e = exit]: ").strip()
-
-        if keyword_input.lower() in ('s', 'skip'):
-            break
-        if keyword_input.lower() in ('e', 'exit', 'quit', 'q'):
-            exit()
-
-        if keyword_input == '':
-            keyword_input = suggested_phrase
-
-        results = next_df[next_df['Justification'].astype(str).str.contains(re.escape(keyword_input), case=False, regex=True)]
-
-        if results.empty:
-            console.print("[red]No matches found.[/red]")
-            retry_input = input("Try again [r] / Skip [s] / Exit [e]: ").strip().lower()
-            if retry_input == 'r':
-                continue
-            elif retry_input == 's':
-                break
-            elif retry_input == 'e':
-                exit()
-            else:
-                console.print("[yellow]Invalid input. Skipping this alert.[/yellow]")
-                break
-
-        else:
-            table = Table(title="Matching NextGen Alerts", show_lines=True)
-            table.add_column("#", style="bold", width=4)
-            table.add_column("Alert ID", style="yellow")
-            table.add_column("Content Type", style="cyan")
-            table.add_column("Date", style="white")
-            table.add_column("Sender", style="magenta")
-            table.add_column("Justification", style="white")
-
-            match_list = []
-            for i, (_, match) in enumerate(results.iterrows(), start=1):
-                match_list.append(match)
-                table.add_row(
-                    str(i),
-                    str(match.get('Alert ID', '')),
-                    str(match.get('Content type', '')),
-                    str(match.get('Content date', '')),
-                    str(match.get('Message sender', '')),
-                    str(match.get('Justification', '')),
-                )
-
-            console.print(table)
-
-            selected = input("Select match number(s) (e.g. 1 or 1,2), or Enter to skip: ").strip()
-            if not selected:
-                break
-
-            try:
-                indices = [int(i.strip()) for i in selected.replace(',', ' ').split() if i.strip().isdigit()]
-                selected_ids = []
-                selected_justs = []
-                for idx in indices:
-                    match_row = match_list[idx - 1]
-                    selected_ids.append(str(match_row['Alert ID']))
-                    selected_justs.append(str(match_row['Justification']))
-
-                matches.append({
-                    'Alert ID CG': alert_id,
-                    'Justification CG': justification,
-                    'Alert ID NG': ', '.join(selected_ids),
-                    'Justification NG': ', '.join(selected_justs)
-                })
-                console.print("[green]Match recorded.[/green]")
-                break
-            except Exception as e:
-                console.print(f"[red]Error:[/red] {e}")
-                break
-
-if matches:
-    output_df = pd.DataFrame(matches)
-    output_df.to_excel("matched_results.xlsx", index=False)
-    console.print(Panel("[bold green]Matches saved to matched_results.xlsx[/bold green]"))
-else:
-    console.print("[bold red]No matches recorded.[/bold red]")
+print(f"{filename} generated successfully with {total_rows} rows.")
