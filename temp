@@ -1,25 +1,24 @@
 import csv
 
-# File name
-filename = "dummy_data.csv"
+def read_csv_line(file_path, line_number):
+    try:
+        with open(file_path, mode='r', newline='') as file:
+            reader = csv.reader(file)
+            for current_line, row in enumerate(reader, start=1):
+                if current_line == line_number:
+                    return row
+        return f"Line {line_number} not found. File might be shorter."
+    except FileNotFoundError:
+        return f"File '{file_path}' not found."
+    except Exception as e:
+        return f"An error occurred: {e}"
 
-# Total number of rows
-total_rows = 1_500_000
-split_point = 1_100_000
-
-# Open the file and write data
-with open(filename, mode='w', newline='') as file:
-    writer = csv.writer(file)
-    
-    # Write header
-    writer.writerow(["category", "value1", "value2"])
-    
-    # Write 'a' rows
-    for i in range(split_point):
-        writer.writerow(['a', f"val{i % 100}", i % 50])
-    
-    # Write 'b' rows
-    for i in range(total_rows - split_point):
-        writer.writerow(['b', f"val{i % 200}", (i + 10) % 75])
-
-print(f"{filename} generated successfully with {total_rows} rows.")
+# Example usage
+if __name__ == "__main__":
+    path = input("Enter CSV file path: ")
+    try:
+        line_num = int(input("Enter line number to read: "))
+        result = read_csv_line(path, line_num)
+        print("Line content:", result)
+    except ValueError:
+        print("Please enter a valid integer for the line number.")
