@@ -1,21 +1,50 @@
 from html.parser import HTMLParser
 
-class H2Extractor(HTMLParser):
+class RoadmapParser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.in_h2 = False
+        self.inside_roadmap_content = False
+        self.inside_epic = False
+        self.capture_p = False
+        self.current_tag = ''
+        self.result = []
 
     def handle_starttag(self, tag, attrs):
-        if tag == "h2":
-            self.in_h2 = True
+        attrs_dict = dict(attrs)
+
+        if tag == 'div' and attrs_dict.get('id') == 'roadmap-content':
+            self.inside_roadmap_content = True
+
+        elif tag == 'div' and self.inside_roadmap_content and attrs_dict.get('class') == 'epic':
+            self.inside_epic = True
+
+        elif tag == 'p' and self.inside_epic:
+            if 'class' not in attrs_dict and 'id' not in attrs_dict:
+                self.capture_p = True
+                self.current_tag = 'p'
 
     def handle_endtag(self, tag):
-        if tag == "h2":
-            self.in_h2 = False
+        if tag == 'div' and self.inside_epic:
+            self.inside_epic = False
+
+        elif tag == 'div' and self.inside_roadmap_content:
+            self.inside_roadmap_content = False
+
+        elif tag == 'p' and self.capture_p:
+            self.capture_p = False
+            self.current_tag = ''
 
     def handle_data(self, data):
-        if self.in_h2:
-            print(data.strip())
+        if self.capture_p and self.current_tag == 'p':
+            self.result.append(data.strip())
 
-with open("your_file.html", encoding="utf-8") as f:
-    H2Extractor().feed(f.read())
+# Load and parse the HTML
+with open('roadmap.html', 'r', encoding='utf-8') as file:
+    html_content = file.read()
+
+parser = RoadmapParser()
+parser.feed(html_content)
+
+# Print all matching <p> tag contents
+for p_text in parser.result:
+    print(p_text)
