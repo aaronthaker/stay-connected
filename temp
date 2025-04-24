@@ -1,24 +1,21 @@
-import csv
+from html.parser import HTMLParser
 
-def read_csv_line(file_path, line_number):
-    try:
-        with open(file_path, mode='r', newline='') as file:
-            reader = csv.reader(file)
-            for current_line, row in enumerate(reader, start=1):
-                if current_line == line_number:
-                    return row
-        return f"Line {line_number} not found. File might be shorter."
-    except FileNotFoundError:
-        return f"File '{file_path}' not found."
-    except Exception as e:
-        return f"An error occurred: {e}"
+class H2Extractor(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.in_h2 = False
 
-# Example usage
-if __name__ == "__main__":
-    path = input("Enter CSV file path: ")
-    try:
-        line_num = int(input("Enter line number to read: "))
-        result = read_csv_line(path, line_num)
-        print("Line content:", result)
-    except ValueError:
-        print("Please enter a valid integer for the line number.")
+    def handle_starttag(self, tag, attrs):
+        if tag == "h2":
+            self.in_h2 = True
+
+    def handle_endtag(self, tag):
+        if tag == "h2":
+            self.in_h2 = False
+
+    def handle_data(self, data):
+        if self.in_h2:
+            print(data.strip())
+
+with open("your_file.html", encoding="utf-8") as f:
+    H2Extractor().feed(f.read())
