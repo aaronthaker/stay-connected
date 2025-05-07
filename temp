@@ -1,50 +1,25 @@
-from html.parser import HTMLParser
+import json
 
-class RoadmapParser(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.inside_roadmap_content = False
-        self.inside_epic = False
-        self.capture_p = False
-        self.current_tag = ''
-        self.result = []
+def print_json_structure(data, indent=0, max_items=3):
+    spacing = "  " * indent
+    if isinstance(data, dict):
+        for key, value in data.items():
+            print(f"{spacing}- {key}:")
+            print_json_structure(value, indent + 1, max_items)
+    elif isinstance(data, list):
+        print(f"{spacing}- [List] ({len(data)} items)")
+        for i, item in enumerate(data[:max_items]):
+            print(f"{spacing}  [{i}]")
+            print_json_structure(item, indent + 2, max_items)
+        if len(data) > max_items:
+            print(f"{spacing}  ...and {len(data) - max_items} more items")
+    else:
+        # Print a sample value
+        print(f"{spacing}- {repr(data)} ({type(data).__name__})")
 
-    def handle_starttag(self, tag, attrs):
-        attrs_dict = dict(attrs)
+# Load and print structure
+with open("test.json", "r", encoding="utf-8") as f:
+    json_data = json.load(f)
 
-        if tag == 'div' and attrs_dict.get('id') == 'roadmap-content':
-            self.inside_roadmap_content = True
-
-        elif tag == 'div' and self.inside_roadmap_content and attrs_dict.get('class') == 'epic':
-            self.inside_epic = True
-
-        elif tag == 'p' and self.inside_epic:
-            if 'class' not in attrs_dict and 'id' not in attrs_dict:
-                self.capture_p = True
-                self.current_tag = 'p'
-
-    def handle_endtag(self, tag):
-        if tag == 'div' and self.inside_epic:
-            self.inside_epic = False
-
-        elif tag == 'div' and self.inside_roadmap_content:
-            self.inside_roadmap_content = False
-
-        elif tag == 'p' and self.capture_p:
-            self.capture_p = False
-            self.current_tag = ''
-
-    def handle_data(self, data):
-        if self.capture_p and self.current_tag == 'p':
-            self.result.append(data.strip())
-
-# Load and parse the HTML
-with open('roadmap.html', 'r', encoding='utf-8') as file:
-    html_content = file.read()
-
-parser = RoadmapParser()
-parser.feed(html_content)
-
-# Print all matching <p> tag contents
-for p_text in parser.result:
-    print(p_text)
+print("JSON Structure:")
+print_json_structure(json_data)
