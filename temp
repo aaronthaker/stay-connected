@@ -6,32 +6,62 @@ import pandas as pd
 DATA_FOLDER = "behavox_json_pages"
 
 def extract_message_data(item):
-    # Flatten multiple entries into comma-separated strings
+    # Helper to flatten fields from list of dicts, removing duplicates
     def flatten_list(objects, fields):
         def get_field(obj, path):
             value = obj
             for part in path.split('.'):
                 value = value.get(part, "") if isinstance(value, dict) else ""
-            return str(value)
-        return ", ".join([
+            return str(value).strip()
+        combined = [
             " | ".join(get_field(obj, f) for f in fields)
             for obj in objects
-        ])
+        ]
+        # Deduplicate and preserve order
+        seen = set()
+        unique = []
+        for val in combined:
+            if val not in seen:
+                seen.add(val)
+                unique.append(val)
+        return ", ".join(unique)
 
-    # Sender
-    from_person = item.get("from", {}).get("person", {})
-    from_contact = item.get("from", {}).get("contact", {})
-
-    # Recipients (multiple)
+    # Flatten recipients into two separate lists
     first_recipients = item.get("firstRecipients", [])
-    recipients_str = flatten_list(first_recipients, ["person.label", "contact.value"])
+    recipient_labels = []
+    recipient_contacts = []
 
-    # Case and Alert (multiple)
+    for r in first_recipients:
+        label = r.get("person", {}).get("label", "")
+        contact = r.get("contact", {}).get("value", "")
+        if label:
+            recipient_labels.append(label.strip())
+        if contact:
+            recipient_contacts.append(contact.strip())
+
+    # Remove duplicates while preserving order
+    def unique_preserved(lst):
+        seen = set()
+        result = []
+        for item in lst:
+            if item not in seen:
+                seen.add(item)
+                result.append(item)
+        return result
+
+    recipient_labels_str = ", ".join(unique_preserved(recipient_labels))
+    recipient_contacts_str = ", ".join(unique_preserved(recipient_contacts))
+
+    # Flatten alerts and cases
     case_ids = item.get("caseIds", [])
     alert_ids = item.get("alertIds", [])
 
     case_str = flatten_list(case_ids, ["name", "status"])
     alert_str = flatten_list(alert_ids, ["name", "status"])
+
+    # Sender
+    from_person = item.get("from", {}).get("person", {})
+    from_contact = item.get("from", {}).get("contact", {})
 
     return {
         "Message ID": item.get("id"),
@@ -47,7 +77,8 @@ def extract_message_data(item):
         "From Monitored Employee": from_person.get("me"),
         "From Contact": from_contact.get("value"),
         "From Contact Type": from_contact.get("typeId"),
-        "Recipients": recipients_str,
+        "Recipient Labels": recipient_labels_str,
+        "Recipient Contacts": recipient_contacts_str,
         "Recipient Count": item.get("recipientCount"),
         "Cases": case_str,
         "Alerts": alert_str
