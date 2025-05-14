@@ -1,37 +1,44 @@
 import json
 
-def describe_structure(obj, path="root"):
+def describe_structure(obj, path=""):
     structure = []
     if isinstance(obj, dict):
         for key, value in obj.items():
-            new_path = f"{path}.{key}"
-            structure.extend(describe_structure(value, new_path))
+            full_path = f"{path}.{key}" if path else key
+            structure.extend(describe_structure(value, full_path))
     elif isinstance(obj, list):
         if obj:
             structure.extend(describe_structure(obj[0], f"{path}[0]"))
         else:
             structure.append(f"{path}[0]: empty list")
     else:
-        structure.append(f"{path}: {type(obj).__name__}")
+        typename = type(obj).__name__
+        structure.append(f"{path}: {typename}")
     return structure
 
 def main():
-    print("Paste your JSON object (end input with Ctrl+D on Linux/Mac or Ctrl+Z on Windows):")
+    print("Paste your JSON object. End input with two blank lines:")
     input_lines = []
-    try:
-        while True:
-            input_lines.append(input())
-    except EOFError:
-        pass
+    blank_count = 0
+    while True:
+        line = input()
+        if line.strip() == "":
+            blank_count += 1
+            if blank_count == 2:
+                break
+        else:
+            blank_count = 0
+        input_lines.append(line)
 
+    input_text = "\n".join(input_lines)
     try:
-        json_data = json.loads("\n".join(input_lines))
+        data = json.loads(input_text)
     except json.JSONDecodeError as e:
-        print(f"Invalid JSON: {e}")
+        print("Invalid JSON:", e)
         return
 
     print("\nSTRUCTURE:")
-    for line in describe_structure(json_data):
+    for line in describe_structure(data):
         print(line)
 
 if __name__ == "__main__":
