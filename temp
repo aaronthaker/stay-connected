@@ -1,20 +1,20 @@
-@echo off
-setlocal enabledelayedexpansion
+import json
+import os
 
-:: Ask the user for the number of JSON files to generate
-set /p fileCount=How many JSON files would you like to generate? 
+def generate_json_files():
+    try:
+        count = int(input("How many JSON files would you like to generate? "))
+        if count <= 0:
+            print("Please enter a positive number.")
+            return
 
-:: Validate input
-for /f "delims=0123456789" %%a in ("%fileCount%") do (
-    echo Invalid input. Please enter a number.
-    goto :eof
-)
+        for i in range(1, count + 1):
+            filename = f"page{i}.json"
+            with open(filename, 'w') as f:
+                json.dump({}, f)  # Write an empty JSON object
+            print(f"Created {filename}")
+    except ValueError:
+        print("Invalid input. Please enter a number.")
 
-:: Generate the JSON files
-for /l %%i in (1,1,%fileCount%) do (
-    echo {} > page%%i.json
-    echo Created page%%i.json
-)
-
-echo Done.
-pause
+if __name__ == "__main__":
+    generate_json_files()
