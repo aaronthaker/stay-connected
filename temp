@@ -1,40 +1,20 @@
-import json
+@echo off
+setlocal enabledelayedexpansion
 
-def describe_structure(obj, path=""):
-    structure = []
-    if isinstance(obj, dict):
-        for key, value in obj.items():
-            full_path = f"{path}.{key}" if path else key
-            structure.extend(describe_structure(value, full_path))
-    elif isinstance(obj, list):
-        if obj:
-            structure.extend(describe_structure(obj[0], f"{path}[0]"))
-        else:
-            structure.append(f"{path}[0]: empty list")
-    else:
-        typename = type(obj).__name__
-        structure.append(f"{path}: {typename}")
-    return structure
+:: Ask the user for the number of JSON files to generate
+set /p fileCount=How many JSON files would you like to generate? 
 
-def main():
-    print("Paste your JSON object (end input by pressing Enter twice):")
-    input_lines = []
-    while True:
-        line = input()
-        if line.strip() == "":
-            break
-        input_lines.append(line)
-    input_text = "\n".join(input_lines)
+:: Validate input
+for /f "delims=0123456789" %%a in ("%fileCount%") do (
+    echo Invalid input. Please enter a number.
+    goto :eof
+)
 
-    try:
-        data = json.loads(input_text)
-    except json.JSONDecodeError as e:
-        print("Invalid JSON:", e)
-        return
+:: Generate the JSON files
+for /l %%i in (1,1,%fileCount%) do (
+    echo {} > page%%i.json
+    echo Created page%%i.json
+)
 
-    print("\nSTRUCTURE:")
-    for line in describe_structure(data):
-        print(line)
-
-if __name__ == "__main__":
-    main()
+echo Done.
+pause
