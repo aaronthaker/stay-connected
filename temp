@@ -17,20 +17,15 @@ def describe_structure(obj, path=""):
     return structure
 
 def main():
-    print("Paste your JSON object. End input with two blank lines:")
+    print("Paste your JSON object (end input by pressing Enter twice):")
     input_lines = []
-    blank_count = 0
     while True:
         line = input()
         if line.strip() == "":
-            blank_count += 1
-            if blank_count == 2:
-                break
-        else:
-            blank_count = 0
+            break
         input_lines.append(line)
-
     input_text = "\n".join(input_lines)
+
     try:
         data = json.loads(input_text)
     except json.JSONDecodeError as e:
