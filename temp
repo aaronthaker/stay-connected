@@ -1,32 +1,37 @@
 import json
 import os
 import pandas as pd
-from datetime import datetime
 
-# Folder containing your JSON files
-DATA_FOLDER = "json_files"
-
-def convert_timestamp(ms):
-    if isinstance(ms, int):
-        return datetime.utcfromtimestamp(ms / 1000).strftime('%Y-%m-%d %H:%M:%S')
-    return None
-
-def join_values(items, fields):
-    """Joins multiple values in a list of dicts using specified subfields."""
-    return ", ".join(
-        " | ".join(str(item.get(f, "")) for f in fields)
-        for item in items
-    )
+# Folder containing the JSON files
+DATA_FOLDER = "behavox_json_pages"
 
 def extract_message_data(item):
+    # Flatten multiple entries into comma-separated strings
+    def flatten_list(objects, fields):
+        def get_field(obj, path):
+            value = obj
+            for part in path.split('.'):
+                value = value.get(part, "") if isinstance(value, dict) else ""
+            return str(value)
+        return ", ".join([
+            " | ".join(get_field(obj, f) for f in fields)
+            for obj in objects
+        ])
+
+    # Sender
     from_person = item.get("from", {}).get("person", {})
     from_contact = item.get("from", {}).get("contact", {})
 
+    # Recipients (multiple)
     first_recipients = item.get("firstRecipients", [])
-    recipient_data = join_values(first_recipients, ["label", "id", "me", "value"])
+    recipients_str = flatten_list(first_recipients, ["person.label", "contact.value"])
 
-    case_data = join_values(item.get("caseIds", []), ["name", "id", "status"])
-    alert_data = join_values(item.get("alertIds", []), ["name", "id", "status"])
+    # Case and Alert (multiple)
+    case_ids = item.get("caseIds", [])
+    alert_ids = item.get("alertIds", [])
+
+    case_str = flatten_list(case_ids, ["name", "status"])
+    alert_str = flatten_list(alert_ids, ["name", "status"])
 
     return {
         "Message ID": item.get("id"),
@@ -34,7 +39,7 @@ def extract_message_data(item):
         "Format": item.get("format"),
         "Subject": item.get("subject"),
         "Body": item.get("body"),
-        "Date": convert_timestamp(item.get("date")),
+        "Date": item.get("date"),
         "Has Attachments": item.get("hasAttachments"),
         "Review Count": item.get("reviewCount"),
         "From ID": from_person.get("id"),
@@ -42,23 +47,24 @@ def extract_message_data(item):
         "From Monitored Employee": from_person.get("me"),
         "From Contact": from_contact.get("value"),
         "From Contact Type": from_contact.get("typeId"),
-        "Recipients": recipient_data,
+        "Recipients": recipients_str,
         "Recipient Count": item.get("recipientCount"),
-        "Cases": case_data,
-        "Alerts": alert_data
+        "Cases": case_str,
+        "Alerts": alert_str
     }
 
-# Load and parse all JSON files
+# Parse all JSON files and collect data
 all_data = []
 
 for file in sorted(os.listdir(DATA_FOLDER)):
     if file.endswith(".json"):
         with open(os.path.join(DATA_FOLDER, file), 'r', encoding='utf-8') as f:
             data = json.load(f)
-            for item in data.get("items", []):
+            items = data.get("items", [])
+            for item in items:
                 all_data.append(extract_message_data(item))
 
-# Create a DataFrame and export to Excel
+# Convert to DataFrame and export to Excel
 df = pd.DataFrame(all_data)
 df.to_excel("behavox_export.xlsx", index=False)
 print(f"Exported {len(df)} messages to behavox_export.xlsx")
