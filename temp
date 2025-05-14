@@ -1,39 +1,38 @@
 import json
 
-def describe_structure(data, indent=0):
-    prefix = ' ' * indent
-    if isinstance(data, dict):
-        print(f"{prefix}Object with {len(data)} keys:")
-        for key, value in data.items():
-            print(f"{prefix}- Key: '{key}'")
-            describe_structure(value, indent + 4)
-    elif isinstance(data, list):
-        print(f"{prefix}List with {len(data)} elements.")
-        if data:
-            print(f"{prefix}First element structure:")
-            describe_structure(data[0], indent + 4)
+def describe_structure(obj, path="root"):
+    structure = []
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            new_path = f"{path}.{key}"
+            structure.extend(describe_structure(value, new_path))
+    elif isinstance(obj, list):
+        if obj:
+            structure.extend(describe_structure(obj[0], f"{path}[0]"))
+        else:
+            structure.append(f"{path}[0]: empty list")
     else:
-        print(f"{prefix}Type: {type(data).__name__} | Example: {repr(data)}")
+        structure.append(f"{path}: {type(obj).__name__}")
+    return structure
 
 def main():
-    print("Paste your JSON object below (single line or multiline), then press Enter twice:")
+    print("Paste your JSON object (end input with Ctrl+D on Linux/Mac or Ctrl+Z on Windows):")
     input_lines = []
-    while True:
-        try:
-            line = input()
-            if line == "":
-                break
-            input_lines.append(line)
-        except EOFError:
-            break
-
-    json_str = '\n'.join(input_lines)
     try:
-        json_obj = json.loads(json_str)
-        print("\nStructure of your JSON object:")
-        describe_structure(json_obj)
+        while True:
+            input_lines.append(input())
+    except EOFError:
+        pass
+
+    try:
+        json_data = json.loads("\n".join(input_lines))
     except json.JSONDecodeError as e:
-        print(f"Invalid JSON input: {e}")
+        print(f"Invalid JSON: {e}")
+        return
+
+    print("\nSTRUCTURE:")
+    for line in describe_structure(json_data):
+        print(line)
 
 if __name__ == "__main__":
     main()
