@@ -1,20 +1,68 @@
 import json
 import os
+import pandas as pd
 
-def generate_json_files():
-    try:
-        count = int(input("How many JSON files would you like to generate? "))
-        if count <= 0:
-            print("Please enter a positive number.")
-            return
+# Folder containing the JSON files
+DATA_FOLDER = "behavox_json_pages"
 
-        for i in range(1, count + 1):
-            filename = f"page{i}.json"
-            with open(filename, 'w') as f:
-                json.dump({}, f)  # Write an empty JSON object
-            print(f"Created {filename}")
-    except ValueError:
-        print("Invalid input. Please enter a number.")
+def extract_message_data(item):
+    # Safely pull nested data with default fallbacks
+    def get(d, *keys, default=None):
+        for key in keys:
+            d = d.get(key, {})
+        return d or default
 
-if __name__ == "__main__":
-    generate_json_files()
+    def safe_list(lst, index=0, default=None):
+        return lst[index] if index < len(lst) else default
+
+    case = safe_list(item.get("caseIds", []), 0, {})
+    alert = safe_list(item.get("alertIds", []), 0, {})
+    from_person = get(item, "from", "person", default={})
+    from_contact = get(item, "from", "contact", default={})
+    recipient = safe_list(item.get("firstRecipients", []), 0, {})
+    rec_person = recipient.get("person", {})
+    rec_contact = recipient.get("contact", {})
+
+    return {
+        "Message ID": item.get("id"),
+        "Type": item.get("type"),
+        "Format": item.get("format"),
+        "Subject": item.get("subject"),
+        "Body": item.get("body"),
+        "Date": item.get("date"),
+        "Has Attachments": item.get("hasAttachments"),
+        "Review Count": item.get("reviewCount"),
+        "From ID": from_person.get("id"),
+        "From Label": from_person.get("label"),
+        "From Monitored Employee": from_person.get("me"),
+        "From Contact": from_contact.get("value"),
+        "From Contact Type": from_contact.get("typeId"),
+        "Recipient ID": rec_person.get("id"),
+        "Recipient Label": rec_person.get("label"),
+        "Recipient Monitored Employee": rec_person.get("me"),
+        "Recipient Contact": rec_contact.get("value"),
+        "Recipient Contact Type": rec_contact.get("typeId"),
+        "Recipient Count": item.get("recipientCount"),
+        "Case ID": case.get("id"),
+        "Case Name": case.get("name"),
+        "Case Status": case.get("status"),
+        "Alert ID": alert.get("id"),
+        "Alert Name": alert.get("name"),
+        "Alert Status": alert.get("status")
+    }
+
+# Parse all JSON files and collect data
+all_data = []
+
+for file in sorted(os.listdir(DATA_FOLDER)):
+    if file.endswith(".json"):
+        with open(os.path.join(DATA_FOLDER, file), 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            items = data.get("items", [])
+            for item in items:
+                all_data.append(extract_message_data(item))
+
+# Convert to DataFrame and export to Excel
+df = pd.DataFrame(all_data)
+df.to_excel("behavox_export.xlsx", index=False)
+print(f"Exported {len(df)} messages to behavox_export.xlsx")
