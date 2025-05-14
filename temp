@@ -1,25 +1,39 @@
 import json
 
-def print_json_structure(data, indent=0, max_items=3):
-    spacing = "  " * indent
+def describe_structure(data, indent=0):
+    prefix = ' ' * indent
     if isinstance(data, dict):
+        print(f"{prefix}Object with {len(data)} keys:")
         for key, value in data.items():
-            print(f"{spacing}- {key}:")
-            print_json_structure(value, indent + 1, max_items)
+            print(f"{prefix}- Key: '{key}'")
+            describe_structure(value, indent + 4)
     elif isinstance(data, list):
-        print(f"{spacing}- [List] ({len(data)} items)")
-        for i, item in enumerate(data[:max_items]):
-            print(f"{spacing}  [{i}]")
-            print_json_structure(item, indent + 2, max_items)
-        if len(data) > max_items:
-            print(f"{spacing}  ...and {len(data) - max_items} more items")
+        print(f"{prefix}List with {len(data)} elements.")
+        if data:
+            print(f"{prefix}First element structure:")
+            describe_structure(data[0], indent + 4)
     else:
-        # Print a sample value
-        print(f"{spacing}- {repr(data)} ({type(data).__name__})")
+        print(f"{prefix}Type: {type(data).__name__} | Example: {repr(data)}")
 
-# Load and print structure
-with open("test.json", "r", encoding="utf-8") as f:
-    json_data = json.load(f)
+def main():
+    print("Paste your JSON object below (single line or multiline), then press Enter twice:")
+    input_lines = []
+    while True:
+        try:
+            line = input()
+            if line == "":
+                break
+            input_lines.append(line)
+        except EOFError:
+            break
 
-print("JSON Structure:")
-print_json_structure(json_data)
+    json_str = '\n'.join(input_lines)
+    try:
+        json_obj = json.loads(json_str)
+        print("\nStructure of your JSON object:")
+        describe_structure(json_obj)
+    except json.JSONDecodeError as e:
+        print(f"Invalid JSON input: {e}")
+
+if __name__ == "__main__":
+    main()
