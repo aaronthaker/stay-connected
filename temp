@@ -1,87 +1,95 @@
 import pandas as pd
-from pathlib import Path
+import numpy as np
+import math
 
-FILE_PATH = Path(r"T:\99_Personal_Working_Folders\DS\QA\closed_alerts.csv")
-DATE_COLS = ["Creation date", "Content date", "Closing date"]
+# --- CONFIGURATION ---
+input_csv = 'your_file.csv'
+output_excel = 'qa_sample_output.xlsx'
+random_seed = 42
 
-def load_csv(path: Path) -> pd.DataFrame:
-    """Load CSV with parsed dates and cleaned column names."""
-    if not path.exists():
-        raise FileNotFoundError(f"File not found: {path}")
+# Load data
+df = pd.read_csv(input_csv)
 
-    df = pd.read_csv(path, skiprows=[0], header=0)
+# Clean-up if needed
+df = df.dropna(subset=['Name', 'Current owner'])  # Remove rows missing key data
 
-    # Clean column names
-    df.columns = df.columns.str.strip()
+# Total number of alerts
+total_alerts = len(df)
 
-    # Strip whitespace and parse dates
-    for col in DATE_COLS:
-        df[col] = pd.to_datetime(
-            df[col].str.strip(),
-            format="%d/%m/%Y %H:%M:%S %Z",
-            utc=True,
-            errors="coerce"
-        )
+# Define function to determine sample size
+def get_sample_size(n):
+    if n <= 500:
+        return 65
+    elif n <= 1000:
+        return 90
+    elif n <= 2500:
+        return 110
+    elif n <= 5000:
+        return 150
+    elif n <= 10000:
+        return 215
+    elif n <= 15000:
+        return 275
+    else:
+        return 275  # Can adjust if needed
 
-    return df
+# Get total sample size from mapping
+total_sample_size = get_sample_size(total_alerts)
 
-def filter_alerts(df: pd.DataFrame, start: str, end: str) -> pd.DataFrame:
-    """
-    Filter alerts closed between `start` and `end` (inclusive).
+# Calculate number of alerts per scenario
+scenario_counts = df['Name'].value_counts().to_dict()
+scenario_sample_targets = {
+    scenario: (count / total_alerts) * total_sample_size
+    for scenario, count in scenario_counts.items()
+}
 
-    Parameters:
-    - df: DataFrame of alerts
-    - start: Start date string (YYYY-MM-DD)
-    - end: End date string (YYYY-MM-DD)
+# Create sampling plan per analyst per scenario
+sampling_plan = []
 
-    Returns:
-    - Filtered DataFrame
-    """
-    start_date = pd.to_datetime(start)
-    end_date = pd.to_datetime(end)
+for scenario, scenario_total in scenario_counts.items():
+    scenario_sample_size = scenario_sample_targets[scenario]
 
-    return df[
-        (df["Closing date"] >= start_date) &
-        (df["Closing date"] <= end_date)
-    ]
+    sub_df = df[df['Name'] == scenario]
+    analyst_counts = sub_df['Current owner'].value_counts()
 
-def stratified_sampling(df: pd.DataFrame, strata: list[str], sample_size: int = 200) -> pd.DataFrame:
-    """
-    Perform stratified sampling on the DataFrame by given strata.
-    Ensures at least one sample per group.
-    """
-    frac = sample_size / len(df)
+    for analyst, analyst_count in analyst_counts.items():
+        prop_sample = (analyst_count / scenario_total) * scenario_sample_size
+        if 0 < prop_sample < 1:
+            sample_n = 1
+        else:
+            sample_n = int(round(prop_sample))
 
-    def sample_group(group):
-        return group.sample(n=max(1, int(len(group) * frac)), random_state=42)
+        sampling_plan.append({
+            'Scenario': scenario,
+            'Analyst': analyst,
+            'Sample Size': sample_n
+        })
 
-    return df.groupby(strata, group_keys=False).apply(sample_group)
+# Convert to DataFrame
+sampling_df = pd.DataFrame(sampling_plan)
 
-def main():
-    # Load alert data
-    df = load_csv(FILE_PATH)
+# Merge with original data to pull sample
+sampled_rows = []
 
-    # Define your date range for filtering
-    start_date = "2025-05-25"
-    end_date = "2025-05-27"
+for _, row in sampling_df.iterrows():
+    scenario = row['Scenario']
+    analyst = row['Analyst']
+    sample_size = row['Sample Size']
 
-    # Filter by closing date
-    df_filtered = filter_alerts(df, start_date, end_date)
+    subset = df[(df['Name'] == scenario) & (df['Current owner'] == analyst)]
 
-    # Perform stratified sampling
-    sample_size = 200
-    strata = ["Name", "Current owner"]
-    df_sample = stratified_sampling(df_filtered, strata, sample_size)
+    if len(subset) == 0:
+        continue
 
-    # QA summary table (optional)
-    df_summary = (
-        df_sample.groupby(strata)["Alert ID"]
-        .count()
-        .reset_index(name="QA Alerts")
-        .pivot(index="Name", columns="Current owner", values="QA Alerts")
+    sampled_subset = subset.sample(
+        n=min(sample_size, len(subset)),
+        random_state=random_seed
     )
+    sampled_rows.append(sampled_subset)
 
-    print(df_summary)
+# Combine all samples
+final_sample = pd.concat(sampled_rows)
 
-if __name__ == "__main__":
-    main()
+# Export to Excel
+final_sample.to_excel(output_excel, index=False)
+print(f"QA sample of size {len(final_sample)} saved to {output_excel}")
