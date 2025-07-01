@@ -2,21 +2,30 @@ import pandas as pd
 import numpy as np
 import math
 
-# --- CONFIGURATION ---
-input_csv = 'your_file.csv'
+# ------------------ CONFIGURATION ------------------
+input_csv = 'your_file.csv'  # <-- Replace with your actual CSV filename
 output_excel = 'qa_sample_output.xlsx'
 random_seed = 42
+# ---------------------------------------------------
 
-# Load data
+print("📂 Step 1: Loading CSV data...")
 df = pd.read_csv(input_csv)
 
-# Clean-up if needed
-df = df.dropna(subset=['Name', 'Current owner'])  # Remove rows missing key data
+# Initial stats
+print(f"✅ Loaded {len(df)} rows from '{input_csv}'")
 
-# Total number of alerts
+# Drop rows missing key information
+print("🧹 Step 2: Cleaning data...")
+initial_rows = len(df)
+df = df.dropna(subset=['Name', 'Current owner'])  # Remove incomplete rows
+removed_rows = initial_rows - len(df)
+print(f"🧹 Removed {removed_rows} rows due to missing 'Name' or 'Current owner'")
+
+# Total alerts
 total_alerts = len(df)
+print(f"📊 Step 3: Total number of valid closed alerts: {total_alerts}")
 
-# Define function to determine sample size
+# Define function to determine sample size based on population
 def get_sample_size(n):
     if n <= 500:
         return 65
@@ -31,33 +40,43 @@ def get_sample_size(n):
     elif n <= 15000:
         return 275
     else:
-        return 275  # Can adjust if needed
+        return 275
 
-# Get total sample size from mapping
+# Get recommended sample size
+print("📐 Step 4: Determining recommended sample size...")
 total_sample_size = get_sample_size(total_alerts)
+print(f"🎯 Recommended total sample size (based on {total_alerts} alerts): {total_sample_size}")
 
-# Calculate number of alerts per scenario
+# Step 5: Count alerts per scenario (Name)
+print("📂 Step 5: Calculating alert counts per scenario...")
 scenario_counts = df['Name'].value_counts().to_dict()
-scenario_sample_targets = {
-    scenario: (count / total_alerts) * total_sample_size
-    for scenario, count in scenario_counts.items()
-}
 
-# Create sampling plan per analyst per scenario
+# Step 6: Determine sample size per scenario
+print("🧮 Step 6: Calculating sample size target per scenario...")
+scenario_sample_targets = {}
+for scenario, count in scenario_counts.items():
+    target = (count / total_alerts) * total_sample_size
+    scenario_sample_targets[scenario] = target
+    print(f"  📌 Scenario '{scenario}': {count} alerts -> Target sample: {round(target, 2)}")
+
+# Step 7: Create sampling plan per analyst per scenario
+print("📋 Step 7: Calculating proportional sample per analyst in each scenario...")
 sampling_plan = []
 
 for scenario, scenario_total in scenario_counts.items():
     scenario_sample_size = scenario_sample_targets[scenario]
-
     sub_df = df[df['Name'] == scenario]
     analyst_counts = sub_df['Current owner'].value_counts()
 
     for analyst, analyst_count in analyst_counts.items():
+        # Calculate proportional sample size for this analyst
         prop_sample = (analyst_count / scenario_total) * scenario_sample_size
         if 0 < prop_sample < 1:
             sample_n = 1
         else:
             sample_n = int(round(prop_sample))
+
+        print(f"    🧑 Analyst '{analyst}' in scenario '{scenario}': {analyst_count} alerts -> Sample: {sample_n}")
 
         sampling_plan.append({
             'Scenario': scenario,
@@ -65,10 +84,12 @@ for scenario, scenario_total in scenario_counts.items():
             'Sample Size': sample_n
         })
 
-# Convert to DataFrame
+# Convert plan to DataFrame
 sampling_df = pd.DataFrame(sampling_plan)
+print(f"✅ Created sampling plan with {len(sampling_df)} analyst-scenario combinations.")
 
-# Merge with original data to pull sample
+# Step 8: Sample alerts
+print("🎲 Step 8: Randomly sampling alerts per analyst-scenario...")
 sampled_rows = []
 
 for _, row in sampling_df.iterrows():
@@ -79,17 +100,25 @@ for _, row in sampling_df.iterrows():
     subset = df[(df['Name'] == scenario) & (df['Current owner'] == analyst)]
 
     if len(subset) == 0:
+        print(f"⚠️ Skipping: No alerts for analyst '{analyst}' in scenario '{scenario}'")
         continue
 
-    sampled_subset = subset.sample(
-        n=min(sample_size, len(subset)),
-        random_state=random_seed
-    )
+    sample_n = min(sample_size, len(subset))
+    sampled_subset = subset.sample(n=sample_n, random_state=random_seed)
     sampled_rows.append(sampled_subset)
 
-# Combine all samples
-final_sample = pd.concat(sampled_rows)
+    print(f"    🎯 Sampled {sample_n} alert(s) for analyst '{analyst}' in scenario '{scenario}'")
 
-# Export to Excel
+# Combine all sampled alerts
+print("📦 Step 9: Compiling all sampled alerts into one dataset...")
+final_sample = pd.concat(sampled_rows)
+print(f"✅ Final QA sample size: {len(final_sample)} alerts")
+
+# Step 10: Export to Excel
+print(f"💾 Step 10: Saving QA sample to '{output_excel}'...")
 final_sample.to_excel(output_excel, index=False)
-print(f"QA sample of size {len(final_sample)} saved to {output_excel}")
+print("✅ Done! QA sample saved successfully.")
+
+# Optional: Export sampling plan too
+sampling_df.to_excel("qa_sampling_plan_summary.xlsx", index=False)
+print("📝 Sampling plan summary saved to 'qa_sampling_plan_summary.xlsx'")
