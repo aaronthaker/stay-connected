@@ -1,167 +1,17 @@
-from datetime import datetime
-import pandas as pd
-from pathlib import Path
-import math
-
-# Constants (original SAMPLE_FRAC and SAMPLE_MAX no longer used; using mapping logic instead)
-SAMPLE_FRAC: float = 0.05   # not used, sampling now based on mapping table
-SAMPLE_MAX: int = 200       # not used, sample size determined by mapping guidelines
-
-START_DATE: str = "2025-05-25"
-END_DATE: str = "2025-05-27"
-
-FILE_PATH = Path(r"T:\99_Personal_Working_Folders\DS\QA\closed_alerts.csv")  # path to the CSV file
-
 def load_csv(path: Path, date_cols: list[str]) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(f"File not found: {path}")
     df = pd.read_csv(path, skiprows=[0], header=0)
-    # Clean data - strip whitespaces and parse specified date columns
     df.columns = df.columns.str.strip()
     if not date_cols:
         raise ValueError("Expect at least one date column but none were provided")
+    
     for col in date_cols:
-        df[col] = pd.to_datetime(df[col].str.strip(), format="%d/%m/%Y %H:%M:%S %z", utc=True, errors="raise")
+        # Remove ' UTC' suffix, strip whitespace, then parse
+        df[col] = pd.to_datetime(
+            df[col].str.replace(" UTC", "", regex=False).str.strip(),
+            format="%d/%m/%Y %H:%M:%S",
+            dayfirst=True,
+            errors="raise"
+        ).dt.tz_localize("UTC")  # manually set timezone
     return df
-
-def filter_alerts(df: pd.DataFrame, start_date: str, end_date: str) -> pd.DataFrame:
-    start_dt = pd.to_datetime(start_date).tz_localize("UTC")
-    end_dt = pd.to_datetime(end_date).tz_localize("UTC")
-    # Filter alerts closed in [start_date, end_date)
-    return df[(df["Closing date"] >= start_dt) & (df["Closing date"] < end_dt)]
-
-def determine_total_sample_size(total_alerts: int) -> int:
-    """Determine total QA sample size based on total_alerts using predefined mapping ranges (linear interpolation)."""
-    if total_alerts <= 0:
-        return 0
-    # Population brackets and recommended sample size ranges (from guidelines)
-    brackets = [
-        (1, 500,    50,  80),   # 0-500 alerts -> ~50-80 sample
-        (501, 1000, 80,  100),  # 501-1,000 -> ~80-100 sample
-        (1001, 2500, 100, 120), # 1,001-2,500 -> ~100-120 sample
-        (2501, 5000, 120, 180), # 2,501-5,000 -> ~120-180 sample
-        (5001, 10000, 180, 250),# 5,001-10,000 -> ~180-250 sample
-        (10001, 15000, 250, 300)# 10,001-15,000 -> ~250-300 sample
-    ]
-    rec_sample = None
-    for (low, high, sample_low, sample_high) in brackets:
-        if total_alerts >= low and total_alerts <= high:
-            # Interpolate within this bracket
-            ratio = (total_alerts - low) / (high - low) if high > low else 0
-            rec_sample = sample_low + ratio * (sample_high - sample_low)
-            break
-    if rec_sample is None:
-        # Above the highest bracket – cap at 300 (maximum recommended)
-        rec_sample = 300
-    # Round to nearest whole number (round half up). Ensure at least 1 if any alerts exist.
-    total_sample = math.floor(rec_sample + 0.5)
-    if total_sample < 1 and total_alerts > 0:
-        total_sample = 1
-    # Do not exceed total_alerts
-    return min(total_sample, total_alerts)
-
-def stratified_sampling(df: pd.DataFrame, strata: list[str]) -> pd.DataFrame:
-    if not strata:
-        raise ValueError("Expect at least one strata but none were provided")
-    total_alerts = len(df)
-    total_sample = determine_total_sample_size(total_alerts)
-    if total_sample == 0:
-        # No alerts in the dataset or date range
-        return df.iloc[0:0]
-
-    # 1. Allocate samples per Scenario (Name)
-    scenario_counts = df.groupby("Name")["Alert ID"].count()
-    scenario_sample_counts = {}
-    for scenario, scen_count in scenario_counts.items():
-        # Proportion of total sample for this scenario
-        fraction = (scen_count * total_sample) / total_alerts
-        n_scenario = 1 if (0 < fraction < 1) else math.floor(fraction + 0.5)
-        # Cap at total alerts in scenario (just a safety check)
-        scenario_sample_counts[scenario] = min(n_scenario, scen_count)
-
-    # 2. Allocate samples per Analyst within each Scenario
-    scenario_analyst_counts = df.groupby(["Name", "Current owner"])["Alert ID"].count()
-    scenario_analyst_sample_counts = {}
-    for (scenario, analyst), count in scenario_analyst_counts.items():
-        scen_total = scenario_counts[scenario]
-        scen_sample = scenario_sample_counts.get(scenario, 0)
-        if scen_total == 0 or scen_sample == 0:
-            n_sa = 0
-        else:
-            fraction = (count * scen_sample) / scen_total
-            n_sa = 1 if (0 < fraction < 1) else math.floor(fraction + 0.5)
-        scenario_analyst_sample_counts[(scenario, analyst)] = min(n_sa, count)
-
-    # 3. Allocate samples per Month for each Scenario-Analyst
-    scenario_analyst_month_counts = df.groupby(["Name", "Current owner", "Month"])["Alert ID"].count()
-    sample_selection_counts = {}  # final counts per (scenario, analyst, month)
-    for (scenario, analyst, month), count in scenario_analyst_month_counts.items():
-        analyst_total = scenario_analyst_counts[(scenario, analyst)]
-        analyst_sample = scenario_analyst_sample_counts.get((scenario, analyst), 0)
-        if analyst_total == 0 or analyst_sample == 0:
-            n_month = 0
-        else:
-            fraction = (count * analyst_sample) / analyst_total
-            n_month = 1 if (0 < fraction < 1) else math.floor(fraction + 0.5)
-        sample_selection_counts[(scenario, analyst, month)] = min(n_month, count)
-
-    # 4. Perform random sampling based on the computed allocations
-    sampled_dfs = []
-    for keys, group in df.groupby(strata):
-        # Ensure keys is a tuple (Name, Current owner, Month)
-        key_tuple = keys if isinstance(keys, tuple) else (keys,)
-        sample_n = sample_selection_counts.get(tuple(key_tuple), 0)
-        if sample_n <= 0:
-            continue  # no sample for this group
-        # Sample the required number of alerts from this group (randomly)
-        sampled_group = group.copy() if sample_n >= len(group) else group.sample(n=sample_n, random_state=1)
-        sampled_dfs.append(sampled_group)
-    return pd.concat(sampled_dfs, ignore_index=True) if sampled_dfs else df.iloc[0:0]
-
-def output_to_excel(df: pd.DataFrame, date_cols: list[str]):
-    if not date_cols:
-        raise ValueError("Expect at least one date column but none were provided")
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    output_filename = f"QA_Sample_{timestamp}.xlsx"
-    df_out = df.copy()
-    # Remove timezone from datetime columns for readability
-    for col in date_cols:
-        if col in df_out.columns:
-            df_out[col] = df_out[col].dt.tz_localize(None)
-    # Ensure Month column is present as string (not as Timestamp or Period)
-    if "Month" in df_out.columns:
-        df_out["Month"] = df_out["Month"].astype(str)
-    df_out.to_excel(output_filename, index=False)
-    print(f"\nSample results have been saved to '{output_filename}' in the current directory.")
-
-def print_breakdown(df_all: pd.DataFrame, df_sample: pd.DataFrame, strata: list[str]):
-    if not strata:
-        raise ValueError("Expect at least one strata but none were provided")
-    # Use scenario and analyst for breakdown (exclude month)
-    breakdown_strata = [s for s in strata if s.lower() != "month"]
-    df_counts = df_all.groupby(breakdown_strata)["Alert ID"].count().reset_index(name="Total Alerts")
-    df_sample_counts = df_sample.groupby(breakdown_strata)["Alert ID"].count().reset_index(name="QA Alerts")
-    summary_df = pd.merge(df_counts, df_sample_counts, on=breakdown_strata, how="left")
-    summary_df["QA Alerts"] = summary_df["QA Alerts"].fillna(0).astype(int)
-    summary_df["QA Alerts / Total"] = summary_df["QA Alerts"].astype(str) + " / " + summary_df["Total Alerts"].astype(str)
-    # Pivot to Scenario vs Analyst matrix for clarity
-    if {"Name", "Current owner"}.issubset(breakdown_strata):
-        summary_pivot = summary_df.pivot(index="Name", columns="Current owner", values="QA Alerts / Total").fillna("0 / 0")
-    else:
-        summary_pivot = summary_df  # fallback for other strata combinations
-    print(summary_pivot)
-
-def main():
-    # Define which date columns to parse (exclude 'Content date' due to multiple timestamps in one cell)
-    date_columns = ["Creation date", "Closing date"]
-    strata = ["Name", "Current owner", "Month"]  # include month in stratification
-    df = load_csv(FILE_PATH, date_columns)
-    df_filtered = filter_alerts(df, start_date=START_DATE, end_date=END_DATE)
-    # Add Month column (YYYY-MM) derived from Closing date for monthly stratification
-    df_filtered["Month"] = df_filtered["Closing date"].dt.strftime("%Y-%m")
-    df_sample = stratified_sampling(df_filtered, strata)
-    output_to_excel(df_sample, date_columns)
-    print_breakdown(df_filtered, df_sample, strata)
-
-if __name__ == "__main__":
-    main()
