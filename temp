@@ -1,32 +1,23 @@
-from datetime import datetime
-import pandas as pd
-from pathlib import Path
-import math
-
-START_DATE: str = "2025-05-25"
-END_DATE: str = "2025-05-27"
-FILE_PATH = Path(r"T:\99_Personal_Working_Folders\DS\QA\closed_alerts.csv")
-
-
-def load_csv(path: Path, date_cols: list[str]) -> pd.DataFrame:
-    if not path.exists():
-        raise FileNotFoundError(f"File not found: {path}")
-    df = pd.read_csv(path, skiprows=[0], header=0)
-    df.columns = df.columns.str.strip()
-    if not len(date_cols):
-        raise ValueError("Expect at least one date column but none were provided")
-    for col in date_cols:
-        df[col] = pd.to_datetime(df[col].str.strip(), format="%d/%m/%Y %H:%M:%S %z", utc=True, errors="raise")
-    return df
-
-
-def filter_alerts(df: pd.DataFrame, start_date: str, end_date: str) -> pd.DataFrame:
-    start_date = pd.to_datetime(start_date).tz_localize("UTC")
-    end_date = pd.to_datetime(end_date).tz_localize("UTC")
-    return df[(df["Closing date"] >= start_date) & (df["Closing date"] < end_date)]
-
-
 def determine_sample_size(n: int) -> int:
+    """
+    Determine the QA sample size based on the total number of closed alerts.
+
+    The function returns a fixed sample size based on population size ranges,
+    following Glencore's specified thresholds:
+
+        - 0–500 alerts      → 65 samples
+        - 501–1000 alerts   → 90 samples
+        - 1001–2500 alerts  → 110 samples
+        - 2501–5000 alerts  → 150 samples
+        - 5001–10000 alerts → 215 samples
+        - 10001+ alerts     → 275 samples
+
+    Parameters:
+        n (int): The total number of closed alerts in the population.
+
+    Returns:
+        int: The corresponding fixed sample size for QA review.
+    """
     if n <= 500:
         return 65
     elif n <= 1000:
@@ -39,69 +30,3 @@ def determine_sample_size(n: int) -> int:
         return 215
     else:
         return 275
-
-
-def proportional_allocation(df: pd.DataFrame) -> pd.DataFrame:
-    total_alerts = len(df)
-    sample_size = determine_sample_size(total_alerts)
-
-    # Add Closing Month as a new column for stratification
-    df["Closing Month"] = df["Closing date"].dt.to_period("M").astype(str)
-
-    allocations = []
-    
-    # Group by Scenario
-    for scenario, scenario_df in df.groupby("Name"):
-        scenario_total = len(scenario_df)
-        scenario_sample = max(1, round((scenario_total / total_alerts) * sample_size))
-
-        # Group by Analyst (Current owner) within the scenario
-        for (analyst, month), analyst_df in scenario_df.groupby(["Current owner", "Closing Month"]):
-            analyst_total = len(analyst_df)
-            analyst_sample = math.ceil((analyst_total / scenario_total) * scenario_sample)
-
-            # Sample that many rows randomly from this group
-            sampled = analyst_df.sample(n=min(analyst_sample, len(analyst_df)), random_state=1)
-            allocations.append(sampled)
-
-    return pd.concat(allocations)
-
-
-def output_to_excel(df: pd.DataFrame, date_cols: list[str]):
-    if not len(date_cols):
-        raise ValueError("Expect at least one date column but none were provided")
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    output_filename = f"QA_Sample_{timestamp}.xlsx"
-    df_sample_excel = df.copy()
-    for col in date_cols:
-        df_sample_excel[col] = df_sample_excel[col].dt.tz_localize(None)
-    df_sample_excel.to_excel(output_filename, index=False)
-    print(f"\nSample results have been saved to document '{output_filename}' in the current directory.")
-
-
-def print_breakdown(df_all: pd.DataFrame, df_sample: pd.DataFrame, strata: list[str]):
-    if not len(strata):
-        raise ValueError("Expect at least one strata but none were provided")
-    df_counts = df_all.groupby(strata)["Alert ID"].count().reset_index(name="Total Alerts")
-    df_sample_counts = df_sample.groupby(strata)["Alert ID"].count().reset_index(name="QA Alerts")
-    summary_df = pd.merge(df_counts, df_sample_counts, on=strata, how="left")
-    summary_df["QA Alerts"].fillna(0, inplace=True)
-    summary_df["QA Alerts"] = summary_df["QA Alerts"].astype(int)
-    summary_df["QA Taken / Total"] = summary_df["QA Alerts"].astype(str) + " / " + summary_df["Total Alerts"].astype(str)
-    summary_pivot = summary_df.pivot_table(index="Name", columns="Current owner", values="QA Taken / Total", aggfunc="first").fillna("0 / 0")
-    print(summary_pivot)
-
-
-def main():
-    date_columns = ["Creation date", "Closing date"]
-    strata = ["Name", "Current owner", "Closing Month"]
-
-    df = load_csv(FILE_PATH, date_columns)
-    df_filtered = filter_alerts(df, start_date=START_DATE, end_date=END_DATE)
-    df_sample = proportional_allocation(df_filtered)
-    output_to_excel(df_sample, date_columns)
-    print_breakdown(df_filtered, df_sample, strata)
-
-
-if __name__ == "__main__":
-    main()
