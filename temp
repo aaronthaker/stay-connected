@@ -1,25 +1,46 @@
 import PyPDF2
-import difflib
 
-def extract_text_from_pdf(file_path):
-    with open(file_path, 'rb') as file:
-        reader = PyPDF2.PdfReader(file)
-        text = ''
-        for page in reader.pages:
+def extract_text_from_pdf(pdf_path):
+    with open(pdf_path, 'rb') as file:
+        # Create a PDF reader
+        pdf_reader = PyPDF2.PdfReader(file)
+        
+        # Initialize text variable
+        text = ""
+        
+        # Iterate over all the pages and extract text
+        for page in pdf_reader.pages:
             text += page.extract_text()
+
     return text
 
-def print_differences(text1, text2):
-    diff = difflib.unified_diff(text1.splitlines(), text2.splitlines(), lineterm='')
-    for line in diff:
-        print(line)
+def compare_text_lines(text1, text2):
+    lines1 = text1.splitlines()
+    lines2 = text2.splitlines()
 
-def main(pdf1_path, pdf2_path):
-    text1 = extract_text_from_pdf(pdf1_path)
-    text2 = extract_text_from_pdf(pdf2_path)
-    print_differences(text1, text2)
+    # Print lines from text1 that are different or missing in text2
+    print("Lines in March documentation that are different or missing in April documentation:")
+    for line in lines1:
+        if line not in lines2:
+            print("- " + line)
+    
+    # Print lines from text2 that are different or missing in text1
+    print("\nLines in April documentation that are different or missing in March documentation:")
+    for line in lines2:
+        if line not in lines1:
+            print("- " + line)
 
-# Example usage:
-pdf1_path = 'file1.pdf'
-pdf2_path = 'file2.pdf'
-main(pdf1_path, pdf2_path)
+def main():
+    # Paths to your PDF files
+    march_pdf_path = 'MarchDocumentation.pdf'
+    april_pdf_path = 'AprilDocumentation.pdf'
+
+    # Extract text from the PDFs
+    march_text = extract_text_from_pdf(march_pdf_path)
+    april_text = extract_text_from_pdf(april_pdf_path)
+
+    # Compare text lines between the two PDFs
+    compare_text_lines(march_text, april_text)
+
+if __name__ == "__main__":
+    main()
