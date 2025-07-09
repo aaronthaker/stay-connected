@@ -1,32 +1,25 @@
-def determine_sample_size(n: int) -> int:
-    """
-    Determine the QA sample size based on the total number of closed alerts.
+import PyPDF2
+import difflib
 
-    The function returns a fixed sample size based on population size ranges,
-    following Glencore's specified thresholds:
+def extract_text_from_pdf(file_path):
+    with open(file_path, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        text = ''
+        for page in reader.pages:
+            text += page.extract_text()
+    return text
 
-        - 0–500 alerts      → 65 samples
-        - 501–1000 alerts   → 90 samples
-        - 1001–2500 alerts  → 110 samples
-        - 2501–5000 alerts  → 150 samples
-        - 5001–10000 alerts → 215 samples
-        - 10001+ alerts     → 275 samples
+def print_differences(text1, text2):
+    diff = difflib.unified_diff(text1.splitlines(), text2.splitlines(), lineterm='')
+    for line in diff:
+        print(line)
 
-    Parameters:
-        n (int): The total number of closed alerts in the population.
+def main(pdf1_path, pdf2_path):
+    text1 = extract_text_from_pdf(pdf1_path)
+    text2 = extract_text_from_pdf(pdf2_path)
+    print_differences(text1, text2)
 
-    Returns:
-        int: The corresponding fixed sample size for QA review.
-    """
-    if n <= 500:
-        return 65
-    elif n <= 1000:
-        return 90
-    elif n <= 2500:
-        return 110
-    elif n <= 5000:
-        return 150
-    elif n <= 10000:
-        return 215
-    else:
-        return 275
+# Example usage:
+pdf1_path = 'file1.pdf'
+pdf2_path = 'file2.pdf'
+main(pdf1_path, pdf2_path)
